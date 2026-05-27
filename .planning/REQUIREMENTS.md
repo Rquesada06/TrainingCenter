@@ -135,15 +135,55 @@ Requirements mapped to phases by roadmapper.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01–05 | Phase 1 | Pending |
-| CLNT-01–05 | Phase 2 | Pending |
-| EXER-01–06 | Phase 2 | Pending |
-| ROUT-01–07 | Phase 2 | Pending |
-| PROG-01–06 | Phase 2 | Pending |
-| ASGN-01–04 | Phase 2 | Pending |
-| WORK-01–09 | Phase 3 | Pending |
-| HIST-01–04 | Phase 4 | Pending |
-| PROF-01–03 | Phase 4 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| CLNT-01 | Phase 1 | Pending |
+| CLNT-02 | Phase 2 | Pending |
+| CLNT-03 | Phase 2 | Pending |
+| CLNT-04 | Phase 2 | Pending |
+| CLNT-05 | Phase 2 | Pending |
+| EXER-01 | Phase 2 | Pending |
+| EXER-02 | Phase 2 | Pending |
+| EXER-03 | Phase 2 | Pending |
+| EXER-04 | Phase 2 | Pending |
+| EXER-05 | Phase 2 | Pending |
+| EXER-06 | Phase 2 | Pending |
+| ROUT-01 | Phase 2 | Pending |
+| ROUT-02 | Phase 2 | Pending |
+| ROUT-03 | Phase 2 | Pending |
+| ROUT-04 | Phase 2 | Pending |
+| ROUT-05 | Phase 2 | Pending |
+| ROUT-06 | Phase 2 | Pending |
+| ROUT-07 | Phase 2 | Pending |
+| PROG-01 | Phase 2 | Pending |
+| PROG-02 | Phase 2 | Pending |
+| PROG-03 | Phase 2 | Pending |
+| PROG-04 | Phase 2 | Pending |
+| PROG-05 | Phase 2 | Pending |
+| PROG-06 | Phase 2 | Pending |
+| ASGN-01 | Phase 2 | Pending |
+| ASGN-02 | Phase 2 | Pending |
+| ASGN-03 | Phase 2 | Pending |
+| ASGN-04 | Phase 2 | Pending |
+| WORK-01 | Phase 3 | Pending |
+| WORK-02 | Phase 3 | Pending |
+| WORK-03 | Phase 3 | Pending |
+| WORK-04 | Phase 3 | Pending |
+| WORK-05 | Phase 3 | Pending |
+| WORK-06 | Phase 3 | Pending |
+| WORK-07 | Phase 3 | Pending |
+| WORK-08 | Phase 3 | Pending |
+| WORK-09 | Phase 3 | Pending |
+| HIST-01 | Phase 4 | Pending |
+| HIST-02 | Phase 4 | Pending |
+| HIST-03 | Phase 4 | Pending |
+| HIST-04 | Phase 4 | Pending |
+| PROF-01 | Phase 4 | Pending |
+| PROF-02 | Phase 4 | Pending |
+| PROF-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 42 total
@@ -152,4 +192,4 @@ Requirements mapped to phases by roadmapper.
 
 ---
 *Requirements defined: 2026-05-27*
-*Last updated: 2026-05-27 after initial definition*
+*Last updated: 2026-05-27 — phase mappings added by roadmapper*
