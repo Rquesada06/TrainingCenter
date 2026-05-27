@@ -1,0 +1,155 @@
+# Requirements: LauFit
+
+**Defined:** 2026-05-27
+**Core Value:** The trainer can create a program and assign it to a client in under 3 minutes — if that flow is fast and reliable, trainers will adopt the tool.
+
+## v1 Requirements
+
+### Authentication
+
+- [ ] **AUTH-01**: Trainer can log in with email and password
+- [ ] **AUTH-02**: Client can log in with email and password
+- [ ] **AUTH-03**: Both roles stay logged in across app restarts (persistent session)
+- [ ] **AUTH-04**: User can request password reset via email link
+- [ ] **AUTH-05**: App shows appropriate screen on cold start without flashing login (auth race condition guard)
+
+### Client Management (Trainer)
+
+- [ ] **CLNT-01**: Trainer can create a client account (name, email, temporary password) — via Cloud Function (Admin SDK)
+- [ ] **CLNT-02**: Trainer can view a list of their clients showing name, photo, active program, and adherence percentage
+- [ ] **CLNT-03**: Trainer can tap a client to view their profile: active program, start date, and session history
+- [ ] **CLNT-04**: Trainer can edit a client's name and photo
+- [ ] **CLNT-05**: Client list shows a visual indicator when a client has no active program
+
+### Exercise Library (Trainer)
+
+- [ ] **EXER-01**: Trainer can create an exercise with: name, description, category (strength/cardio/functional/hypertrophy/HIIT/mobility), location type (gym/home/both), default sets, default reps, default duration (seconds), default rest (seconds), video URL (YouTube/Vimeo), image URL
+- [ ] **EXER-02**: Trainer can edit any exercise in their library
+- [ ] **EXER-03**: Trainer can delete an exercise from their library
+- [ ] **EXER-04**: Trainer can search exercises by name with instant results (no submit required)
+- [ ] **EXER-05**: Trainer can filter exercises by location type (gym/home/both) and by category
+- [ ] **EXER-06**: Exercises belong to the trainer who created them and are not visible to other trainers
+
+### Routine Builder (Trainer)
+
+- [ ] **ROUT-01**: Trainer can create a named routine by selecting exercises from their library
+- [ ] **ROUT-02**: Trainer can override default sets/reps/duration/rest per exercise within a routine
+- [ ] **ROUT-03**: Trainer can add notes to an exercise within a routine
+- [ ] **ROUT-04**: Trainer can reorder exercises in a routine via drag and drop
+- [ ] **ROUT-05**: Trainer can define a gym/home alternative for an exercise within a routine (alternativeExerciseId cross-reference)
+- [ ] **ROUT-06**: Trainer can edit and delete routines
+- [ ] **ROUT-07**: Trainer can view a list of all their routines
+
+### Program Builder (Trainer)
+
+- [ ] **PROG-01**: Trainer can create a program with: name, description, duration in weeks
+- [ ] **PROG-02**: Trainer can assign a routine to each day of a program (Lun–Dom × N weeks, or Day 1–N)
+- [ ] **PROG-03**: Trainer can mark specific days as rest days
+- [ ] **PROG-04**: Days with no assigned routine default to rest
+- [ ] **PROG-05**: Trainer can edit and delete programs
+- [ ] **PROG-06**: Trainer can view a list of all their programs
+
+### Program Assignment (Trainer)
+
+- [ ] **ASGN-01**: Trainer can assign a program to a client with a start date
+- [ ] **ASGN-02**: When assigning, if the client already has an active program, trainer sees a warning before overwriting
+- [ ] **ASGN-03**: On assignment, the full program (with all routine and exercise data) is copied as an immutable snapshot — editing the original program does not affect active clients
+- [ ] **ASGN-04**: The system calculates the client's current workout day from start date and client's local timezone using date-only string comparison (not Timestamp arithmetic)
+
+### Client Workout Execution
+
+- [ ] **WORK-01**: Client's home screen shows today's workout on open — no additional navigation required
+- [ ] **WORK-02**: Home screen has four explicit states: (1) no program assigned, (2) program starts in N days, (3) rest day with motivational message, (4) active workout with exercise list
+- [ ] **WORK-03**: Client can view exercise detail: name, description, sets × reps / duration, rest, trainer notes, embedded video or image
+- [ ] **WORK-04**: Client can mark each exercise as completed with a checkbox
+- [ ] **WORK-05**: Client can toggle gym/home mode at the session level — exercises with alternatives switch their variant; toggle choice persists for the session
+- [ ] **WORK-06**: Client can tap "Finish Workout" when all exercises are marked complete (or manually bypass)
+- [ ] **WORK-07**: Completing a session shows a celebration/summary screen and saves the session to Firestore
+- [ ] **WORK-08**: In-progress session state is saved locally (AsyncStorage) so a crash or app close does not lose progress; app offers to resume on next open
+- [ ] **WORK-09**: App prevents creating a duplicate session if client already completed today's workout
+
+### Session History
+
+- [ ] **HIST-01**: Client can view a paginated list of their completed sessions (date, routine name, status: completed/partial)
+- [ ] **HIST-02**: Client can tap a session to see which exercises were completed
+- [ ] **HIST-03**: Trainer can view a paginated list of a specific client's sessions (from the client profile screen)
+- [ ] **HIST-04**: Trainer's client list card shows adherence percentage (sessions completed / sessions programmed)
+
+### Profile
+
+- [ ] **PROF-01**: Client can view and edit their name and profile photo
+- [ ] **PROF-02**: Trainer can view and edit their own name and profile photo
+- [ ] **PROF-03**: Profile photos stored in Firebase Storage; loaded with caching (expo-image)
+
+---
+
+## v2 Requirements
+
+### Workout Enhancement
+
+- **WORK-V2-01**: Client can log actual weight and reps per set during workout execution (per-set performance logging)
+- **WORK-V2-02**: Rest timer between sets (configurable duration, Reanimated on UI thread)
+- **WORK-V2-03**: Client can leave a note on a completed session
+
+### Progress Tracking
+
+- **PROG-V2-01**: Trainer and client can view weight/reps progression charts per exercise over time (requires per-set logging data)
+- **PROG-V2-02**: Training streak counter (consecutive days trained)
+- **PROG-V2-03**: Workout volume tracking per muscle group
+
+### Trainer Tools
+
+- **TRNR-V2-01**: Trainer can add notes to a client's session after the fact
+- **TRNR-V2-02**: Calendar view of a client's program (monthly)
+- **TRNR-V2-03**: Trainer can duplicate/template programs across clients
+
+### Notifications
+
+- **NOTF-V2-01**: Push notification to client: "You have a workout today"
+- **NOTF-V2-02**: Push notification to trainer when client completes a session
+
+---
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| In-app chat / messaging | High complexity; not core to workout delivery for MVP |
+| Nutrition tracking | Out of MVP scope — separate product problem |
+| In-app payments / subscriptions | Post-MVP monetization (Phase 8) |
+| Wearables / Apple Health / Google Fit | Phase 8 — too complex for MVP |
+| Custom video upload | MVP uses external links (YouTube/Vimeo) to avoid storage costs |
+| Multi-language | English only for MVP |
+| Advanced analytics | Deferred to Phase 6 (requires per-set data first) |
+| Multi-trainer / gym admin | Start with single trainer (Lau), scale to multi-trainer post-MVP |
+| Public program marketplace | Post-MVP monetization |
+| AI-generated workouts | Out of scope |
+| Body measurements / progress photos | Post-MVP |
+| Client self-registration | MVP uses trainer-creates-account flow for simplicity |
+
+---
+
+## Traceability
+
+Requirements mapped to phases by roadmapper.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| AUTH-01–05 | Phase 1 | Pending |
+| CLNT-01–05 | Phase 2 | Pending |
+| EXER-01–06 | Phase 2 | Pending |
+| ROUT-01–07 | Phase 2 | Pending |
+| PROG-01–06 | Phase 2 | Pending |
+| ASGN-01–04 | Phase 2 | Pending |
+| WORK-01–09 | Phase 3 | Pending |
+| HIST-01–04 | Phase 4 | Pending |
+| PROF-01–03 | Phase 4 | Pending |
+
+**Coverage:**
+- v1 requirements: 42 total
+- Mapped to phases: 42
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-05-27*
+*Last updated: 2026-05-27 after initial definition*
