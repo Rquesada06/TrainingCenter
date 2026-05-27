@@ -29,7 +29,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. App shows a splash screen (not a flash of the login screen) on cold start until Firebase fires the first auth event
   4. Trainer can trigger a password reset email from the login screen
   5. Trainer can create a new client account via the createClientAccount Cloud Function and that client can immediately log in
-**Plans**: TBD
+**Plans**: 4 plans (3 waves)
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold, dependency install, EAS + Firebase + NativeWind config, shared user types (Wave 1)
+- [ ] 01-02-PLAN.md — Zustand authStore, Firebase auth listener, SplashScreen + Stack.Protected root layout, role shells (Wave 2)
+- [ ] 01-03-PLAN.md — Sign-in screen (RHF + zod), password reset, Obsidian Performance UI (Wave 3)
+- [ ] 01-04-PLAN.md — createClientAccount Cloud Function (v1 onCall), Firestore security rules, composite indexes (Wave 2)
 
 ### Phase 2: Trainer Content Creation
 **Goal**: The trainer can build an exercise library, compose routines from those exercises, assemble multi-week programs from those routines, and assign a complete program snapshot to a client — the full content pipeline that makes client workout delivery possible.
@@ -77,7 +82,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure + Auth | 0/TBD | Not started | - |
+| 1. Infrastructure + Auth | 0/4 | Not started | - |
 | 2. Trainer Content Creation | 0/TBD | Not started | - |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |
