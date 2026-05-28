@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans (3 waves)Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Project scaffold, dependency install, EAS + Firebase + NativeWind config, shared user types (Wave 1)
+- [x] 01-01-PLAN.md — Project scaffold, dependency install, EAS + Firebase + NativeWind config, shared user types (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure + Auth | 0/4 | Not started | - |
+| 1. Infrastructure + Auth | 1/4 | In Progress|  |
 | 2. Trainer Content Creation | 0/TBD | Not started | - |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |

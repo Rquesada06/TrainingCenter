@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-27T20:09:03.634Z"
-last_activity: 2026-05-27 -- Phase 1 planning complete
+last_updated: "2026-05-28T14:58:48.661Z"
+last_activity: 2026-05-28
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Trainer can create a program and assign it to a client in under 3 minutes
-**Current focus:** Phase 1 — Infrastructure + Auth
+**Current focus:** Phase 01 — infrastructure-auth
 
 ## Current Position
 
-Phase: 1 of 4 (Infrastructure + Auth)
-Plan: 0 of TBD in current phase
+Phase: 01 (infrastructure-auth) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-05-27 -- Phase 1 planning complete
+Last activity: 2026-05-28
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 25%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01-infrastructure-auth P01 | 8 | 3 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,9 @@ Recent decisions affecting current work:
 - Phase 1: Store `startDate` as YYYY-MM-DD string (not Timestamp) to prevent timezone bugs
 - Phase 2: Assignment uses a deep-copy snapshot transaction — trainer edits never affect active clients
 - Phase 3: Session state in Zustand + AsyncStorage; single Firestore batch write on finalize only
+- [Phase ?]: react-native-firebase v24.0.0 chosen — latest stable compatible with Expo SDK 55 / RN 0.83 New Architecture
+- [Phase ?]: tailwindcss pinned to ^3.x — NativeWind v4 requires Tailwind v3; v4.x silently breaks NativeWind styles
+- [Phase ?]: app.config.js is sole Expo config source — static app.json removed to eliminate expo-doctor config conflict
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-27
-Stopped at: Roadmap created and STATE.md initialized. Ready to plan Phase 1.
+Last session: 2026-05-28T14:58:48.652Z
+Stopped at: Completed 01-01-PLAN.md — scaffold, config, types, jest setup done
 Resume file: None
