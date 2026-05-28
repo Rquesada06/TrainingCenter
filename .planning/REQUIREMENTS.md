@@ -15,7 +15,7 @@
 
 ### Client Management (Trainer)
 
-- [ ] **CLNT-01**: Trainer can create a client account (name, email, temporary password) — via Cloud Function (Admin SDK)
+- [x] **CLNT-01**: Trainer can create a client account (name, email, temporary password) — via Cloud Function (Admin SDK)
 - [ ] **CLNT-02**: Trainer can view a list of their clients showing name, photo, active program, and adherence percentage
 - [ ] **CLNT-03**: Trainer can tap a client to view their profile: active program, start date, and session history
 - [ ] **CLNT-04**: Trainer can edit a client's name and photo
@@ -140,7 +140,7 @@ Requirements mapped to phases by roadmapper.
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Complete |
-| CLNT-01 | Phase 1 | Pending |
+| CLNT-01 | Phase 1 | Complete |
 | CLNT-02 | Phase 2 | Pending |
 | CLNT-03 | Phase 2 | Pending |
 | CLNT-04 | Phase 2 | Pending |
