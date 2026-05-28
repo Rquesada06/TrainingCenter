@@ -7,11 +7,11 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: Trainer can log in with email and password
-- [ ] **AUTH-02**: Client can log in with email and password
-- [ ] **AUTH-03**: Both roles stay logged in across app restarts (persistent session)
+- [x] **AUTH-01**: Trainer can log in with email and password
+- [x] **AUTH-02**: Client can log in with email and password
+- [x] **AUTH-03**: Both roles stay logged in across app restarts (persistent session)
 - [ ] **AUTH-04**: User can request password reset via email link
-- [ ] **AUTH-05**: App shows appropriate screen on cold start without flashing login (auth race condition guard)
+- [x] **AUTH-05**: App shows appropriate screen on cold start without flashing login (auth race condition guard)
 
 ### Client Management (Trainer)
 
@@ -135,11 +135,11 @@ Requirements mapped to phases by roadmapper.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Complete |
 | CLNT-01 | Phase 1 | Pending |
 | CLNT-02 | Phase 2 | Pending |
 | CLNT-03 | Phase 2 | Pending |
