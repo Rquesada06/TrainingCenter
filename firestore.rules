@@ -1,0 +1,107 @@
+rules_version = '2';
+// Source: https://firebase.google.com/docs/firestore/security/rules-fields
+// Source: https://firebase.google.com/docs/firestore/solutions/role-based-access
+//
+// LauFit Firestore Security Rules — Phase 1 Baseline
+//
+// Trust boundary: all client reads/writes pass through these server-enforced rules.
+// Admin SDK (Cloud Functions) bypasses these rules — that is intentional.
+//
+// Key protection: T-04-02 — role-elevation defense on USERS update.
+// A client cannot write { role: 'trainer' } to their own profile doc.
+// The affectedKeys().hasAny(['role', 'trainerId']) check denies the entire
+// update if those fields appear in the diff between request and resource data.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: look up the calling user's role
+    // Costs 1 Firestore read per rule evaluation — acceptable for MVP scale
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isTrainer() {
+      return isSignedIn() && userRole() == 'trainer';
+    }
+
+    function isClient() {
+      return isSignedIn() && userRole() == 'client';
+    }
+
+    // USERS collection
+    // - Clients and trainers can read their own doc
+    // - Trainers can create client docs directly (Cloud Function uses Admin SDK and bypasses rules;
+    //   this covers any future direct creation path)
+    // - Document owner can update own non-privileged fields ONLY
+    //   THE ROLE-ELEVATION DEFENSE: deny any write that touches 'role' or 'trainerId'
+    // - No one can delete their account doc via client SDK
+    match /users/{userId} {
+      // Anyone reads their own doc (both trainer and client)
+      allow read: if isSignedIn() && request.auth.uid == userId;
+
+      // Trainer creates via Cloud Function (Admin SDK bypasses this, but cover direct creation too)
+      allow create: if isTrainer();
+
+      // Document owner can update own profile BUT cannot change 'role' or 'trainerId' fields
+      // affectedKeys() returns the set of fields that differ between request and resource data
+      // hasAny(['role', 'trainerId']) returns true if any of those protected fields are in the diff
+      // The ! negation means: allow update ONLY if protected fields are NOT affected
+      allow update: if isSignedIn()
+        && request.auth.uid == userId
+        && !request.resource.data.diff(resource.data)
+              .affectedKeys()
+              .hasAny(['role', 'trainerId']);
+
+      // No client can delete their own account doc via client SDK
+      allow delete: if false;
+    }
+
+    // EXERCISES — trainer owns; read/write scoped to trainerId == self
+    // Future phases (Phase 2+) will use these rules
+    match /exercises/{exerciseId} {
+      allow read, write: if isTrainer()
+        && resource.data.trainerId == request.auth.uid;
+      allow create: if isTrainer()
+        && request.resource.data.trainerId == request.auth.uid;
+    }
+
+    // ROUTINES — trainer owns; future phases
+    match /routines/{routineId} {
+      allow read, write: if isTrainer()
+        && resource.data.trainerId == request.auth.uid;
+      allow create: if isTrainer()
+        && request.resource.data.trainerId == request.auth.uid;
+    }
+
+    // PROGRAMS — trainer owns; future phases
+    match /programs/{programId} {
+      allow read, write: if isTrainer()
+        && resource.data.trainerId == request.auth.uid;
+      allow create: if isTrainer()
+        && request.resource.data.trainerId == request.auth.uid;
+    }
+
+    // ASSIGNMENTS — trainer creates/updates; read by owning trainer OR assigned client
+    // Phase 2+ will use these rules
+    match /assignments/{assignmentId} {
+      allow create, update: if isTrainer()
+        && request.resource.data.trainerId == request.auth.uid;
+      allow read: if (isTrainer() && resource.data.trainerId == request.auth.uid)
+        || (isClient() && resource.data.clientId == request.auth.uid);
+    }
+
+    // SESSIONS — client creates/updates own; read by owning client OR the client's trainer
+    // Phase 3+ will use these rules
+    match /sessions/{sessionId} {
+      allow create, update: if isClient()
+        && request.resource.data.clientId == request.auth.uid;
+      allow read: if (isClient() && resource.data.clientId == request.auth.uid)
+        || (isTrainer() && resource.data.trainerId == request.auth.uid);
+    }
+  }
+}
