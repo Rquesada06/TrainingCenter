@@ -1,0 +1,12 @@
+// jest.config.js
+// Source: https://docs.expo.dev/develop/unit-testing/
+module.exports = {
+  preset: 'jest-expo',
+  moduleNameMapper: {
+    // Map @/* imports to src/* matching the tsconfig path alias
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@react-native-firebase/.*|nativewind)',
+  ],
+};
