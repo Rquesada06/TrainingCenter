@@ -24,7 +24,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInSchema, type SignInValues } from '@/validation/auth.schema';
-import { signIn, sendPasswordReset } from '@/firebase/auth';
+import { signIn, sendPasswordReset, signInWithGoogle } from '@/firebase/auth';
 import { TextField } from '@/components/ui/TextField';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 
@@ -54,6 +54,7 @@ export default function SignInScreen() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [resetStatus, setResetStatus] = useState<'idle' | 'sent' | 'error'>('idle');
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
 
   const {
     control,
@@ -81,6 +82,25 @@ export default function SignInScreen() {
       setAuthError(mapSignInError(code));
     } finally {
       setIsSigningIn(false);
+    }
+  };
+
+  // ── Google Sign-In handler ────────────────────────────────────────────────
+
+  const onGoogleSignIn = async () => {
+    setAuthError(null);
+    setIsGoogleSigningIn(true);
+    try {
+      await signInWithGoogle();
+      // On success — auth listener fires, authStore updates, Stack.Protected routes.
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code ?? '';
+      // User cancelled the Google picker — not an error worth showing
+      if (code !== 'SIGN_IN_CANCELLED') {
+        setAuthError('Google sign-in failed. Please try again.');
+      }
+    } finally {
+      setIsGoogleSigningIn(false);
     }
   };
 
@@ -119,7 +139,7 @@ export default function SignInScreen() {
       >
         <View className="flex-1 justify-center px-6 py-12">
           {/* Logo / brand */}
-          <Text className="text-white text-4xl font-bold mb-2 tracking-tight">LauFit</Text>
+          <Text className="text-white text-4xl font-bold mb-2 tracking-tight">TrainingCenter</Text>
           <Text className="text-[#888888] text-sm mb-10">
             Sign in to your coaching account
           </Text>
@@ -193,6 +213,21 @@ export default function SignInScreen() {
           >
             <Text className="text-[#888888] text-sm">Forgot password?</Text>
           </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="flex-row items-center my-6">
+            <View className="flex-1 h-px bg-[#444444]" />
+            <Text className="text-[#444444] text-xs mx-3">or</Text>
+            <View className="flex-1 h-px bg-[#444444]" />
+          </View>
+
+          {/* Google Sign-In — trainer only */}
+          <PrimaryButton
+            label="Continue with Google"
+            onPress={onGoogleSignIn}
+            loading={isGoogleSigningIn}
+            variant="outline"
+          />
 
           {/* Reset error state */}
           {resetStatus === 'error' ? (

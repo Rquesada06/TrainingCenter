@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach Lau | Client Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid #262626;
+        }
+        .performance-gradient {
+            background: linear-gradient(180deg, #1A1A1A 0%, #121212 100%);
+        }
+        .electric-glow {
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.1);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error": "#690005",
+                      "outline": "#849581",
+                      "surface-container-lowest": "#0e0e0e",
+                      "inverse-surface": "#e5e2e1",
+                      "on-primary": "#003911",
+                      "on-secondary": "#313030",
+                      "on-background": "#e5e2e1",
+                      "primary-fixed-dim": "#00e55b",
+                      "primary-container": "#00ff66",
+                      "tertiary-fixed": "#e5e2e1",
+                      "inverse-on-surface": "#313030",
+                      "surface-tint": "#00e55b",
+                      "primary-fixed": "#6bff83",
+                      "surface-bright": "#3a3939",
+                      "surface-container-high": "#2a2a2a",
+                      "on-secondary-fixed": "#1c1b1b",
+                      "on-tertiary-fixed": "#1c1b1b",
+                      "secondary": "#c8c6c5",
+                      "on-tertiary-fixed-variant": "#474746",
+                      "tertiary-fixed-dim": "#c8c6c5",
+                      "error-container": "#93000a",
+                      "on-surface": "#e5e2e1",
+                      "on-secondary-container": "#bab8b7",
+                      "surface-container": "#201f1f",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary-container": "#626161",
+                      "secondary-fixed-dim": "#c8c6c5",
+                      "primary": "#edffe8",
+                      "tertiary": "#fdf9f9",
+                      "on-tertiary": "#313030",
+                      "on-primary-fixed": "#002107",
+                      "surface-container-low": "#1c1b1b",
+                      "error": "#ffb4ab",
+                      "surface-dim": "#131313",
+                      "tertiary-container": "#e0dddc",
+                      "secondary-container": "#4a4949",
+                      "surface": "#131313",
+                      "on-surface-variant": "#b9ccb5",
+                      "on-primary-fixed-variant": "#00531b",
+                      "on-secondary-fixed-variant": "#474646",
+                      "background": "#131313",
+                      "outline-variant": "#3b4b3a",
+                      "surface-variant": "#353534",
+                      "inverse-primary": "#006e27",
+                      "secondary-fixed": "#e5e2e1",
+                      "surface-container-highest": "#353534",
+                      "on-primary-container": "#007128"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "40px",
+                      "unit": "8px",
+                      "container-max": "1200px",
+                      "gutter": "16px",
+                      "margin-mobile": "20px"
+              },
+              "fontFamily": {
+                      "metric-xl": ["Hanken Grotesk"],
+                      "label-caps": ["JetBrains Mono"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-lg": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "display-lg-mobile": ["Hanken Grotesk"],
+                      "body-md": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "metric-xl": ["64px", {"lineHeight": "64px", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Coach Lau Professional Headshot" class="w-full h-full object-cover" data-alt="A professional close-up headshot of a fit, athletic male fitness coach in high-performance athletic wear. The lighting is dramatic and technical, using a cinematic dark background with a soft green key light highlighting his profile. The mood is focused, authoritative, and elite, reflecting a high-end tech-noir performance aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBTWsWlmx7wSQxW-Zah1QYPy3v5hiOoEsw9FkmZ4_00HDqsQUsS4sJADVPgNvouCJVJXfHqjNHXq-2wy3-AoJjAs-JwsWUd7IDps3eoC9RFwPKHVoLQyyLIeeyjv_UWiqLeqm5vrEilLWCelPFJRZFMkblPRcAACmxEmjJ9JupN9byqA0NxeOvhRB1CsvilmcE5z2OMzOO9ed2ge4Y0Unm7d49eJFA4ItU2HTsrJurTRLX5-IwufA8WshJ4Rf-OzBm81tgbNawh7C7"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile font-bold tracking-tighter text-on-surface">COACH LAU</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-outline hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Greeting Section -->
+<section class="mb-10">
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-primary-fixed-dim uppercase tracking-widest">PERFORMANCE DASHBOARD</span>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Hola, Alex</h2>
+<p class="font-body-md text-body-md text-outline">You are 85% through your hypertrophy cycle. Consistency is key.</p>
+</div>
+</section>
+<!-- Bento Grid: Daily Metrics -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+<!-- Steps -->
+<div class="glass-panel rounded-xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="footprint">footprint</span>
+<span class="font-label-caps text-label-caps text-outline">DAILY</span>
+</div>
+<div>
+<div class="font-metric-xl text-[32px] leading-none mb-1">8,432</div>
+<div class="font-label-caps text-[10px] text-outline">STEPS / 10K GOAL</div>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-[84%]"></div>
+</div>
+</div>
+<!-- Heart Rate -->
+<div class="glass-panel rounded-xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-error" data-icon="favorite">favorite</span>
+<span class="font-label-caps text-label-caps text-outline">BPM</span>
+</div>
+<div>
+<div class="font-metric-xl text-[32px] leading-none mb-1">64</div>
+<div class="font-label-caps text-[10px] text-outline">RESTING HEART RATE</div>
+</div>
+<div class="flex items-end gap-1 h-8">
+<div class="bg-outline-variant w-full h-[40%] rounded-sm"></div>
+<div class="bg-outline-variant w-full h-[60%] rounded-sm"></div>
+<div class="bg-primary-container w-full h-[80%] rounded-sm"></div>
+<div class="bg-outline-variant w-full h-[50%] rounded-sm"></div>
+<div class="bg-outline-variant w-full h-[70%] rounded-sm"></div>
+</div>
+</div>
+<!-- Calories -->
+<div class="glass-panel rounded-xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="local_fire_department">local_fire_department</span>
+<span class="font-label-caps text-label-caps text-outline">KCAL</span>
+</div>
+<div>
+<div class="font-metric-xl text-[32px] leading-none mb-1">2,150</div>
+<div class="font-label-caps text-[10px] text-outline">NET CONSUMPTION</div>
+</div>
+<div class="flex gap-2">
+<span class="bg-surface-container-high px-2 py-0.5 rounded-full font-label-caps text-[9px] text-primary-fixed-dim border border-primary-container/20">+450 Surplus</span>
+</div>
+</div>
+<!-- Sleep -->
+<div class="glass-panel rounded-xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary" data-icon="bedtime">bedtime</span>
+<span class="font-label-caps text-label-caps text-outline">REST</span>
+</div>
+<div>
+<div class="font-metric-xl text-[32px] leading-none mb-1">7h 20m</div>
+<div class="font-label-caps text-[10px] text-outline">OPTIMAL RECOVERY</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="font-label-caps text-[10px] text-on-surface">Score: 88</div>
+<div class="h-2 w-2 rounded-full bg-primary-container animate-pulse"></div>
+</div>
+</div>
+</section>
+<!-- Main Content Area: Routine & Chart -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Featured Card: Rutina de Hoy -->
+<div class="lg:col-span-2">
+<div class="performance-gradient border border-outline-variant rounded-xl p-8 h-full flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md-mobile text-on-surface mb-2">Rutina de Hoy</h3>
+<div class="flex gap-2">
+<span class="bg-surface-container px-3 py-1 rounded-full font-label-caps text-[11px] text-outline border border-outline-variant/30 uppercase">Push Day</span>
+<span class="bg-surface-container px-3 py-1 rounded-full font-label-caps text-[11px] text-outline border border-outline-variant/30 uppercase">65 Min</span>
+</div>
+</div>
+<button class="h-12 w-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center electric-glow hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="play_arrow" data-weight="fill">play_arrow</span>
+</button>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-4 group">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/30 group-hover:border-primary-container/50 transition-colors">
+<span class="font-label-caps text-outline">01</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface">Barbell Bench Press</h4>
+<p class="font-label-caps text-[12px] text-outline">4 Sets x 8-10 Reps • RPE 8</p>
+</div>
+<span class="material-symbols-outlined text-outline/30" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/30 group-hover:border-primary-container/50 transition-colors">
+<span class="font-label-caps text-outline">02</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface">Incline Dumbbell Fly</h4>
+<p class="font-label-caps text-[12px] text-outline">3 Sets x 12 Reps • RPE 7</p>
+</div>
+<span class="material-symbols-outlined text-outline/30" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/30 group-hover:border-primary-container/50 transition-colors">
+<span class="font-label-caps text-outline">03</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface">Overhead Press</h4>
+<p class="font-label-caps text-[12px] text-outline">3 Sets x 10 Reps • RPE 9</p>
+</div>
+<span class="material-symbols-outlined text-outline/30" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+</div>
+<button class="mt-8 w-full py-4 rounded-xl border border-outline-variant text-on-surface font-label-caps tracking-widest hover:bg-surface-container-high transition-colors">
+                        VIEW FULL WORKOUT
+                    </button>
+</div>
+</div>
+<!-- Performance Chart -->
+<div class="glass-panel rounded-xl p-6 flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-[18px] text-on-surface">Progreso de Peso</h3>
+<div class="flex gap-2">
+<button class="text-[10px] font-label-caps bg-primary-container/10 text-primary-fixed-dim px-2 py-1 rounded">1M</button>
+<button class="text-[10px] font-label-caps text-outline px-2 py-1 rounded">3M</button>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-2 relative min-h-[200px]">
+<!-- Vertical Grid Lines -->
+<div class="absolute inset-0 flex justify-between px-2">
+<div class="h-full w-[1px] bg-outline-variant/10"></div>
+<div class="h-full w-[1px] bg-outline-variant/10"></div>
+<div class="h-full w-[1px] bg-outline-variant/10"></div>
+<div class="h-full w-[1px] bg-outline-variant/10"></div>
+</div>
+<!-- Line Chart Visualization (Simplified SVG) -->
+<svg class="w-full h-full relative z-10 overflow-visible" viewbox="0 0 300 150">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#00FF66" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#00FF66" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,130 Q50,110 100,115 T200,80 T300,50" fill="transparent" stroke="#00FF66" stroke-linecap="round" stroke-width="3"></path>
+<path d="M0,130 Q50,110 100,115 T200,80 T300,50 L300,150 L0,150 Z" fill="url(#chartGradient)"></path>
+<circle cx="300" cy="50" fill="#00FF66" r="4"></circle>
+</svg>
+<div class="flex justify-between text-outline font-label-caps text-[10px]">
+<span>SEP 01</span>
+<span>SEP 15</span>
+<span>TODAY</span>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant/30 flex items-center justify-between">
+<div>
+<div class="font-label-caps text-[10px] text-outline">CURRENT WEIGHT</div>
+<div class="font-headline-md text-on-surface">82.4 kg</div>
+</div>
+<div class="text-right">
+<div class="font-label-caps text-[10px] text-outline">NET CHANGE</div>
+<div class="font-headline-md text-primary-fixed-dim">-3.2 kg</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-[0_-4px_20px_rgba(0,255,102,0.05)] md:hidden">
+<div class="flex justify-around items-center w-full h-20 pb-safe px-4">
+<div class="flex flex-col items-center justify-center text-primary-fixed-dim bg-primary-container/10 rounded-xl px-4 py-1 scale-110 duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-caps text-[10px] uppercase">Training</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline px-4 py-1 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-caps text-[10px] uppercase">Insights</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline px-4 py-1 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+<span class="font-label-caps text-[10px] uppercase">Programs</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline px-4 py-1 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-[10px] uppercase">Profile</span>
+</div>
+</div>
+</nav>
+<!-- Desktop Floating Navigation -->
+<nav class="hidden md:flex fixed top-0 left-1/2 -translate-x-1/2 z-[60] h-16 items-center px-8 gap-8 pointer-events-none">
+<div class="flex bg-surface-container/60 backdrop-blur-md rounded-full border border-outline-variant/30 p-1 pointer-events-auto">
+<a class="px-6 py-2 rounded-full font-label-caps text-label-caps text-primary-fixed-dim bg-primary-container/10 transition-all" href="#">TRAINING</a>
+<a class="px-6 py-2 rounded-full font-label-caps text-label-caps text-outline hover:text-on-surface transition-all" href="#">INSIGHTS</a>
+<a class="px-6 py-2 rounded-full font-label-caps text-label-caps text-outline hover:text-on-surface transition-all" href="#">PROGRAMS</a>
+<a class="px-6 py-2 rounded-full font-label-caps text-label-caps text-outline hover:text-on-surface transition-all" href="#">PROFILE</a>
+</div>
+</nav>
+<script>
+        // Subtle micro-interaction for cards
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Simple animation for numbers (counter effect)
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Trigger animations after load
+        window.onload = () => {
+            const stepCounter = document.querySelector('.font-metric-xl');
+            if(stepCounter) animateValue(stepCounter, 0, 8432, 1500);
+        };
+    </script>
+</body></html>

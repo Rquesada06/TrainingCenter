@@ -209,3 +209,11 @@ No blockers for Plans 02-04. EAS build requires Firebase project + secret files 
 ---
 *Phase: 01-infrastructure-auth*
 *Completed: 2026-05-28*
+
+## Self-Check: PASSED
+
+- All 12 created files verified present on disk
+- All 3 task commits verified in git log (9655c5c, 4ebc59f, 11b600b)
+- SUMMARY.md created at `.planning/phases/01-infrastructure-auth/01-01-SUMMARY.md`
+- expo-doctor: 19/19 checks passed
+- tsc --noEmit: clean

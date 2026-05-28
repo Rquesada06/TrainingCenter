@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach Lau | Elite Performance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "outline": "#849581",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-surface": "#e5e2e1",
+                    "on-primary": "#003911",
+                    "on-secondary": "#313030",
+                    "on-background": "#e5e2e1",
+                    "primary-fixed-dim": "#00e55b",
+                    "primary-container": "#00ff66",
+                    "tertiary-fixed": "#e5e2e1",
+                    "inverse-on-surface": "#313030",
+                    "surface-tint": "#00e55b",
+                    "primary-fixed": "#6bff83",
+                    "surface-bright": "#3a3939",
+                    "surface-container-high": "#2a2a2a",
+                    "on-secondary-fixed": "#1c1b1b",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "secondary": "#c8c6c5",
+                    "on-tertiary-fixed-variant": "#474746",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "error-container": "#93000a",
+                    "on-surface": "#e5e2e1",
+                    "on-secondary-container": "#bab8b7",
+                    "surface-container": "#201f1f",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#626161",
+                    "secondary-fixed-dim": "#c8c6c5",
+                    "primary": "#edffe8",
+                    "tertiary": "#fdf9f9",
+                    "on-tertiary": "#313030",
+                    "on-primary-fixed": "#002107",
+                    "surface-container-low": "#1c1b1b",
+                    "error": "#ffb4ab",
+                    "surface-dim": "#131313",
+                    "tertiary-container": "#e0dddc",
+                    "secondary-container": "#4a4949",
+                    "surface": "#131313",
+                    "on-surface-variant": "#b9ccb5",
+                    "on-primary-fixed-variant": "#00531b",
+                    "on-secondary-fixed-variant": "#474646",
+                    "background": "#131313",
+                    "outline-variant": "#3b4b3a",
+                    "surface-variant": "#353534",
+                    "inverse-primary": "#006e27",
+                    "secondary-fixed": "#e5e2e1",
+                    "surface-container-highest": "#353534",
+                    "on-primary-container": "#007128"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "unit": "8px",
+                    "container-max": "1200px",
+                    "gutter": "16px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "metric-xl": ["Hanken Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "display-lg-mobile": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "metric-xl": ["64px", {"lineHeight": "64px", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0E0E0E;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .ambient-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 102, 0.08) 0%, rgba(14, 14, 14, 0) 70%);
+        }
+
+        .glass-card {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid #262626;
+        }
+
+        .electric-glow {
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+        }
+
+        .vignette {
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .scanning-line {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 102, 0.3), transparent);
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- Background Layer -->
+<div class="fixed inset-0 z-0 bg-surface-container-lowest">
+<div class="absolute inset-0 ambient-glow"></div>
+<div class="absolute inset-0 vignette pointer-events-none"></div>
+<div class="scanning-line"></div>
+<!-- Background Imagery -->
+<div class="absolute inset-0 opacity-20 grayscale mix-blend-overlay">
+<img class="w-full h-full object-cover" data-alt="A cinematic, low-key photograph of a high-performance athlete in a moment of intense focus, set within a dark, industrial training facility. The lighting is dramatic and technical, with sharp rim lighting in Electric Green highlighting muscular definition. The environment is minimalist and high-tech, featuring subtle carbon fiber textures and clean metallic surfaces that align with a premium Tech-Noir fitness aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbVtn4epKOD4fZo7mlABfvKdhu7x7c26LU2Y8qf3pRBWL9ROdhVvSsnbkENpCr92iaAE405P8bPSjn1Xdp5Yedr78cB3iDPy6lVu05xe0qoaU0Qq-TMF67KttdqtLEZlOpaBywEbxEYEh4UwaYDqy1tL7I7hn-0TTmLIFNpbArnYk64gkbgvCSBrrGZAPObg5bmGMNlqk0lL60VzRaYGWfoBo5UiHqbBGAbRjOwsKTi-iqo4BWCKYHbzuzArM20aKtJuLm8u89ILpk"/>
+</div>
+</div>
+<!-- Main Canvas -->
+<main class="relative z-10 min-h-screen flex flex-col items-center justify-between py-12 px-margin-mobile md:px-margin-desktop overflow-hidden">
+<!-- Top Branding Section -->
+<div class="w-full flex justify-center pt-8 fade-in-up" style="animation-delay: 0.2s">
+<div class="flex flex-col items-center gap-2">
+<div class="font-label-caps text-label-caps tracking-[0.4em] text-primary-fixed-dim uppercase">
+                    Premium Coaching
+                </div>
+</div>
+</div>
+<!-- Central Identity Cluster -->
+<div class="flex flex-col items-center text-center max-w-2xl w-full">
+<div class="mb-8 fade-in-up" style="animation-delay: 0.4s">
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md font-bold tracking-tighter text-on-surface">
+                    COACH LAU
+                </h1>
+<div class="h-[2px] w-12 bg-primary-container mx-auto mt-2 rounded-full electric-glow"></div>
+</div>
+<div class="fade-in-up" style="animation-delay: 0.6s">
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-4 text-on-surface">
+                    Tu evolución, <br/>
+<span class="text-primary-fixed-dim">nuestra ciencia.</span>
+</h2>
+<p class="font-body-lg text-body-lg text-outline max-w-md mx-auto mb-12">
+                    Ingeniería aplicada al rendimiento humano. Accede a la metodología utilizada por atletas de élite.
+                </p>
+</div>
+<!-- Action Area -->
+<div class="w-full max-w-xs space-y-4 fade-in-up" style="animation-delay: 0.8s">
+<button class="group relative w-full h-14 bg-primary-container rounded-xl flex items-center justify-center transition-all duration-300 active:scale-95 hover:shadow-[0_0_30px_rgba(0,255,102,0.3)]" onclick="handleStart()">
+<span class="font-label-caps text-label-caps text-on-primary-container font-bold z-10">
+                        Empezar ahora
+                    </span>
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+</button>
+<button class="w-full h-14 border border-outline-variant/30 rounded-xl flex items-center justify-center transition-all duration-300 hover:bg-surface-variant/20 group">
+<span class="font-label-caps text-label-caps text-on-surface">
+                        Iniciar Sesión
+                    </span>
+</button>
+</div>
+</div>
+<!-- Bottom Tagline & Stats -->
+<div class="w-full max-w-4xl flex flex-col md:flex-row items-center justify-between gap-8 fade-in-up" style="animation-delay: 1s">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-widest">Protocolo</span>
+<span class="font-body-md text-on-surface font-semibold">BIO-MECHANIC 2.0</span>
+</div>
+<div class="w-[1px] h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-widest">Estado</span>
+<span class="font-body-md text-primary-fixed-dim font-semibold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+                        ONLINE
+                    </span>
+</div>
+</div>
+<div class="text-center md:text-right">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-[0.5em] block mb-1">
+                    Elite Performance
+                </span>
+<div class="flex items-center justify-center md:justify-end gap-1 text-outline-variant">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span class="font-label-caps text-[10px]">VER: 4.12.0_STABLE</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Interactive Elements Overlay -->
+<div class="fixed inset-0 z-[100] bg-surface flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-700" id="loading-overlay">
+<div class="flex flex-col items-center gap-4">
+<div class="w-16 h-16 border-2 border-primary-container/20 border-t-primary-container rounded-full animate-spin"></div>
+<span class="font-label-caps text-label-caps text-primary-fixed-dim animate-pulse uppercase">Iniciando Sistemas...</span>
+</div>
+</div>
+<script>
+        function handleStart() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            overlay.classList.add('opacity-100');
+            
+            // Simulation of transition to main app
+            setTimeout(() => {
+                console.log('Transitioning to onboarding flow...');
+                // In a real app: window.location.href = '/onboarding';
+            }, 2000);
+        }
+
+        // Parallax effect for the background hero
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+            const hero = document.querySelector('img');
+            if (hero) {
+                hero.style.transform = `scale(1.1) translate(${x}px, ${y}px)`;
+            }
+        });
+
+        // Initialize animations on load
+        window.addEventListener('load', () => {
+            document.body.classList.add('ready');
+        });
+    </script>
+</body></html>

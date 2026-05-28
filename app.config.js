@@ -4,7 +4,7 @@ const IS_DEV = process.env.APP_VARIANT === 'development';
 
 module.exports = {
   expo: {
-    name: IS_DEV ? 'LauFit (Dev)' : 'LauFit',
+    name: IS_DEV ? 'TrainingCenter (Dev)' : 'TrainingCenter',
     slug: 'laufit',
     version: '1.0.0',
     orientation: 'portrait',
@@ -13,11 +13,11 @@ module.exports = {
     userInterfaceStyle: 'automatic',
     ios: {
       icon: './assets/expo.icon',
-      bundleIdentifier: IS_DEV ? 'com.laufit.dev' : 'com.laufit',
+      bundleIdentifier: IS_DEV ? 'com.trainingcenter.dev' : 'com.trainingcenter',
       googleServicesFile: process.env.GOOGLE_SERVICE_INFO_PLIST ?? './GoogleService-Info.plist',
     },
     android: {
-      package: IS_DEV ? 'com.laufit.dev' : 'com.laufit',
+      package: IS_DEV ? 'com.trainingcenter.dev' : 'com.trainingcenter',
       googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
       adaptiveIcon: {
         backgroundColor: '#0E0E0E',
@@ -54,7 +54,11 @@ module.exports = {
         },
       ],
       'expo-secure-store',
+      '@react-native-google-signin/google-signin',
     ],
+    extra: {
+      googleWebClientId: '911229291499-vs0j44h5ehl0bo6la8c4ks1r6if1on9n.apps.googleusercontent.com',
+    },
     experiments: {
       typedRoutes: true,
       reactCompiler: true,

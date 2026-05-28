@@ -13,7 +13,13 @@
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Constants from 'expo-constants';
 import { useAuthStore } from '@/stores/authStore';
+
+GoogleSignin.configure({
+  webClientId: Constants.expoConfig?.extra?.googleWebClientId as string,
+});
 
 // ────────────────────────────────────────────────────────────────────────────
 // Auth listener
@@ -38,10 +44,24 @@ export function initAuthListener(): () => void {
 
     // Signed in — read role from Firestore USERS doc (one read per auth event)
     try {
-      const snap = await firestore().collection('users').doc(firebaseUser.uid).get();
-      const data = snap.data();
-      const role = data?.role;
+      const ref = firestore().collection('users').doc(firebaseUser.uid);
+      const snap = await ref.get();
+      let data = snap.data();
 
+      // First Google sign-in: no USERS doc exists yet → create as trainer
+      if (!snap.exists) {
+        const newUser = {
+          role: 'trainer' as const,
+          trainerId: null,
+          name: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        };
+        await ref.set(newUser);
+        data = newUser;
+      }
+
+      const role = data?.role;
       useAuthStore.getState().set({
         uid: firebaseUser.uid,
         role: (role === 'trainer' || role === 'client') ? role : null,
@@ -74,3 +94,19 @@ export const signOut = () => auth().signOut();
  */
 export const sendPasswordReset = (email: string) =>
   auth().sendPasswordResetEmail(email);
+
+/**
+ * Sign in with Google.
+ * Gets a Google ID token via native Google Sign-In, then exchanges it for
+ * a Firebase credential. Triggers onAuthStateChanged on success.
+ * The auth listener reads the USERS doc — if no doc exists yet (first Google
+ * sign-in for a trainer), the caller must create it via Firestore.
+ */
+export async function signInWithGoogle(): Promise<void> {
+  await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  const response = await GoogleSignin.signIn();
+  const idToken = response.data?.idToken;
+  if (!idToken) throw new Error('Google Sign-In did not return an ID token.');
+  const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+  await auth().signInWithCredential(googleCredential);
+}

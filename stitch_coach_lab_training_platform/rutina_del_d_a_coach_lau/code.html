@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "outline": "#849581",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary": "#003911",
+                        "on-secondary": "#313030",
+                        "on-background": "#e5e2e1",
+                        "primary-fixed-dim": "#00e55b",
+                        "primary-container": "#00ff66",
+                        "tertiary-fixed": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "surface-tint": "#00e55b",
+                        "primary-fixed": "#6bff83",
+                        "surface-bright": "#3a3939",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "secondary": "#c8c6c5",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "error-container": "#93000a",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-container": "#bab8b7",
+                        "surface-container": "#201f1f",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#626161",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary": "#edffe8",
+                        "tertiary": "#fdf9f9",
+                        "on-tertiary": "#313030",
+                        "on-primary-fixed": "#002107",
+                        "surface-container-low": "#1c1b1b",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#131313",
+                        "tertiary-container": "#e0dddc",
+                        "secondary-container": "#4a4949",
+                        "surface": "#131313",
+                        "on-surface-variant": "#b9ccb5",
+                        "on-primary-fixed-variant": "#00531b",
+                        "on-secondary-fixed-variant": "#474646",
+                        "background": "#131313",
+                        "outline-variant": "#3b4b3a",
+                        "surface-variant": "#353534",
+                        "inverse-primary": "#006e27",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "on-primary-container": "#007128"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "container-max": "1200px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "metric-xl": ["Hanken Grotesk"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "display-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "metric-xl": ["64px", {"lineHeight": "64px", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #131313; color: #e5e2e1; -webkit-font-smoothing: antialiased; }
+        .glass-panel { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .tech-border { border: 1px solid #262626; }
+        .performance-gradient { background: linear-gradient(180deg, #1A1A1A 0%, #121212 100%); }
+        .custom-checkbox:checked { background-color: #00FF66; border-color: #00FF66; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .fill-icon { font-variation-settings: 'FILL' 1 !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0E0E0E; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/50">
+<img alt="Coach Lau Professional Headshot" class="w-full h-full object-cover" data-alt="A cinematic, low-key professional headshot of a fit athletic coach in a dark, high-end gym environment. The lighting is dramatic and technical, with subtle green rim highlights against a deep black background. The coach wears high-performance gear, embodying elite discipline and precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcPjHbQSWb-VhrVI1yuymptgmBv60TTCH1EvMo7hn7zC8azp31j67yo8P2n4FGSUg4dc8WjNsesklGt3BncHIDQnzzQhLarkLgD7JCopQc0xG7mNmyLtO6ZJyIWymW5WjYxl7zuuUNxrE5PsCUe5dL4hCy-lUEB7zm-7m8yC2PsTksmCEGYZ3NE58NYpwfHHK6ZyJ-u69XtolynMZ5lFP9d3YRS9sw_jdyYqzTFRQ3mSHtY2Smswg07F1Jxe5PJDWCuV7jmvFDHM8J"/>
+</div>
+<span class="font-headline-md text-headline-md-mobile font-bold tracking-tighter text-on-surface">COACH LAU</span>
+</div>
+<button class="text-primary-fixed-dim hover:text-primary transition-colors duration-200 active:opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile max-w-container-max mx-auto">
+<!-- Hero Section / Context -->
+<div class="mb-10">
+<div class="flex items-center gap-2 mb-2">
+<span class="font-label-caps text-label-caps text-primary-fixed-dim uppercase tracking-widest">RUTINA DEL DÍA</span>
+<div class="h-[1px] flex-grow bg-outline-variant/30"></div>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Power &amp; Hypertrophy</h1>
+<p class="font-body-md text-on-surface-variant max-w-xl">Enfoque en cadena posterior y estabilización de núcleo. Mantén la tensión controlada en cada fase excéntrica.</p>
+</div>
+<!-- Exercise List Grid -->
+<div class="space-y-6">
+<!-- Exercise Item 1 -->
+<section class="tech-border performance-gradient rounded-xl overflow-hidden">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg overflow-hidden tech-border flex-shrink-0 bg-surface-container-lowest">
+<img alt="Barbell Deadlift" class="w-full h-full object-cover opacity-80" data-alt="Close-up detail of a heavy olympic barbell with black plates in a moody, dark-mode gym setting. Electric green ambient lighting reflects off the metallic surface of the knurling. The atmosphere is industrial, technical, and high-performance, emphasizing strength and precision engineering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1IEwhItBg9Qxh2ry6aj15dng4E5BRyjjX6XtmapqQHIlrOdQs2FhNT3DYd8eTCpm4ByrqHr_ojc7JrwiagZE-wxOPnHGGfGn_TqRILSNc1YXIwGiJVMuafV-JCuCw7ec5R3sJl_ro93EP4rccQwOsCPZwZytXrAEoFAZHekZOZTLCB5QquCeJ9l0f_9YnCp3o9W71HM3ekcNExqTrz12ZF-QGJboOJNj363GtN4UxPJL27Nxo86EoD3BnHodu8XjqdQZ0glfLhIKX"/>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface mb-1">Deadlift (Convencional)</h3>
+<div class="flex gap-2">
+<span class="font-label-caps text-[10px] px-2 py-0.5 rounded-full bg-primary-container/10 text-primary-fixed-dim border border-primary-container/20 uppercase">Power</span>
+<span class="font-label-caps text-[10px] px-2 py-0.5 rounded-full bg-surface-container-high text-outline uppercase">Compound</span>
+</div>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+<!-- Sets Table -->
+<div class="grid grid-cols-12 gap-2 text-center mb-4">
+<div class="col-span-1 font-label-caps text-outline text-[10px]">SET</div>
+<div class="col-span-3 font-label-caps text-outline text-[10px]">PESO (KG)</div>
+<div class="col-span-3 font-label-caps text-outline text-[10px]">REPS</div>
+<div class="col-span-3 font-label-caps text-outline text-[10px]">RPE</div>
+<div class="col-span-2 font-label-caps text-outline text-[10px]">STATUS</div>
+</div>
+<div class="space-y-2">
+<!-- Set Row -->
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low/50 p-3 rounded-lg group hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30">
+<div class="col-span-1 font-label-caps text-on-surface-variant">1</div>
+<div class="col-span-3">
+<input class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-md text-center text-primary-fixed-dim font-metric-xl text-xl p-1 focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-all" type="text" value="140"/>
+</div>
+<div class="col-span-3 font-metric-xl text-xl text-on-surface">5</div>
+<div class="col-span-3 font-label-caps text-outline">8.5</div>
+<div class="col-span-2 flex justify-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="handleSetCheck(this)" type="checkbox"/>
+<div class="w-8 h-8 rounded-md tech-border bg-surface-container-lowest peer-checked:bg-primary-container/20 peer-checked:border-primary-container flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-transparent peer-checked:text-primary-container text-lg" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Set Row 2 -->
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low/50 p-3 rounded-lg group hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30">
+<div class="col-span-1 font-label-caps text-on-surface-variant">2</div>
+<div class="col-span-3 font-metric-xl text-xl text-primary-fixed-dim">140</div>
+<div class="col-span-3 font-metric-xl text-xl text-on-surface">5</div>
+<div class="col-span-3 font-label-caps text-outline">9</div>
+<div class="col-span-2 flex justify-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" onchange="handleSetCheck(this)" type="checkbox"/>
+<div class="w-8 h-8 rounded-md tech-border bg-surface-container-lowest peer-checked:bg-primary-container/20 peer-checked:border-primary-container flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-transparent peer-checked:text-primary-container text-lg" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Exercise Item 2 -->
+<section class="tech-border performance-gradient rounded-xl overflow-hidden">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg overflow-hidden tech-border flex-shrink-0 bg-surface-container-lowest">
+<img alt="Lat Pulldown" class="w-full h-full object-cover opacity-80" data-alt="A detailed view of a high-tech gym pulley system cables and chrome weights. The focus is sharp on the industrial textures. The scene is bathed in a cool, deep charcoal and black monochromatic style with razor-sharp electric green neon accents highlighting the moving parts. Minimalist and technical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT17PWR6qu2dlSjVdglBhLil49NeX3dFpwq9RscT4a0KBmPHn5Gu2wgH3VpZudl1oLXddEsu1k9yApTM2Bh8-y6PBC3kAqnaaykt4bF0wBR26CDCuHmvjmYHCq4s4qs7pN7dMR2pI-oV2gXMoaESId4JUhMaxZxUroNzKsDj_auvzgmREf4B170roajL3dcD_lOa3b1LP3t3cUcr3gz9R8MggsGB5ZT97pC8XkGJjARxHNtaTp1uuH7wglmHBU5dQM8IgCCQJJf3u6"/>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface mb-1">Lat Pulldown (Neutral Grip)</h3>
+<div class="flex gap-2">
+<span class="font-label-caps text-[10px] px-2 py-0.5 rounded-full bg-surface-container-high text-outline uppercase">Hypertrophy</span>
+</div>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+<div class="grid grid-cols-12 gap-2 text-center mb-4">
+<div class="col-span-1 font-label-caps text-outline text-[10px]">SET</div>
+<div class="col-span-3 font-label-caps text-outline text-[10px]">PESO (LB)</div>
+<div class="col-span-3 font-label-caps text-outline text-[10px]">REPS</div>
+<div class="col-span-3 font-label-caps text-outline text-[10px]">RPE</div>
+<div class="col-span-2 font-label-caps text-outline text-[10px]">STATUS</div>
+</div>
+<div class="space-y-2">
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low/50 p-3 rounded-lg group">
+<div class="col-span-1 font-label-caps text-on-surface-variant">1</div>
+<div class="col-span-3 font-metric-xl text-xl text-primary-fixed-dim">120</div>
+<div class="col-span-3 font-metric-xl text-xl text-on-surface">12</div>
+<div class="col-span-3 font-label-caps text-outline">7</div>
+<div class="col-span-2 flex justify-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" onchange="handleSetCheck(this)" type="checkbox"/>
+<div class="w-8 h-8 rounded-md tech-border bg-surface-container-lowest peer-checked:bg-primary-container/20 peer-checked:border-primary-container flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-transparent peer-checked:text-primary-container text-lg" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</label>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low/50 p-3 rounded-lg group">
+<div class="col-span-1 font-label-caps text-on-surface-variant">2</div>
+<div class="col-span-3 font-metric-xl text-xl text-primary-fixed-dim">120</div>
+<div class="col-span-3 font-metric-xl text-xl text-on-surface">12</div>
+<div class="col-span-3 font-label-caps text-outline">8</div>
+<div class="col-span-2 flex justify-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" onchange="handleSetCheck(this)" type="checkbox"/>
+<div class="w-8 h-8 rounded-md tech-border bg-surface-container-lowest peer-checked:bg-primary-container/20 peer-checked:border-primary-container flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-transparent peer-checked:text-primary-container text-lg" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Floating Action Button Contextual -->
+<div class="fixed bottom-24 right-6 z-50">
+<button class="flex items-center gap-3 bg-primary-container text-on-primary-container px-6 py-4 rounded-xl font-bold shadow-[0_0_30px_rgba(0,255,102,0.25)] hover:scale-105 transition-transform active:scale-95 group" id="finishBtn">
+<span class="font-label-caps">FINALIZAR SESIÓN</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">bolt</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl rounded-t-xl border-t border-outline-variant/30 shadow-[0_-4px_20px_rgba(0,255,102,0.05)] flex justify-around items-center w-full h-20 pb-safe px-4">
+<a class="flex flex-col items-center justify-center text-primary-fixed-dim bg-primary-container/10 rounded-xl px-4 py-1 scale-110 duration-300 ease-out transition-all" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-caps text-label-caps mt-1">Training</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline px-4 py-1 hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-caps text-label-caps mt-1">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline px-4 py-1 hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+<span class="font-label-caps text-label-caps mt-1">Programs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline px-4 py-1 hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        function handleSetCheck(checkbox) {
+            const row = checkbox.closest('.grid');
+            if(checkbox.checked) {
+                row.classList.add('opacity-40');
+                row.classList.add('grayscale');
+                // Micro-interaction sound or vibration could be added here
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(50);
+                }
+            } else {
+                row.classList.remove('opacity-40');
+                row.classList.remove('grayscale');
+            }
+        }
+
+        // Simple button interaction
+        const finishBtn = document.getElementById('finishBtn');
+        finishBtn.addEventListener('click', () => {
+            finishBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> <span class="font-label-caps">GUARDANDO...</span>';
+            setTimeout(() => {
+                finishBtn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> <span class="font-label-caps">COMPLETADO</span>';
+                finishBtn.classList.replace('bg-primary-container', 'bg-surface-container-highest');
+                finishBtn.classList.replace('text-on-primary-container', 'text-primary-fixed-dim');
+            }, 1200);
+        });
+    </script>
+</body></html>

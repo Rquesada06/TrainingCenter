@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Hanken Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid #262626;
+        }
+        .performance-card {
+            background: linear-gradient(180deg, #1A1A1A 0%, #121212 100%);
+            border: 1px solid #262626;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .performance-card:hover {
+            border-color: #00FF66;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-glow {
+            box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+        }
+        /* Hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "outline": "#849581",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary": "#003911",
+                        "on-secondary": "#313030",
+                        "on-background": "#e5e2e1",
+                        "primary-fixed-dim": "#00e55b",
+                        "primary-container": "#00ff66",
+                        "tertiary-fixed": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "surface-tint": "#00e55b",
+                        "primary-fixed": "#6bff83",
+                        "surface-bright": "#3a3939",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "secondary": "#c8c6c5",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "error-container": "#93000a",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-container": "#bab8b7",
+                        "surface-container": "#201f1f",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#626161",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary": "#edffe8",
+                        "tertiary": "#fdf9f9",
+                        "on-tertiary": "#313030",
+                        "on-primary-fixed": "#002107",
+                        "surface-container-low": "#1c1b1b",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#131313",
+                        "tertiary-container": "#e0dddc",
+                        "secondary-container": "#4a4949",
+                        "surface": "#131313",
+                        "on-surface-variant": "#b9ccb5",
+                        "on-primary-fixed-variant": "#00531b",
+                        "on-secondary-fixed-variant": "#474646",
+                        "background": "#131313",
+                        "outline-variant": "#3b4b3a",
+                        "surface-variant": "#353534",
+                        "inverse-primary": "#006e27",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "on-primary-container": "#007128"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "container-max": "1200px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "metric-xl": ["Hanken Grotesk"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "display-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "metric-xl": ["64px", {"lineHeight": "64px", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- Top Navigation Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/50">
+<img alt="Coach Lau" class="w-full h-full object-cover" data-alt="A professional close-up headshot of a fit, athletic coach with a determined expression. The lighting is dramatic and technical, utilizing a high-contrast cinematic noir style with deep shadows and soft green ambient highlights. The background is a minimalist, dark high-end gym environment with blurred metal equipment, conveying elite performance and expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSuUY5GZ9-3Ap7bI9SjfqoVexfeb760OxnYm5S4qhEaSJelHbTXxq0d2smRlCdmJtwjlsK2w_fg19ppppLefnFyM_0r--anQKGWChv42r0Gb7PC0U-F53rahM34GX0Ij_gWE6388CdMHkJ3Iv8GXu69DVMboPIwcdJt8BxMVZ0gV1qdnLl9HVRxlOJdtjHA6j3N3OkiWHtVFFtdaBzgpf5s4FcXXhpEPavntdHriQMUzEEJZHZGy1dq4HExahUy7820MwyzYHpXXoU"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md font-bold tracking-tighter text-on-surface">COACH LAU</h1>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-primary-fixed-dim cursor-pointer hover:opacity-80 transition-all">notifications</span>
+<div class="hidden md:flex gap-8">
+<a class="font-label-caps text-label-caps text-primary-fixed-dim" href="#">CLIENTS</a>
+<a class="font-label-caps text-label-caps text-outline hover:text-on-surface transition-colors" href="#">ANALYTICS</a>
+<a class="font-label-caps text-label-caps text-outline hover:text-on-surface transition-colors" href="#">RESOURCES</a>
+</div>
+</div>
+</header>
+<main class="pt-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Dashboard Header & Search -->
+<section class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<p class="font-label-caps text-label-caps text-primary-fixed-dim mb-2 uppercase tracking-widest">Management Console</p>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Client Roster</h2>
+</div>
+<div class="relative group w-full md:w-96">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-fixed-dim transition-colors">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl py-4 pl-12 pr-4 text-on-surface focus:outline-none focus:border-primary-container font-body-md transition-all placeholder:text-outline/50" placeholder="Search athletes by name or goal..." type="text"/>
+</div>
+</section>
+<!-- Stats Overview Row -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+<div class="performance-card p-6 rounded-xl">
+<p class="font-label-caps text-label-caps text-outline mb-1">TOTAL ACTIVE</p>
+<p class="font-metric-xl text-metric-xl text-primary-fixed-dim">24</p>
+</div>
+<div class="performance-card p-6 rounded-xl">
+<p class="font-label-caps text-label-caps text-outline mb-1">AVG ADHERENCE</p>
+<p class="font-metric-xl text-metric-xl text-on-surface">92<span class="text-headline-md">%</span></p>
+</div>
+<div class="performance-card p-6 rounded-xl">
+<p class="font-label-caps text-label-caps text-outline mb-1">NEW THIS WEEK</p>
+<p class="font-metric-xl text-metric-xl text-on-surface">03</p>
+</div>
+<div class="performance-card p-6 rounded-xl">
+<p class="font-label-caps text-label-caps text-outline mb-1">PENDING CHECK-IN</p>
+<p class="font-metric-xl text-metric-xl text-error">05</p>
+</div>
+</section>
+<!-- Client Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Client Card 1 -->
+<div class="performance-card rounded-xl overflow-hidden group">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-xl overflow-hidden border border-outline-variant/30">
+<img alt="Marcus V." class="w-full h-full object-cover" data-alt="A cinematic portrait of a professional male athlete training in a moody, low-lit high-performance gym. The aesthetic is tech-noir with subtle green glow illuminating his focused expression. High-fidelity textures of sweat and athletic wear are visible under sharp, directional lighting. Deep black background creates a premium, elite coaching atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC7Di0q1BSHQZGlDQoB4pZabcjMQDG2AX7orcZZvZu9mjQBRIDf8bFCSxT1aSawBM-LXNGUS1zDeuK-Iz0qwiwDvRGb-tdptiAqtD8fgmqwL3feLDPwHFfA98vk_9ADyZiH6jn7cDc_yESfKjlVhsl-3Iiyb7Lg53W1ryahl97Y7E5Ow9j3dbTye2-ExSqAqgqPfqHdPW2xWKGDw-sO7ZEq7y4xLlegSRUZ_imcB7CE7md6VWUAWAu0tvCoYRGf2EMPGWIBjaMHiWG"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary-container rounded-full border-2 border-background active-glow"></div>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface">Marcus V.</h3>
+<p class="font-label-caps text-label-caps text-outline">ELITE POWERLIFTING</p>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-caps text-label-caps text-outline">ADHERENCE</span>
+<span class="font-label-caps text-label-caps text-primary-fixed-dim">98%</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-[98%] shadow-[0_0_8px_#00FF66]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
+<div>
+<p class="font-label-caps text-[10px] text-outline">LAST ACTIVE</p>
+<p class="font-body-md text-on-surface">12m ago</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline">NEXT CHECK-IN</p>
+<p class="font-body-md text-on-surface">Tomorrow</p>
+</div>
+</div>
+</div>
+<div class="flex border-t border-outline-variant/30 bg-surface-container-low/50">
+<button class="flex-1 py-3 font-label-caps text-label-caps text-primary-fixed-dim hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">chat</span> MESSAGE
+                    </button>
+<div class="w-px bg-outline-variant/30"></div>
+<button class="flex-1 py-3 font-label-caps text-label-caps text-outline hover:text-on-surface hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span> REPORTS
+                    </button>
+</div>
+</div>
+<!-- Client Card 2 -->
+<div class="performance-card rounded-xl overflow-hidden group">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-xl overflow-hidden border border-outline-variant/30">
+<img alt="Sarah J." class="w-full h-full object-cover" data-alt="A professional female athlete with a focused look, captured in a high-contrast dark environment. The lighting features soft green rim lights typical of a tech-noir aesthetic. She is wearing premium technical athletic gear. The background is a blurred minimalist fitness studio with sleek black equipment, emphasizing a high-end personal training brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHphNMTDyyGkOTLvBmqMwIbA-4Uj4Srltkfun0pT6zfCDU7kIVZM1FrwEcm_DEQN2ov5CFSvhLLzKUATnJ1dZMcYwYq41AgAyrXirv-Oh8ycaNr8HZimyezph9WYDCllxWLB3_R28_gx56GpE4XtqtB7Qu6TGJ8a8P9Yw0OqjbULcDyagWBK3zAC4vafGGzddemf8eImiA0Nh3SL4cpegql66Vc9OSsjrpfx0DQgeJd8xrNSPA_pvjdNiW_y_4zhGwYCEmkq9ozFL9"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary-container rounded-full border-2 border-background active-glow"></div>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface">Sarah J.</h3>
+<p class="font-label-caps text-label-caps text-outline">HYPERTROPHY PHASE II</p>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-caps text-label-caps text-outline">ADHERENCE</span>
+<span class="font-label-caps text-label-caps text-primary-fixed-dim">84%</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-[84%] shadow-[0_0_8px_#00FF66]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
+<div>
+<p class="font-label-caps text-[10px] text-outline">LAST ACTIVE</p>
+<p class="font-body-md text-on-surface">2h ago</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline">NEXT CHECK-IN</p>
+<p class="font-body-md text-on-surface">In 3 days</p>
+</div>
+</div>
+</div>
+<div class="flex border-t border-outline-variant/30 bg-surface-container-low/50">
+<button class="flex-1 py-3 font-label-caps text-label-caps text-primary-fixed-dim hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">chat</span> MESSAGE
+                    </button>
+<div class="w-px bg-outline-variant/30"></div>
+<button class="flex-1 py-3 font-label-caps text-label-caps text-outline hover:text-on-surface hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span> REPORTS
+                    </button>
+</div>
+</div>
+<!-- Client Card 3 (Offline/Warning) -->
+<div class="performance-card rounded-xl overflow-hidden group">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-xl overflow-hidden border border-outline-variant/30 grayscale opacity-60">
+<img alt="David L." class="w-full h-full object-cover" data-alt="Detailed portrait of a male client in a dark, high-end fitness setting. The image is stylized with a tech-noir monochromatic aesthetic, featuring sharp shadows and fine details. He appears thoughtful. The background is a clean, dark industrial gym space with subtle metallic textures and electric green accent lights in the far distance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCg20eP27Du5c3Gnl_RwLJj2dvPYXgpbIynLRw3CI8ZBWwlfJNII0RtJEGFTf-0d8OQr7TIT29a3yQpgs5hozamZE6XF3saguSw_ApUSXXOFILEuT3L3D-qYuGBzE-xMfeBEudO8G8XOz_efb9jrgWIKn13W1YsLZkZCeamASLcrtvHRdHqf4ts5N_F0bqyU073dTqU8gTPjI3t1cggmPCmQ1wLXBfnKPKkCRsymMytsq3FioS4TzkABhaC0GrIesDLw5Lkh7DLHOnS"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-outline rounded-full border-2 border-background"></div>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface/50">David L.</h3>
+<p class="font-label-caps text-label-caps text-outline">FAT LOSS JOURNEY</p>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-caps text-label-caps text-outline">ADHERENCE</span>
+<span class="font-label-caps text-label-caps text-error">42%</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-error h-full w-[42%]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
+<div>
+<p class="font-label-caps text-[10px] text-outline">LAST ACTIVE</p>
+<p class="font-body-md text-error">4 days ago</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline">NEXT CHECK-IN</p>
+<p class="font-body-md text-on-surface/50">Missed</p>
+</div>
+</div>
+</div>
+<div class="flex border-t border-outline-variant/30 bg-surface-container-low/50">
+<button class="flex-1 py-3 font-label-caps text-label-caps text-error hover:bg-error/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">warning</span> ACTION REQUIRED
+                    </button>
+<div class="w-px bg-outline-variant/30"></div>
+<button class="flex-1 py-3 font-label-caps text-label-caps text-outline hover:text-on-surface hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span> REPORTS
+                    </button>
+</div>
+</div>
+<!-- Client Card 4 -->
+<div class="performance-card rounded-xl overflow-hidden group">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-xl overflow-hidden border border-outline-variant/30">
+<img alt="Elena K." class="w-full h-full object-cover" data-alt="A striking portrait of a female athlete with a powerful gaze. High-fidelity tech-noir style with deep contrasts and subtle green light tracing her features. She is in a minimalist dark environment with clean lines and high-performance equipment in soft focus. The overall atmosphere is elite, disciplined, and technologically superior." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO781U5uztULnGmlmBC68e4OU1ovmRgiBTmSVLDzYVvJ9L98BX-KL2oB4eSCgH3N7GMR96Zhl6-u8jCtclDidC4KUheP0-P8RljxsoN1gIl8EHtPkfQv0CxvS89NwwusNSMRZRoqnbcxTD2fhxvH4y7LB2YLsfL3-XKqIASb0n3AiKbNEv9OLZQA5qOfrZHa7xoxvNyj6gNWP2bbztLXl8pLdMT8uXPWJoCOUX5puk8r9kU7U9cd3u8veIzWH2kyUbzWir4ItmJHJ6"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary-container rounded-full border-2 border-background active-glow"></div>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface">Elena K.</h3>
+<p class="font-label-caps text-label-caps text-outline">MARATHON PREP</p>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-caps text-label-caps text-outline">ADHERENCE</span>
+<span class="font-label-caps text-label-caps text-primary-fixed-dim">95%</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-[95%] shadow-[0_0_8px_#00FF66]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
+<div>
+<p class="font-label-caps text-[10px] text-outline">LAST ACTIVE</p>
+<p class="font-body-md text-on-surface">1h ago</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline">NEXT CHECK-IN</p>
+<p class="font-body-md text-on-surface">Today</p>
+</div>
+</div>
+</div>
+<div class="flex border-t border-outline-variant/30 bg-surface-container-low/50">
+<button class="flex-1 py-3 font-label-caps text-label-caps text-primary-fixed-dim hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">chat</span> MESSAGE
+                    </button>
+<div class="w-px bg-outline-variant/30"></div>
+<button class="flex-1 py-3 font-label-caps text-label-caps text-outline hover:text-on-surface hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span> REPORTS
+                    </button>
+</div>
+</div>
+<!-- Add Client Placeholder Card -->
+<button class="border-2 border-dashed border-outline-variant/30 rounded-xl flex flex-col items-center justify-center p-12 hover:border-primary-container hover:bg-primary-container/5 transition-all group">
+<span class="material-symbols-outlined text-4xl text-outline group-hover:text-primary-fixed-dim mb-4 transition-colors">person_add</span>
+<p class="font-label-caps text-label-caps text-outline group-hover:text-primary-fixed-dim transition-colors">ONBOARD NEW ATHLETE</p>
+</button>
+</div>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-24 right-6 md:right-margin-desktop w-14 h-14 bg-primary-container text-background rounded-xl shadow-[0_0_30px_rgba(0,255,102,0.3)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined font-bold">add</span>
+</button>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/30 rounded-t-xl h-20 flex justify-around items-center px-4 pb-safe">
+<div class="flex flex-col items-center justify-center text-primary-fixed-dim bg-primary-container/10 rounded-xl px-4 py-1">
+<span class="material-symbols-outlined" data-weight="fill">person</span>
+<span class="font-label-caps text-[10px] mt-1">CLIENTS</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline px-4 py-1">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-[10px] mt-1">INSIGHTS</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline px-4 py-1">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-caps text-[10px] mt-1">PROGRAMS</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline px-4 py-1">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-[10px] mt-1">PROFILE</span>
+</div>
+</nav>
+<script>
+        // Micro-interactions and data visualization simulation
+        document.querySelectorAll('.performance-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const bar = card.querySelector('.bg-primary-container');
+                if(bar) {
+                    bar.style.filter = 'brightness(1.2)';
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                const bar = card.querySelector('.bg-primary-container');
+                if(bar) {
+                    bar.style.filter = 'brightness(1)';
+                }
+            });
+        });
+
+        // Search bar interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.performance-card').forEach(card => {
+                const name = card.querySelector('h3')?.innerText.toLowerCase();
+                if(name) {
+                    card.style.display = name.includes(query) ? 'block' : 'none';
+                }
+            });
+        });
+    </script>
+</body></html>

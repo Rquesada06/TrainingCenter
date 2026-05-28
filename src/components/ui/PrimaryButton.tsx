@@ -16,31 +16,36 @@ import React from 'react';
 import { ActivityIndicator, Pressable, Text, type PressableProps } from 'react-native';
 
 export interface PrimaryButtonProps extends Pick<PressableProps, 'onPress'> {
-  /** Button label text */
   label: string;
-  /** Shows a spinner and disables tap interaction */
   loading?: boolean;
-  /** Dims the button and disables tap interaction */
   disabled?: boolean;
+  /** 'solid' = #00FF66 filled (default); 'outline' = transparent with #444 border */
+  variant?: 'solid' | 'outline';
 }
 
-export function PrimaryButton({ label, onPress, loading = false, disabled = false }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, loading = false, disabled = false, variant = 'solid' }: PrimaryButtonProps) {
   const isDisabled = disabled || loading;
+  const isOutline = variant === 'outline';
 
   return (
     <Pressable
       onPress={isDisabled ? undefined : onPress}
       className={[
-        'bg-[#00FF66] rounded-lg py-4 items-center justify-center',
+        'rounded-lg py-4 items-center justify-center border',
+        isOutline
+          ? 'bg-transparent border-[#444444]'
+          : 'bg-[#00FF66] border-[#00FF66]',
         isDisabled ? 'opacity-50' : 'opacity-100',
       ].join(' ')}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
-        <ActivityIndicator color="#0E0E0E" />
+        <ActivityIndicator color={isOutline ? '#FFFFFF' : '#0E0E0E'} />
       ) : (
-        <Text className="text-[#0E0E0E] font-semibold text-base">{label}</Text>
+        <Text className={isOutline ? 'text-white font-semibold text-base' : 'text-[#0E0E0E] font-semibold text-base'}>
+          {label}
+        </Text>
       )}
     </Pressable>
   );
