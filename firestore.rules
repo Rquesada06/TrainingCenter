@@ -44,8 +44,12 @@ service cloud.firestore {
       // Anyone reads their own doc (both trainer and client)
       allow read: if isSignedIn() && request.auth.uid == userId;
 
-      // Trainer creates via Cloud Function (Admin SDK bypasses this, but cover direct creation too)
-      allow create: if isTrainer();
+      // Trainer can create client docs only (role must be 'client', trainerId must be self)
+      // Admin SDK (Cloud Function) bypasses these rules; this covers any direct creation path.
+      allow create: if isTrainer()
+        && request.resource.data.role == 'client'
+        && request.resource.data.trainerId == request.auth.uid
+        && userId != request.auth.uid;
 
       // Document owner can update own profile BUT cannot change 'role' or 'trainerId' fields
       // affectedKeys() returns the set of fields that differ between request and resource data
@@ -64,7 +68,7 @@ service cloud.firestore {
     // EXERCISES — trainer owns; read/write scoped to trainerId == self
     // Future phases (Phase 2+) will use these rules
     match /exercises/{exerciseId} {
-      allow read, write: if isTrainer()
+      allow read, update, delete: if isTrainer()
         && resource.data.trainerId == request.auth.uid;
       allow create: if isTrainer()
         && request.resource.data.trainerId == request.auth.uid;
@@ -72,7 +76,7 @@ service cloud.firestore {
 
     // ROUTINES — trainer owns; future phases
     match /routines/{routineId} {
-      allow read, write: if isTrainer()
+      allow read, update, delete: if isTrainer()
         && resource.data.trainerId == request.auth.uid;
       allow create: if isTrainer()
         && request.resource.data.trainerId == request.auth.uid;
@@ -80,7 +84,7 @@ service cloud.firestore {
 
     // PROGRAMS — trainer owns; future phases
     match /programs/{programId} {
-      allow read, write: if isTrainer()
+      allow read, update, delete: if isTrainer()
         && resource.data.trainerId == request.auth.uid;
       allow create: if isTrainer()
         && request.resource.data.trainerId == request.auth.uid;

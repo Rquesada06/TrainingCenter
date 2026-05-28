@@ -78,11 +78,18 @@ export const createClientAccount = functions.https.onCall(
         displayName: data.name,
       });
     } catch (err: unknown) {
-      const firebaseError = err as { code: string; message: string };
-      throw new functions.https.HttpsError(
-        'already-exists',
-        `Auth user creation failed: ${firebaseError.message}`
-      );
+      const firebaseError = err as { code?: string; message?: string };
+      const code = firebaseError.code ?? '';
+      if (code === 'auth/email-already-exists') {
+        throw new functions.https.HttpsError('already-exists', 'An account with that email already exists.');
+      }
+      if (code === 'auth/invalid-email') {
+        throw new functions.https.HttpsError('invalid-argument', 'The email address is invalid.');
+      }
+      if (code === 'auth/invalid-password') {
+        throw new functions.https.HttpsError('invalid-argument', 'The password must be at least 6 characters.');
+      }
+      throw new functions.https.HttpsError('internal', `Auth user creation failed: ${firebaseError.message ?? 'unknown error'}`);
     }
 
     // Step 4: Write USERS doc with role: 'client' and trainerId reference

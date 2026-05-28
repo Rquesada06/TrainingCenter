@@ -37,15 +37,22 @@ export function initAuthListener(): () => void {
     }
 
     // Signed in — read role from Firestore USERS doc (one read per auth event)
-    const snap = await firestore().collection('users').doc(firebaseUser.uid).get();
-    const data = snap.data() as { role?: string; trainerId?: string } | undefined;
+    try {
+      const snap = await firestore().collection('users').doc(firebaseUser.uid).get();
+      const data = snap.data();
+      const role = data?.role;
 
-    useAuthStore.getState().set({
-      uid: firebaseUser.uid,
-      role: (data?.role as 'trainer' | 'client') ?? null,
-      trainerId: data?.trainerId ?? null,
-      isLoaded: true,
-    });
+      useAuthStore.getState().set({
+        uid: firebaseUser.uid,
+        role: (role === 'trainer' || role === 'client') ? role : null,
+        trainerId: data?.trainerId ?? null,
+        isLoaded: true,
+      });
+    } catch {
+      // Firestore unreachable — sign out so the user lands on the sign-in screen
+      // rather than freezing on the splash screen indefinitely.
+      await auth().signOut();
+    }
   });
 }
 
