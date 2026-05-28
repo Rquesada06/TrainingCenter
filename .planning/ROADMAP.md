@@ -13,7 +13,7 @@ LauFit ships as four vertical slices, each delivering a complete working capabil
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Infrastructure + Auth** - Firebase setup, EAS dev build, auth flow, role-based navigation shell, Cloud Function, composite indexes
+- [x] **Phase 1: Infrastructure + Auth** - Firebase setup, EAS dev build, auth flow, role-based navigation shell, Cloud Function, composite indexes (completed 2026-05-28)
 - [ ] **Phase 2: Trainer Content Creation** - Exercise library, routine builder, program builder, client management, program assignment with snapshot transaction, trainer dashboard
 - [ ] **Phase 3: Client Workout Execution** - Workout calculator, four home states, session execution, gym/home toggle, crash-safe local state, completion flow, duplicate guard
 - [ ] **Phase 4: History + Polish** - Paginated session history, trainer client history view, profiles with photos, empty states, adherence metrics, in-session navigation guard
@@ -45,7 +45,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03-PLAN.md — Sign-in screen (RHF + zod), password reset, Obsidian Performance UI (Wave 3)
+- [x] 01-03-PLAN.md — Sign-in screen (RHF + zod), password reset, Obsidian Performance UI (Wave 3)
 
 ### Phase 2: Trainer Content Creation
 
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure + Auth | 3/4 | In Progress|  |
+| 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 0/TBD | Not started | - |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |
