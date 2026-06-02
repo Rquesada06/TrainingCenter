@@ -32,9 +32,9 @@ LauFit is a mobile fitness coaching app that connects personal trainers with the
 | @tanstack/react-query | ^5.x | Server state, async data | HIGH — v5 is current stable |
 | zustand | ^5.0.x | Client/UI state | HIGH — v5 is current stable |
 | react-hook-form | ^7.66.x | Form management | HIGH — v7 is current stable |
-| zod | ^3.x | Schema validation | HIGH — standard, unchanged |
+| zod | ^4.4.3 | Schema validation | HIGH — v4 installed; use z.enum([...] as const), z.coerce.number(), z.url() NOT v3 API |
 | nativewind | ^4.x (stable) | Tailwind styling | MEDIUM — see note below |
-| react-native-reanimated | ~3.18.0 | Animations (required by NativeWind) | HIGH — bundled with SDK |
+| react-native-reanimated | 4.2.1 | Animations (required by NativeWind) | HIGH — v4 installed (not v3); use react-native-reanimated-dnd for drag-reorder |
 | react-native-gesture-handler | ~2.26.0 | Gesture handling | HIGH — bundled with SDK |
 | react-native-safe-area-context | latest | Safe area insets | HIGH — standard dep |
 | expo-image | latest | Performant image rendering | HIGH — replaces RN Image |
