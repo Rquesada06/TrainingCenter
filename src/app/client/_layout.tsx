@@ -1,13 +1,6 @@
-/**
- * Trainer tab navigator — Phase 01 Plan 02
- *
- * Two placeholder tabs: Dashboard (index) and Profile.
- * Real tab content ships in Phases 2-4.
- */
-
 import { Tabs } from 'expo-router';
 
-export default function TrainerTabsLayout() {
+export default function ClientLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -17,7 +10,7 @@ export default function TrainerTabsLayout() {
         tabBarInactiveTintColor: '#888888',
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Dashboard' }} />
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
       <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
     </Tabs>
   );

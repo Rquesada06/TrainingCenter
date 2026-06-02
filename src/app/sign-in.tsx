@@ -132,6 +132,7 @@ export default function SignInScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-[#0E0E0E]"
+      style={{ flex: 1, backgroundColor: '#0E0E0E' }}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}

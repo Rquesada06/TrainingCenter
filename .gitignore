@@ -45,3 +45,9 @@ app-example
 # Firebase config files — sourced from EAS secret file env vars
 google-services.json
 GoogleService-Info.plist
+
+# GSD workflow tooling — not app source
+.claude/
+
+# macOS
+.DS_Store

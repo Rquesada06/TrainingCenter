@@ -44,8 +44,16 @@ service cloud.firestore {
       // Anyone reads their own doc (both trainer and client)
       allow read: if isSignedIn() && request.auth.uid == userId;
 
-      // Trainer can create client docs only (role must be 'client', trainerId must be self)
-      // Admin SDK (Cloud Function) bypasses these rules; this covers any direct creation path.
+      // First sign-in: allow a user to self-provision their own trainer doc.
+      // This covers email/password trainers and Google Sign-In (first login, no doc yet).
+      // Clients never hit this path — their docs are created by Cloud Function (Admin SDK).
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'trainer'
+        && request.resource.data.trainerId == null;
+
+      // Trainer can create client docs (Cloud Function is the primary path via Admin SDK;
+      // this covers any future direct client creation path).
       allow create: if isTrainer()
         && request.resource.data.role == 'client'
         && request.resource.data.trainerId == request.auth.uid

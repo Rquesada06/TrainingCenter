@@ -32,6 +32,16 @@ jest.mock('@react-native-firebase/firestore', () => {
   return mockFirestore;
 });
 
+// google-signin pulls in the RNGoogleSignin native TurboModule, which is not
+// available under Jest. Mock it so importing ../auth doesn't crash on load.
+jest.mock('@react-native-google-signin/google-signin', () => ({
+  GoogleSignin: {
+    configure: jest.fn(),
+    hasPlayServices: jest.fn(),
+    signIn: jest.fn(),
+  },
+}));
+
 // ────────────────────────────────────────────────────────────────────────────
 // Imports — AFTER mocks
 // ────────────────────────────────────────────────────────────────────────────

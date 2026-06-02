@@ -58,6 +58,9 @@ module.exports = {
     ],
     extra: {
       googleWebClientId: '911229291499-vs0j44h5ehl0bo6la8c4ks1r6if1on9n.apps.googleusercontent.com',
+      eas: {
+        projectId: 'aa2ddf02-8e35-42ea-a949-26dc541f54b6',
+      },
     },
     experiments: {
       typedRoutes: true,
