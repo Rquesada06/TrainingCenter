@@ -10,39 +10,49 @@
  *
  * Threat T-02-01 / EXER-06: WHERE trainerId filter is present in listExercises.
  * Threat T-02-04: trainerId comes from authStore, not form input.
+ *
+ * Mock strategy:
+ *   jest.mock() is hoisted above const declarations. To avoid temporal dead zone
+ *   issues, the mock factory creates all mock functions internally. Mocks are
+ *   exposed on the returned module object and retrieved in tests via
+ *   jest.requireMock(). This mirrors the pattern used in auth.service.test.ts.
  */
 
 // ────────────────────────────────────────────────────────────────────────────
 // Mocks (must be before imports)
 // ────────────────────────────────────────────────────────────────────────────
 
-const mockServerTimestamp = jest.fn(() => 'SERVER_TIMESTAMP');
-const mockAdd = jest.fn();
-const mockDelete = jest.fn();
-const mockUpdate = jest.fn();
-const mockGet = jest.fn();
-const mockDoc = jest.fn(() => ({ get: mockGet, update: mockUpdate, delete: mockDelete }));
-const mockOrderBy = jest.fn();
-const mockWhere = jest.fn();
-const mockCollection = jest.fn();
-
-// Build chainable mock: collection().where().orderBy().get()
-mockCollection.mockReturnValue({ where: mockWhere, doc: mockDoc, add: mockAdd });
-mockWhere.mockReturnValue({ orderBy: mockOrderBy, doc: mockDoc });
-mockOrderBy.mockReturnValue({ get: mockGet });
-
 jest.mock('@react-native-firebase/firestore', () => {
-  const mockFirestore = jest.fn(() => ({
-    collection: mockCollection,
-    FieldValue: {
-      serverTimestamp: mockServerTimestamp,
-    },
-  }));
-  // Expose FieldValue statically for `firestore.FieldValue.serverTimestamp()`
-  mockFirestore.FieldValue = {
-    serverTimestamp: mockServerTimestamp,
+  // All mock fns created inside the factory to avoid hoisting TDZ issues.
+  const _mockGet = jest.fn();
+  const _mockUpdate = jest.fn();
+  const _mockDelete = jest.fn();
+  const _mockAdd = jest.fn();
+  const _mockDoc = jest.fn(() => ({ get: _mockGet, update: _mockUpdate, delete: _mockDelete }));
+  const _mockOrderBy = jest.fn(() => ({ get: _mockGet }));
+  const _mockWhere = jest.fn(() => ({ orderBy: _mockOrderBy, doc: _mockDoc }));
+  const _mockCollection = jest.fn(() => ({ where: _mockWhere, doc: _mockDoc, add: _mockAdd }));
+  const _mockServerTimestamp = jest.fn(() => 'SERVER_TIMESTAMP');
+
+  // The default export is a callable that returns the firestore instance.
+  // `firestore.FieldValue.serverTimestamp` is accessed as a static property.
+  const firestoreFn = jest.fn(() => ({ collection: _mockCollection }));
+  (firestoreFn as any).FieldValue = { serverTimestamp: _mockServerTimestamp };
+
+  // Expose all mock fns on the module for retrieval via jest.requireMock()
+  (firestoreFn as any).__mocks = {
+    get: _mockGet,
+    update: _mockUpdate,
+    delete: _mockDelete,
+    add: _mockAdd,
+    doc: _mockDoc,
+    orderBy: _mockOrderBy,
+    where: _mockWhere,
+    collection: _mockCollection,
+    serverTimestamp: _mockServerTimestamp,
   };
-  return mockFirestore;
+
+  return firestoreFn;
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -58,15 +68,37 @@ import {
 } from '../exercise.service';
 
 // ────────────────────────────────────────────────────────────────────────────
+// Mock accessor helpers (retrieved after imports)
+// ────────────────────────────────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const firestoreMock = jest.requireMock('@react-native-firebase/firestore');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mocks = (firestoreMock as any).__mocks as {
+  get: jest.Mock;
+  update: jest.Mock;
+  delete: jest.Mock;
+  add: jest.Mock;
+  doc: jest.Mock;
+  orderBy: jest.Mock;
+  where: jest.Mock;
+  collection: jest.Mock;
+  serverTimestamp: jest.Mock;
+};
+
+// ────────────────────────────────────────────────────────────────────────────
 // listExercises
 // ────────────────────────────────────────────────────────────────────────────
 
 describe('listExercises', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCollection.mockReturnValue({ where: mockWhere, doc: mockDoc, add: mockAdd });
-    mockWhere.mockReturnValue({ orderBy: mockOrderBy });
-    mockOrderBy.mockReturnValue({ get: mockGet });
+    // Re-wire chain after clearAllMocks resets mock.calls (NOT implementations).
+    // clearAllMocks preserves mockReturnValue, but we re-set here defensively.
+    mocks.collection.mockReturnValue({ where: mocks.where, doc: mocks.doc, add: mocks.add });
+    mocks.where.mockReturnValue({ orderBy: mocks.orderBy, doc: mocks.doc });
+    mocks.orderBy.mockReturnValue({ get: mocks.get });
+    mocks.serverTimestamp.mockReturnValue('SERVER_TIMESTAMP');
   });
 
   it('calls where(trainerId) + orderBy(name asc) + get() and maps docs to Exercise[]', async () => {
@@ -93,14 +125,22 @@ describe('listExercises', () => {
         updatedAt: 'ts2',
       }),
     };
-    mockGet.mockResolvedValueOnce({ docs: [fakeDoc1, fakeDoc2] });
+    mocks.get.mockResolvedValueOnce({ docs: [fakeDoc1, fakeDoc2] });
 
     const result = await listExercises(uid);
 
-    expect(mockWhere).toHaveBeenCalledWith('trainerId', '==', uid);
-    expect(mockOrderBy).toHaveBeenCalledWith('name', 'asc');
+    expect(mocks.where).toHaveBeenCalledWith('trainerId', '==', uid);
+    expect(mocks.orderBy).toHaveBeenCalledWith('name', 'asc');
     expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({ id: 'exercise-1', trainerId: uid, name: 'Bench Press', category: 'strength', locationTypes: ['gym'], createdAt: 'ts1', updatedAt: 'ts1' });
+    expect(result[0]).toEqual({
+      id: 'exercise-1',
+      trainerId: uid,
+      name: 'Bench Press',
+      category: 'strength',
+      locationTypes: ['gym'],
+      createdAt: 'ts1',
+      updatedAt: 'ts1',
+    });
     expect(result[1].id).toBe('exercise-2');
   });
 });
@@ -112,7 +152,8 @@ describe('listExercises', () => {
 describe('getExercise', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCollection.mockReturnValue({ where: mockWhere, doc: mockDoc, add: mockAdd });
+    mocks.collection.mockReturnValue({ where: mocks.where, doc: mocks.doc, add: mocks.add });
+    mocks.doc.mockReturnValue({ get: mocks.get, update: mocks.update, delete: mocks.delete });
   });
 
   it('returns { id, ...data } when doc exists', async () => {
@@ -124,16 +165,16 @@ describe('getExercise', () => {
       createdAt: 'ts',
       updatedAt: 'ts',
     };
-    mockGet.mockResolvedValueOnce({ exists: true, id: 'exercise-abc', data: () => docData });
+    mocks.get.mockResolvedValueOnce({ exists: true, id: 'exercise-abc', data: () => docData });
 
     const result = await getExercise('exercise-abc');
 
-    expect(mockDoc).toHaveBeenCalledWith('exercise-abc');
+    expect(mocks.doc).toHaveBeenCalledWith('exercise-abc');
     expect(result).toEqual({ id: 'exercise-abc', ...docData });
   });
 
   it('returns null when doc does not exist', async () => {
-    mockGet.mockResolvedValueOnce({ exists: false, id: 'ghost-id', data: () => undefined });
+    mocks.get.mockResolvedValueOnce({ exists: false, id: 'ghost-id', data: () => undefined });
 
     const result = await getExercise('ghost-id');
 
@@ -148,13 +189,13 @@ describe('getExercise', () => {
 describe('createExercise', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCollection.mockReturnValue({ where: mockWhere, doc: mockDoc, add: mockAdd });
-    mockServerTimestamp.mockReturnValue('SERVER_TIMESTAMP');
+    mocks.collection.mockReturnValue({ where: mocks.where, doc: mocks.doc, add: mocks.add });
+    mocks.serverTimestamp.mockReturnValue('SERVER_TIMESTAMP');
   });
 
   it('calls .add() with input + trainerId + serverTimestamp fields and returns doc id', async () => {
     const newDocRef = { id: 'new-exercise-id' };
-    mockAdd.mockResolvedValueOnce(newDocRef);
+    mocks.add.mockResolvedValueOnce(newDocRef);
 
     const input = {
       name: 'Pull-up',
@@ -165,7 +206,7 @@ describe('createExercise', () => {
 
     const result = await createExercise({ trainerId, input });
 
-    expect(mockAdd).toHaveBeenCalledWith(
+    expect(mocks.add).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Pull-up',
         category: 'strength',
@@ -186,18 +227,19 @@ describe('createExercise', () => {
 describe('updateExercise', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCollection.mockReturnValue({ where: mockWhere, doc: mockDoc, add: mockAdd });
-    mockServerTimestamp.mockReturnValue('SERVER_TIMESTAMP');
+    mocks.collection.mockReturnValue({ where: mocks.where, doc: mocks.doc, add: mocks.add });
+    mocks.doc.mockReturnValue({ get: mocks.get, update: mocks.update, delete: mocks.delete });
+    mocks.serverTimestamp.mockReturnValue('SERVER_TIMESTAMP');
   });
 
   it('calls .doc(id).update() with partial + updatedAt serverTimestamp', async () => {
-    mockUpdate.mockResolvedValueOnce(undefined);
+    mocks.update.mockResolvedValueOnce(undefined);
 
     const partial = { name: 'Updated Exercise', defaultSets: 4 };
     await updateExercise('exercise-xyz', partial);
 
-    expect(mockDoc).toHaveBeenCalledWith('exercise-xyz');
-    expect(mockUpdate).toHaveBeenCalledWith(
+    expect(mocks.doc).toHaveBeenCalledWith('exercise-xyz');
+    expect(mocks.update).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Updated Exercise',
         defaultSets: 4,
@@ -214,15 +256,16 @@ describe('updateExercise', () => {
 describe('deleteExercise', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCollection.mockReturnValue({ where: mockWhere, doc: mockDoc, add: mockAdd });
+    mocks.collection.mockReturnValue({ where: mocks.where, doc: mocks.doc, add: mocks.add });
+    mocks.doc.mockReturnValue({ get: mocks.get, update: mocks.update, delete: mocks.delete });
   });
 
   it('calls .doc(id).delete()', async () => {
-    mockDelete.mockResolvedValueOnce(undefined);
+    mocks.delete.mockResolvedValueOnce(undefined);
 
     await deleteExercise('exercise-to-delete');
 
-    expect(mockDoc).toHaveBeenCalledWith('exercise-to-delete');
-    expect(mockDelete).toHaveBeenCalledTimes(1);
+    expect(mocks.doc).toHaveBeenCalledWith('exercise-to-delete');
+    expect(mocks.delete).toHaveBeenCalledTimes(1);
   });
 });
