@@ -151,7 +151,7 @@ describe('getClient', () => {
       email: 'alice@test.com',
       createdAt: 'ts',
     };
-    mocks.get.mockResolvedValueOnce({ exists: true, id: 'client-abc', data: () => docData });
+    mocks.get.mockResolvedValueOnce({ exists: () => true, id: 'client-abc', data: () => docData });
 
     const result = await getClient('client-abc');
 
@@ -160,7 +160,7 @@ describe('getClient', () => {
   });
 
   it('returns null when doc does not exist', async () => {
-    mocks.get.mockResolvedValueOnce({ exists: false, id: 'ghost-id', data: () => undefined });
+    mocks.get.mockResolvedValueOnce({ exists: () => false, id: 'ghost-id', data: () => undefined });
 
     const result = await getClient('ghost-id');
 

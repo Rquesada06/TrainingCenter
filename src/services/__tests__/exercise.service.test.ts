@@ -165,7 +165,7 @@ describe('getExercise', () => {
       createdAt: 'ts',
       updatedAt: 'ts',
     };
-    mocks.get.mockResolvedValueOnce({ exists: true, id: 'exercise-abc', data: () => docData });
+    mocks.get.mockResolvedValueOnce({ exists: () => true, id: 'exercise-abc', data: () => docData });
 
     const result = await getExercise('exercise-abc');
 
@@ -174,7 +174,7 @@ describe('getExercise', () => {
   });
 
   it('returns null when doc does not exist', async () => {
-    mocks.get.mockResolvedValueOnce({ exists: false, id: 'ghost-id', data: () => undefined });
+    mocks.get.mockResolvedValueOnce({ exists: () => false, id: 'ghost-id', data: () => undefined });
 
     const result = await getExercise('ghost-id');
 

@@ -48,7 +48,7 @@ export async function listExercises(uid: string): Promise<Exercise[]> {
  */
 export async function getExercise(id: string): Promise<Exercise | null> {
   const snap = await exercisesCollection().doc(id).get();
-  if (!snap.exists) return null;
+  if (!snap.exists()) return null; // RNFB v24: exists is a method, not a property
   const { id: _omit, ...rest } = snap.data()! as Exercise;
   void _omit; // id comes from snap.id, not snap.data()
   return { id: snap.id, ...rest } as Exercise;

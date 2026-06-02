@@ -49,7 +49,7 @@ export async function listClients(trainerId: string): Promise<User[]> {
  */
 export async function getClient(uid: string): Promise<User | null> {
   const snap = await usersCollection().doc(uid).get();
-  if (!snap.exists) return null;
+  if (!snap.exists()) return null; // RNFB v24: exists is a method, not a property
   return { ...snap.data()!, uid: snap.id } as User;
 }
 

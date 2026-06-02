@@ -49,7 +49,7 @@ export async function listRoutines(uid: string): Promise<Routine[]> {
  */
 export async function getRoutine(id: string): Promise<Routine | null> {
   const snap = await routinesCollection().doc(id).get();
-  if (!snap.exists) return null;
+  if (!snap.exists()) return null; // RNFB v24: exists is a method, not a property
   const { id: _omit, ...rest } = snap.data()! as Routine;
   void _omit; // id comes from snap.id, not snap.data()
   return { id: snap.id, ...rest } as Routine;

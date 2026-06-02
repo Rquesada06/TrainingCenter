@@ -48,8 +48,10 @@ export function initAuthListener(): () => void {
       const snap = await ref.get();
       let data = snap.data();
 
-      // First Google sign-in: no USERS doc exists yet → create as trainer
-      if (!snap.exists) {
+      // First Google sign-in: no USERS doc exists yet → create as trainer.
+      // RNFB v24: `exists` is a METHOD, not a property — `!snap.exists` (a
+      // function) is always false, so this branch must call `snap.exists()`.
+      if (!snap.exists()) {
         const newUser = {
           role: 'trainer' as const,
           trainerId: null,
