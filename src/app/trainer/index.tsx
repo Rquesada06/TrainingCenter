@@ -1,9 +1,9 @@
-import { View, Text } from 'react-native';
+import { Redirect } from 'expo-router';
 
-export default function TrainerDashboardScreen() {
-  return (
-    <View style={{ flex: 1, backgroundColor: '#0E0E0E', alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: '#FFFFFF', fontSize: 18 }}>Trainer Dashboard</Text>
-    </View>
-  );
+/**
+ * `/trainer` redirects to the Clients tab — the trainer's primary landing (D-1).
+ * Deep-link safety: anything still pointing at `/trainer` lands on `/trainer/clients`.
+ */
+export default function Index() {
+  return <Redirect href="/trainer/clients" />;
 }
