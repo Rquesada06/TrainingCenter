@@ -44,6 +44,9 @@ service cloud.firestore {
       // Anyone reads their own doc (both trainer and client)
       allow read: if isSignedIn() && request.auth.uid == userId;
 
+      // Trainer can read their own client's user doc — needed for CLNT-02 list, CLNT-03 profile, CLNT-04 edit name.
+      allow read: if isTrainer() && resource.data.trainerId == request.auth.uid;
+
       // First sign-in: allow a user to self-provision their own trainer doc.
       // This covers email/password trainers and Google Sign-In (first login, no doc yet).
       // Clients never hit this path — their docs are created by Cloud Function (Admin SDK).
@@ -68,6 +71,15 @@ service cloud.firestore {
         && !request.resource.data.diff(resource.data)
               .affectedKeys()
               .hasAny(['role', 'trainerId']);
+
+      // Trainer can update non-privileged fields (name, photoURL) on their own client's doc.
+      // Role/trainerId/email remain locked by the role-elevation defense — diff().affectedKeys().hasAny()
+      // denies the entire update if any privileged key changes.
+      allow update: if isTrainer()
+        && resource.data.trainerId == request.auth.uid
+        && !request.resource.data.diff(resource.data)
+              .affectedKeys()
+              .hasAny(['role', 'trainerId', 'email']);
 
       // No client can delete their own account doc via client SDK
       allow delete: if false;

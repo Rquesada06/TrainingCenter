@@ -1,0 +1,231 @@
+/**
+ * Client profile screen — Phase 02 Plan 03 (CLNT-03, CLNT-04)
+ *
+ * CLNT-03: Trainer taps a client row to view their profile — active program + start date.
+ *          Session history section is a placeholder (Phase 4 — HIST-04).
+ *
+ * CLNT-04: Trainer can edit the client's name from this screen.
+ *          Authorized server-side by the trainer-update-client Firestore rule added in Task 3.
+ *          Role/trainerId/email remain locked regardless of what the trainer sends.
+ */
+
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useClient } from '@/hooks/useClient';
+import { useActiveAssignment } from '@/hooks/useActiveAssignment';
+import { useUpdateClient } from '@/hooks/useUpdateClient';
+import { ClientPhoto } from '@/components/clients/ClientPhoto';
+import { TextField } from '@/components/ui/TextField';
+import { PrimaryButton } from '@/components/ui/PrimaryButton';
+
+export default function ClientProfileScreen() {
+  const { clientId } = useLocalSearchParams<{ clientId: string }>();
+  const router = useRouter();
+
+  const client = useClient(clientId);
+  const activeAssignment = useActiveAssignment(clientId);
+  const updateClient = useUpdateClient();
+
+  // Local state for the editable name field
+  const [nameValue, setNameValue] = useState('');
+  const [savedConfirmation, setSavedConfirmation] = useState(false);
+
+  // Initialize name from fetched client data
+  useEffect(() => {
+    if (client.data?.name) {
+      setNameValue(client.data.name);
+    }
+  }, [client.data?.name]);
+
+  // Loading state
+  if (client.isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator color="#00FF66" size="large" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Not found state
+  if (!client.data) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#888888', fontSize: 16 }}>Client not found.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const handleSaveName = () => {
+    if (!nameValue.trim() || !clientId) return;
+    updateClient.mutate(
+      { uid: clientId, partial: { name: nameValue.trim() } },
+      {
+        onSuccess: () => {
+          setSavedConfirmation(true);
+          setTimeout(() => setSavedConfirmation(false), 2000);
+        },
+      }
+    );
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Back button */}
+        <PrimaryButton
+          label="← Back"
+          variant="outline"
+          onPress={() => router.back()}
+        />
+
+        {/* ── Header: avatar + name + email ─────────────────────────────── */}
+        <View style={{ alignItems: 'center', marginTop: 24, marginBottom: 24 }}>
+          <ClientPhoto
+            photoURL={client.data.photoURL}
+            name={client.data.name}
+            size={96}
+          />
+          <Text
+            style={{
+              color: '#FFFFFF',
+              fontSize: 22,
+              fontWeight: 'bold',
+              marginTop: 12,
+              textAlign: 'center',
+            }}
+          >
+            {client.data.name}
+          </Text>
+          <Text
+            style={{
+              color: '#888888',
+              fontSize: 14,
+              marginTop: 4,
+              textAlign: 'center',
+            }}
+          >
+            {client.data.email}
+          </Text>
+        </View>
+
+        {/* ── Edit name (CLNT-04) ────────────────────────────────────────── */}
+        <View
+          style={{
+            backgroundColor: '#1A1A1A',
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 16,
+          }}
+        >
+          <Text
+            style={{ color: '#888888', fontSize: 13, marginBottom: 8, fontWeight: '600' }}
+          >
+            EDIT PROFILE
+          </Text>
+          <TextField
+            label="Name"
+            value={nameValue}
+            onChangeText={setNameValue}
+          />
+          <PrimaryButton
+            label="Save Name"
+            onPress={handleSaveName}
+            loading={updateClient.isPending}
+            disabled={!nameValue.trim() || nameValue.trim() === client.data.name}
+          />
+          {savedConfirmation && (
+            <Text
+              style={{
+                color: '#00FF66',
+                fontSize: 13,
+                marginTop: 8,
+                textAlign: 'center',
+              }}
+            >
+              Saved
+            </Text>
+          )}
+          {updateClient.isError && (
+            <Text
+              style={{
+                color: '#FF4444',
+                fontSize: 13,
+                marginTop: 8,
+                textAlign: 'center',
+              }}
+            >
+              {(updateClient.error as Error)?.message ?? 'Failed to save — please try again.'}
+            </Text>
+          )}
+        </View>
+
+        {/* ── Active program (CLNT-03) ───────────────────────────────────── */}
+        <View
+          style={{
+            backgroundColor: '#1A1A1A',
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 16,
+          }}
+        >
+          <Text
+            style={{ color: '#888888', fontSize: 13, marginBottom: 8, fontWeight: '600' }}
+          >
+            ACTIVE PROGRAM
+          </Text>
+          {activeAssignment.isLoading ? (
+            <ActivityIndicator color="#00FF66" />
+          ) : activeAssignment.data ? (
+            <>
+              <Text style={{ color: '#00FF66', fontSize: 18, fontWeight: '600' }}>
+                {activeAssignment.data.snapshot.name}
+              </Text>
+              <Text style={{ color: '#FFFFFF', fontSize: 14, marginTop: 4 }}>
+                Started:{' '}
+                <Text style={{ color: '#FFFFFF' }}>
+                  {activeAssignment.data.startDate}
+                </Text>
+              </Text>
+            </>
+          ) : (
+            <Text style={{ color: '#FFD600', fontSize: 15 }}>
+              No active program assigned
+            </Text>
+          )}
+        </View>
+
+        {/* ── Session history placeholder (Phase 4 — HIST-04) ───────────── */}
+        <View
+          style={{
+            backgroundColor: '#1A1A1A',
+            borderRadius: 8,
+            padding: 16,
+          }}
+        >
+          <Text
+            style={{ color: '#888888', fontSize: 13, marginBottom: 8, fontWeight: '600' }}
+          >
+            SESSION HISTORY
+          </Text>
+          <Text style={{ color: '#888888', fontSize: 14, fontStyle: 'italic' }}>
+            Session history coming in Phase 4.
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}

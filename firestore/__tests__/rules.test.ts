@@ -282,3 +282,53 @@ describe('Phase 2 — cross-trainer denial (T-02-01)', () => {
     await assertSucceeds(trainerDb.doc(`assignments/assignment-mine`).get());
   });
 });
+
+describe('Phase 2 — CLNT-04 trainer reads/updates own client', () => {
+  // Additional seed: a second trainer (OTHER_TRAINER_UID) and their client (OTHER_CLIENT_UID)
+  // are already seeded in beforeEach (clientB = OTHER_CLIENT_UID, trainerB = OTHER_TRAINER_UID)
+
+  test('trainer can read own client user doc', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertSucceeds(trainerDb.doc(`users/${CLIENT_UID}`).get());
+  });
+
+  test('trainer cannot read other trainer client doc', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(trainerDb.doc(`users/${OTHER_CLIENT_UID}`).get());
+  });
+
+  test('trainer can update own client name', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertSucceeds(
+      trainerDb.doc(`users/${CLIENT_UID}`).update({ name: 'New Name' })
+    );
+  });
+
+  test('trainer cannot update own client role (role-elevation defense holds)', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(
+      trainerDb.doc(`users/${CLIENT_UID}`).update({ name: 'X', role: 'trainer' })
+    );
+  });
+
+  test('trainer cannot update own client trainerId', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(
+      trainerDb.doc(`users/${CLIENT_UID}`).update({ trainerId: 'someoneElse' })
+    );
+  });
+
+  test('trainer cannot update own client email', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(
+      trainerDb.doc(`users/${CLIENT_UID}`).update({ email: 'new@example.com' })
+    );
+  });
+
+  test('trainer cannot update other trainer client doc', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(
+      trainerDb.doc(`users/${OTHER_CLIENT_UID}`).update({ name: 'Hijack' })
+    );
+  });
+});
