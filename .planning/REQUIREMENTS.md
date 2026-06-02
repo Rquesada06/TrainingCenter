@@ -19,7 +19,7 @@
 - [ ] **CLNT-02**: Trainer can view a list of their clients showing name, photo, active program, and adherence percentage
 - [ ] **CLNT-03**: Trainer can tap a client to view their profile: active program, start date, and session history
 - [ ] **CLNT-04**: Trainer can edit a client's name and photo
-- [ ] **CLNT-05**: Client list shows a visual indicator when a client has no active program
+- [x] **CLNT-05**: Client list shows a visual indicator when a client has no active program
 
 ### Exercise Library (Trainer)
 
@@ -28,7 +28,7 @@
 - [ ] **EXER-03**: Trainer can delete an exercise from their library
 - [ ] **EXER-04**: Trainer can search exercises by name with instant results (no submit required)
 - [ ] **EXER-05**: Trainer can filter exercises by location type (gym/home/both) and by category
-- [ ] **EXER-06**: Exercises belong to the trainer who created them and are not visible to other trainers
+- [x] **EXER-06**: Exercises belong to the trainer who created them and are not visible to other trainers
 
 ### Routine Builder (Trainer)
 
@@ -38,7 +38,7 @@
 - [ ] **ROUT-04**: Trainer can reorder exercises in a routine via drag and drop
 - [ ] **ROUT-05**: Trainer can define a gym/home alternative for an exercise within a routine (alternativeExerciseId cross-reference)
 - [ ] **ROUT-06**: Trainer can edit and delete routines
-- [ ] **ROUT-07**: Trainer can view a list of all their routines
+- [x] **ROUT-07**: Trainer can view a list of all their routines
 
 ### Program Builder (Trainer)
 
@@ -47,7 +47,7 @@
 - [ ] **PROG-03**: Trainer can mark specific days as rest days
 - [ ] **PROG-04**: Days with no assigned routine default to rest
 - [ ] **PROG-05**: Trainer can edit and delete programs
-- [ ] **PROG-06**: Trainer can view a list of all their programs
+- [x] **PROG-06**: Trainer can view a list of all their programs
 
 ### Program Assignment (Trainer)
 
@@ -144,26 +144,26 @@ Requirements mapped to phases by roadmapper.
 | CLNT-02 | Phase 2 | Pending |
 | CLNT-03 | Phase 2 | Pending |
 | CLNT-04 | Phase 2 | Pending |
-| CLNT-05 | Phase 2 | Pending |
+| CLNT-05 | Phase 2 | Complete |
 | EXER-01 | Phase 2 | Pending |
 | EXER-02 | Phase 2 | Pending |
 | EXER-03 | Phase 2 | Pending |
 | EXER-04 | Phase 2 | Pending |
 | EXER-05 | Phase 2 | Pending |
-| EXER-06 | Phase 2 | Pending |
+| EXER-06 | Phase 2 | Complete |
 | ROUT-01 | Phase 2 | Pending |
 | ROUT-02 | Phase 2 | Pending |
 | ROUT-03 | Phase 2 | Pending |
 | ROUT-04 | Phase 2 | Pending |
 | ROUT-05 | Phase 2 | Pending |
 | ROUT-06 | Phase 2 | Pending |
-| ROUT-07 | Phase 2 | Pending |
+| ROUT-07 | Phase 2 | Complete |
 | PROG-01 | Phase 2 | Pending |
 | PROG-02 | Phase 2 | Pending |
 | PROG-03 | Phase 2 | Pending |
 | PROG-04 | Phase 2 | Pending |
 | PROG-05 | Phase 2 | Pending |
-| PROG-06 | Phase 2 | Pending |
+| PROG-06 | Phase 2 | Complete |
 | ASGN-01 | Phase 2 | Pending |
 | ASGN-02 | Phase 2 | Pending |
 | ASGN-03 | Phase 2 | Pending |

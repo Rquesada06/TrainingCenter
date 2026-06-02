@@ -65,7 +65,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Types, Zod v4 schemas, Wave 0 test stubs, Firestore service refs, 4 new composite indexes (exercises/routines/programs/users), 5-tab trainer nav shell, package install checkpoint (Wave 1)
+- [x] 02-01-PLAN.md — Types, Zod v4 schemas, Wave 0 test stubs, Firestore service refs, 4 new composite indexes (exercises/routines/programs/users), 5-tab trainer nav shell, package install checkpoint (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion — parallel: exercises and clients touch disjoint file trees)*
 
@@ -120,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
-| 2. Trainer Content Creation | 0/5 | Not started | - |
+| 2. Trainer Content Creation | 1/5 | In Progress|  |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |

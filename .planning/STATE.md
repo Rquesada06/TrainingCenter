@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planned
-last_updated: "2026-06-01T18:30:00.000Z"
-last_activity: 2026-06-01
+status: executing
+last_updated: "2026-06-02T16:45:31.633Z"
+last_activity: 2026-06-02
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 9
-  completed_plans: 4
+  completed_plans: 5
   percent: 25
 ---
 
@@ -20,18 +20,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Trainer can create a program and assign it to a client in under 3 minutes
-**Current focus:** Phase 01 — infrastructure-auth
+**Current focus:** Phase 02 — trainer-content-creation
 
 ## Current Position
 
-Phase: 02 (trainer-content-creation) — PLANNED, READY TO EXECUTE
-Plan: 0 of 5
-Status: Phase 1 complete (verified). Phase 2 plans finalized (5 plans, 4 waves, checker passed).
-Last activity: 2026-06-01
+Phase: 02 (trainer-content-creation) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-02
 
-Progress: [████████████████████░░░░░░░░░░░░░░░░░░░░] Phase 1 done, Phase 2 ready
+Progress: [██████░░░░] 56%
 
 ### Phase 2 Planning Notes (recorded 2026-06-01)
+
 - Reanimated v4.2.1 and Zod v4.4.3 are installed (CLAUDE.md tech table still shows v3 versions — update before execution)
 - Drag-and-drop: react-native-reanimated-dnd (switched from react-native-draggable-flatlist due to Reanimated v4 flicker bug)
 - Firestore index count: 4 existing + 4 new = 8 total (exercises/routines/programs/users by trainerId+name)
@@ -62,6 +63,7 @@ Progress: [████████████████████░░░
 | Phase 01 P02 | 6 | 2 tasks | 15 files |
 | Phase 01-infrastructure-auth P04 | 18 | 2 tasks | 11 files |
 | Phase 01-infrastructure-auth P03 | 167 | 2 tasks | 5 files |
+| Phase 02 P01 | 35min | 3 tasks | 28 files |
 
 ## Accumulated Context
 
@@ -87,6 +89,7 @@ Recent decisions affecting current work:
 - [Phase ?]: sign-in error mapping
 - [Phase ?]: auth listener owns navigation on sign-in
 - [Phase ?]: sendPasswordReset: generic confirmation, no actionCodeSettings
+- [Phase ?]: Phase 2 foundation locked Zod v4 + expo-router patterns; types/schemas/refs/indexes + 5-tab shell
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-28T15:25:07.983Z
+Last session: 2026-06-02T16:45:25.505Z
 Stopped at: Completed 01-04-PLAN.md — createClientAccount Cloud Function, Firestore rules with role-elevation defense, 4 composite indexes, client caller + service wrapper
 Resume file: None
