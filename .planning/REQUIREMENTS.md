@@ -23,11 +23,11 @@
 
 ### Exercise Library (Trainer)
 
-- [ ] **EXER-01**: Trainer can create an exercise with: name, description, category (strength/cardio/functional/hypertrophy/HIIT/mobility), location type (gym/home/both), default sets, default reps, default duration (seconds), default rest (seconds), video URL (YouTube/Vimeo), image URL
-- [ ] **EXER-02**: Trainer can edit any exercise in their library
-- [ ] **EXER-03**: Trainer can delete an exercise from their library
-- [ ] **EXER-04**: Trainer can search exercises by name with instant results (no submit required)
-- [ ] **EXER-05**: Trainer can filter exercises by location type (gym/home/both) and by category
+- [x] **EXER-01**: Trainer can create an exercise with: name, description, category (strength/cardio/functional/hypertrophy/HIIT/mobility), location type (gym/home/both), default sets, default reps, default duration (seconds), default rest (seconds), video URL (YouTube/Vimeo), image URL
+- [x] **EXER-02**: Trainer can edit any exercise in their library
+- [x] **EXER-03**: Trainer can delete an exercise from their library
+- [x] **EXER-04**: Trainer can search exercises by name with instant results (no submit required)
+- [x] **EXER-05**: Trainer can filter exercises by location type (gym/home/both) and by category
 - [x] **EXER-06**: Exercises belong to the trainer who created them and are not visible to other trainers
 
 ### Routine Builder (Trainer)
@@ -145,11 +145,11 @@ Requirements mapped to phases by roadmapper.
 | CLNT-03 | Phase 2 | Pending |
 | CLNT-04 | Phase 2 | Pending |
 | CLNT-05 | Phase 2 | Complete |
-| EXER-01 | Phase 2 | Pending |
-| EXER-02 | Phase 2 | Pending |
-| EXER-03 | Phase 2 | Pending |
-| EXER-04 | Phase 2 | Pending |
-| EXER-05 | Phase 2 | Pending |
+| EXER-01 | Phase 2 | Complete |
+| EXER-02 | Phase 2 | Complete |
+| EXER-03 | Phase 2 | Complete |
+| EXER-04 | Phase 2 | Complete |
+| EXER-05 | Phase 2 | Complete |
 | EXER-06 | Phase 2 | Complete |
 | ROUT-01 | Phase 2 | Pending |
 | ROUT-02 | Phase 2 | Pending |

@@ -69,7 +69,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(blocked on Wave 1 completion — parallel: exercises and clients touch disjoint file trees)*
 
-- [ ] 02-02-PLAN.md — Exercise library: service + hooks + ExerciseForm + list/new/edit screens with search and filter (EXER-01..06) (Wave 2)
+- [x] 02-02-PLAN.md — Exercise library: service + hooks + ExerciseForm + list/new/edit screens with search and filter (EXER-01..06) (Wave 2)
 - [ ] 02-03-PLAN.md — Client management: client.service + ClientPhoto + list/profile/add screens + useActiveAssignment hook for CLNT-05 indicator (CLNT-02..05) (Wave 2)
 
 **Wave 3** *(blocked on Wave 1+2 — routines reference exercises)*
@@ -120,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
-| 2. Trainer Content Creation | 1/5 | In Progress|  |
+| 2. Trainer Content Creation | 2/5 | In Progress|  |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |
