@@ -78,7 +78,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 4** *(blocked on Wave 3 — programs reference routines; assignment needs both clients and programs)*
 
-- [ ] 02-05-PLAN.md — Programs + Assignment: program CRUD + Week×Day grid + DayPickerSheet + createAssignment v1 onCall Cloud Function + AssignProgramModal with ASGN-02 overwrite warning + end-to-end smoke test checkpoint (PROG-01..06, ASGN-01..04) (Wave 4)
+- [x] 02-05-PLAN.md — Programs + Assignment: program CRUD + Week×Day grid + DayPickerSheet + createAssignment v1 onCall Cloud Function + AssignProgramModal with ASGN-02 overwrite warning + end-to-end smoke test checkpoint (PROG-01..06, ASGN-01..04) (Wave 4)
 
 ### Phase 3: Client Workout Execution
 
@@ -120,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
-| 2. Trainer Content Creation | 4/5 | In Progress|  |
+| 2. Trainer Content Creation | 5/5 | Complete   | 2026-06-02 |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |

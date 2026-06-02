@@ -42,19 +42,19 @@
 
 ### Program Builder (Trainer)
 
-- [ ] **PROG-01**: Trainer can create a program with: name, description, duration in weeks
-- [ ] **PROG-02**: Trainer can assign a routine to each day of a program (Lun–Dom × N weeks, or Day 1–N)
-- [ ] **PROG-03**: Trainer can mark specific days as rest days
-- [ ] **PROG-04**: Days with no assigned routine default to rest
-- [ ] **PROG-05**: Trainer can edit and delete programs
+- [x] **PROG-01**: Trainer can create a program with: name, description, duration in weeks
+- [x] **PROG-02**: Trainer can assign a routine to each day of a program (Lun–Dom × N weeks, or Day 1–N)
+- [x] **PROG-03**: Trainer can mark specific days as rest days
+- [x] **PROG-04**: Days with no assigned routine default to rest
+- [x] **PROG-05**: Trainer can edit and delete programs
 - [x] **PROG-06**: Trainer can view a list of all their programs
 
 ### Program Assignment (Trainer)
 
-- [ ] **ASGN-01**: Trainer can assign a program to a client with a start date
-- [ ] **ASGN-02**: When assigning, if the client already has an active program, trainer sees a warning before overwriting
-- [ ] **ASGN-03**: On assignment, the full program (with all routine and exercise data) is copied as an immutable snapshot — editing the original program does not affect active clients
-- [ ] **ASGN-04**: The system calculates the client's current workout day from start date and client's local timezone using date-only string comparison (not Timestamp arithmetic)
+- [x] **ASGN-01**: Trainer can assign a program to a client with a start date
+- [x] **ASGN-02**: When assigning, if the client already has an active program, trainer sees a warning before overwriting
+- [x] **ASGN-03**: On assignment, the full program (with all routine and exercise data) is copied as an immutable snapshot — editing the original program does not affect active clients
+- [x] **ASGN-04**: The system calculates the client's current workout day from start date and client's local timezone using date-only string comparison (not Timestamp arithmetic)
 
 ### Client Workout Execution
 
@@ -158,16 +158,16 @@ Requirements mapped to phases by roadmapper.
 | ROUT-05 | Phase 2 | Complete |
 | ROUT-06 | Phase 2 | Complete |
 | ROUT-07 | Phase 2 | Complete |
-| PROG-01 | Phase 2 | Pending |
-| PROG-02 | Phase 2 | Pending |
-| PROG-03 | Phase 2 | Pending |
-| PROG-04 | Phase 2 | Pending |
-| PROG-05 | Phase 2 | Pending |
+| PROG-01 | Phase 2 | Complete |
+| PROG-02 | Phase 2 | Complete |
+| PROG-03 | Phase 2 | Complete |
+| PROG-04 | Phase 2 | Complete |
+| PROG-05 | Phase 2 | Complete |
 | PROG-06 | Phase 2 | Complete |
-| ASGN-01 | Phase 2 | Pending |
-| ASGN-02 | Phase 2 | Pending |
-| ASGN-03 | Phase 2 | Pending |
-| ASGN-04 | Phase 2 | Pending |
+| ASGN-01 | Phase 2 | Complete |
+| ASGN-02 | Phase 2 | Complete |
+| ASGN-03 | Phase 2 | Complete |
+| ASGN-04 | Phase 2 | Complete |
 | WORK-01 | Phase 3 | Pending |
 | WORK-02 | Phase 3 | Pending |
 | WORK-03 | Phase 3 | Pending |
