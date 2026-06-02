@@ -22,6 +22,12 @@ export interface User {
   name: string;
   email: string;
   /**
+   * Profile photo URL (Firebase Storage download URL).
+   * Null for MVP — photo upload is Phase 4 (PROF-02/03).
+   * ClientPhoto component shows an initial-letter placeholder when null.
+   */
+  photoURL?: string | null;
+  /**
    * Firestore server timestamp. Type is `unknown` here because
    * the Firestore Timestamp type is imported from @react-native-firebase/firestore
    * which is a native module — plan 04 will refine this if needed.
