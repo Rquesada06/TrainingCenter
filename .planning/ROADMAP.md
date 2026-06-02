@@ -74,7 +74,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(blocked on Wave 1+2 — routines reference exercises)*
 
-- [ ] 02-04-PLAN.md — Routine builder: service + hooks + RoutineBuilder with @gorhom/bottom-sheet picker + react-native-reanimated-dnd drag-reorder + alternatives + device verify checkpoint (ROUT-01..07) (Wave 3)
+- [x] 02-04-PLAN.md — Routine builder: service + hooks + RoutineBuilder with @gorhom/bottom-sheet picker + react-native-reanimated-dnd drag-reorder + alternatives + device verify checkpoint (ROUT-01..07) (Wave 3)
 
 **Wave 4** *(blocked on Wave 3 — programs reference routines; assignment needs both clients and programs)*
 
@@ -120,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
-| 2. Trainer Content Creation | 3/5 | In Progress|  |
+| 2. Trainer Content Creation | 4/5 | In Progress|  |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |

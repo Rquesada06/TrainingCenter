@@ -32,12 +32,12 @@
 
 ### Routine Builder (Trainer)
 
-- [ ] **ROUT-01**: Trainer can create a named routine by selecting exercises from their library
-- [ ] **ROUT-02**: Trainer can override default sets/reps/duration/rest per exercise within a routine
-- [ ] **ROUT-03**: Trainer can add notes to an exercise within a routine
-- [ ] **ROUT-04**: Trainer can reorder exercises in a routine via drag and drop
-- [ ] **ROUT-05**: Trainer can define a gym/home alternative for an exercise within a routine (alternativeExerciseId cross-reference)
-- [ ] **ROUT-06**: Trainer can edit and delete routines
+- [x] **ROUT-01**: Trainer can create a named routine by selecting exercises from their library
+- [x] **ROUT-02**: Trainer can override default sets/reps/duration/rest per exercise within a routine
+- [x] **ROUT-03**: Trainer can add notes to an exercise within a routine
+- [x] **ROUT-04**: Trainer can reorder exercises in a routine via drag and drop
+- [x] **ROUT-05**: Trainer can define a gym/home alternative for an exercise within a routine (alternativeExerciseId cross-reference)
+- [x] **ROUT-06**: Trainer can edit and delete routines
 - [x] **ROUT-07**: Trainer can view a list of all their routines
 
 ### Program Builder (Trainer)
@@ -151,12 +151,12 @@ Requirements mapped to phases by roadmapper.
 | EXER-04 | Phase 2 | Complete |
 | EXER-05 | Phase 2 | Complete |
 | EXER-06 | Phase 2 | Complete |
-| ROUT-01 | Phase 2 | Pending |
-| ROUT-02 | Phase 2 | Pending |
-| ROUT-03 | Phase 2 | Pending |
-| ROUT-04 | Phase 2 | Pending |
-| ROUT-05 | Phase 2 | Pending |
-| ROUT-06 | Phase 2 | Pending |
+| ROUT-01 | Phase 2 | Complete |
+| ROUT-02 | Phase 2 | Complete |
+| ROUT-03 | Phase 2 | Complete |
+| ROUT-04 | Phase 2 | Complete |
+| ROUT-05 | Phase 2 | Complete |
+| ROUT-06 | Phase 2 | Complete |
 | ROUT-07 | Phase 2 | Complete |
 | PROG-01 | Phase 2 | Pending |
 | PROG-02 | Phase 2 | Pending |
