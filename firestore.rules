@@ -72,16 +72,16 @@ service cloud.firestore {
               .affectedKeys()
               .hasAny(['role', 'trainerId']);
 
-      // Self-provision a MISSING role: a signed-in user whose own doc has no
-      // 'role' field may set it to 'trainer' (and only 'trainer'), without
-      // touching 'trainerId'. Clients always carry an explicit role:'client'
-      // from creation, so they can never reach this path — it cannot be used
-      // for role elevation. This lets the auth listener self-heal legacy
-      // roleless trainer docs (e.g. created before role was written).
+      // Self-provision a MISSING or INVALID role: a signed-in user whose own
+      // doc has no 'role' field, or a role that is not 'client', may set it to
+      // 'trainer' (and only 'trainer'), without touching 'trainerId'. Clients
+      // always carry an explicit role:'client' from creation and are explicitly
+      // excluded here, so this can never be used for role elevation. This lets
+      // the auth listener self-heal legacy roleless/null-role trainer docs.
       allow update: if isSignedIn()
         && request.auth.uid == userId
-        && !resource.data.keys().hasAny(['role'])
         && request.resource.data.role == 'trainer'
+        && (!resource.data.keys().hasAny(['role']) || resource.data.role != 'client')
         && !request.resource.data.diff(resource.data)
               .affectedKeys()
               .hasAny(['trainerId']);
