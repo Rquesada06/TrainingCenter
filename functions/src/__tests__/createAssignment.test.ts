@@ -16,11 +16,11 @@ const mockBatchSet = jest.fn();
 const mockBatchUpdate = jest.fn();
 const mockBatchCommit = jest.fn().mockResolvedValue(undefined);
 
-// Shared mock doc builder
-const makeDocSnap = (exists: boolean, id: string, data: Record<string, unknown> | null) => ({
-  exists: () => exists,
+// Shared mock doc builder — admin SDK uses `exists` as a boolean property (not a method)
+const makeDocSnap = (existsVal: boolean, id: string, data: Record<string, unknown> | null) => ({
+  exists: existsVal,
   id,
-  data: () => (exists ? data : undefined),
+  data: () => (existsVal ? data : undefined),
 });
 
 // Per-test configurable doc resolver

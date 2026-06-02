@@ -10,14 +10,17 @@
 // Mocks (must be before imports)
 // ────────────────────────────────────────────────────────────────────────────
 
-const mockCallable = jest.fn();
+const mockCallCreateAssignment = jest.fn();
 
 jest.mock('@/firebase/functions', () => ({
-  createAssignmentCallable: mockCallable,
+  createAssignmentCallable: jest.fn(),
+  callCreateAssignment: (...args: unknown[]) => mockCallCreateAssignment(...args),
 }));
 
+const mockFindActiveAssignment = jest.fn().mockResolvedValue(null);
+
 jest.mock('@/services/client.service', () => ({
-  findActiveAssignmentForClient: jest.fn().mockResolvedValue(null),
+  findActiveAssignmentForClient: (...args: unknown[]) => mockFindActiveAssignment(...args),
 }));
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -37,7 +40,7 @@ describe('callCreateAssignment', () => {
   });
 
   it('invokes createAssignmentCallable and unwraps result.data.assignmentId', async () => {
-    mockCallable.mockResolvedValueOnce({ data: { assignmentId: 'new-assignment-id' } });
+    mockCallCreateAssignment.mockResolvedValueOnce({ assignmentId: 'new-assignment-id' });
 
     const input = {
       programId: 'prog-1',
@@ -47,14 +50,14 @@ describe('callCreateAssignment', () => {
 
     const result = await callCreateAssignment(input);
 
-    expect(mockCallable).toHaveBeenCalledWith(input);
+    expect(mockCallCreateAssignment).toHaveBeenCalledWith(input);
     expect(result).toEqual({ assignmentId: 'new-assignment-id' });
   });
 });
 
 describe('findActiveAssignmentForClient re-export', () => {
   it('is the same reference as the one from client.service (single source of truth)', () => {
-    // The re-export must be the exact function from client.service
+    // Both are the same underlying mock function routed through the module mock
     expect(findActiveAssignmentForClient).toBe(clientServiceFn);
   });
 });

@@ -14,6 +14,7 @@
 
 import functions from '@react-native-firebase/functions';
 import type { CreateClientAccountInput, CreateClientAccountResult } from '@/types/user';
+import type { CreateAssignmentInput, CreateAssignmentResult } from '@/types/assignment';
 
 /**
  * Callable reference for the createClientAccount Cloud Function.
@@ -24,3 +25,26 @@ export const createClientAccountCallable = functions().httpsCallable<
   CreateClientAccountInput,
   CreateClientAccountResult
 >('createClientAccount');
+
+/**
+ * Callable reference for the createAssignment Cloud Function (Phase 02 Plan 05).
+ * Uses v1 onCall — same pattern as createClientAccount (Pitfall 5, STATE.md).
+ *
+ * Input: { programId, clientId, startDate: YYYY-MM-DD }
+ * Output: { assignmentId: string }
+ */
+export const createAssignmentCallable = functions().httpsCallable<
+  CreateAssignmentInput,
+  CreateAssignmentResult
+>('createAssignment');
+
+/**
+ * Typed wrapper for calling createAssignment.
+ * Unwraps result.data from the httpsCallable envelope.
+ */
+export async function callCreateAssignment(
+  input: CreateAssignmentInput
+): Promise<CreateAssignmentResult> {
+  const result = await createAssignmentCallable(input);
+  return result.data;
+}
