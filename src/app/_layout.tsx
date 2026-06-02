@@ -1,5 +1,6 @@
 import '../../global.css';
 
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -40,19 +41,21 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={!uid}>
-          <Stack.Screen name="sign-in" />
-        </Stack.Protected>
+      <BottomSheetModalProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={!uid}>
+            <Stack.Screen name="sign-in" />
+          </Stack.Protected>
 
-        <Stack.Protected guard={uid !== null && role === 'trainer'}>
-          <Stack.Screen name="trainer" />
-        </Stack.Protected>
+          <Stack.Protected guard={uid !== null && role === 'trainer'}>
+            <Stack.Screen name="trainer" />
+          </Stack.Protected>
 
-        <Stack.Protected guard={uid !== null && role === 'client'}>
-          <Stack.Screen name="client" />
-        </Stack.Protected>
-      </Stack>
+          <Stack.Protected guard={uid !== null && role === 'client'}>
+            <Stack.Screen name="client" />
+          </Stack.Protected>
+        </Stack>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }
