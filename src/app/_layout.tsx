@@ -1,12 +1,15 @@
 import '../../global.css';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { initAuthListener } from '@/firebase/auth';
+import { queryClient } from '@/lib/queryClient';
 import { useAuthStore } from '@/stores/authStore';
 
 SplashScreen.preventAutoHideAsync();
@@ -39,23 +42,38 @@ export default function RootLayout() {
 
   if (!isLoaded) return null;
 
+  // Defensive fallback: a signed-in user with no resolved role must never land
+  // on a blank screen (no Stack.Protected guard below would match). The auth
+  // listener self-heals roleless docs to 'trainer', so this is a last resort.
+  if (uid && role !== 'trainer' && role !== 'client') {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0E0E0E', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <Text style={{ color: '#FFFFFF', fontSize: 15, textAlign: 'center' }}>
+          Setting up your account…
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={!uid}>
-            <Stack.Screen name="sign-in" />
-          </Stack.Protected>
+      <QueryClientProvider client={queryClient}>
+        <BottomSheetModalProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={!uid}>
+              <Stack.Screen name="sign-in" />
+            </Stack.Protected>
 
-          <Stack.Protected guard={uid !== null && role === 'trainer'}>
-            <Stack.Screen name="trainer" />
-          </Stack.Protected>
+            <Stack.Protected guard={uid !== null && role === 'trainer'}>
+              <Stack.Screen name="trainer" />
+            </Stack.Protected>
 
-          <Stack.Protected guard={uid !== null && role === 'client'}>
-            <Stack.Screen name="client" />
-          </Stack.Protected>
-        </Stack>
-      </BottomSheetModalProvider>
+            <Stack.Protected guard={uid !== null && role === 'client'}>
+              <Stack.Screen name="client" />
+            </Stack.Protected>
+          </Stack>
+        </BottomSheetModalProvider>
+      </QueryClientProvider>
     </GestureHandlerRootView>
   );
 }

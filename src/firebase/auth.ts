@@ -61,10 +61,27 @@ export function initAuthListener(): () => void {
         data = newUser;
       }
 
-      const role = data?.role;
+      let resolvedRole =
+        data?.role === 'trainer' || data?.role === 'client' ? data.role : null;
+
+      // Self-heal a roleless doc. A signed-in user whose USERS doc has no valid
+      // role is necessarily a trainer: client docs are only ever created with an
+      // explicit role:'client' + trainerId by the trainer-driven flow. Without
+      // this, a roleless doc leaves the root layout with no matching navigation
+      // guard → blank screen. Best-effort persist; the in-memory role is set
+      // regardless so navigation proceeds even if the write is denied.
+      if (resolvedRole === null) {
+        resolvedRole = 'trainer';
+        try {
+          await ref.set({ role: 'trainer' }, { merge: true });
+        } catch {
+          // Write denied/unreachable — proceed in-memory; retried next sign-in.
+        }
+      }
+
       useAuthStore.getState().set({
         uid: firebaseUser.uid,
-        role: (role === 'trainer' || role === 'client') ? role : null,
+        role: resolvedRole,
         trainerId: data?.trainerId ?? null,
         isLoaded: true,
       });
