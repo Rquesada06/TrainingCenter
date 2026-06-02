@@ -14,7 +14,7 @@ LauFit ships as four vertical slices, each delivering a complete working capabil
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure + Auth** - Firebase setup, EAS dev build, auth flow, role-based navigation shell, Cloud Function, composite indexes (completed 2026-05-28)
-- [ ] **Phase 2: Trainer Content Creation** - Exercise library, routine builder, program builder, client management, program assignment with snapshot transaction, trainer dashboard
+- [~] **Phase 2: Trainer Content Creation** - Exercise library, routine builder, program builder, client management, program assignment with snapshot transaction, trainer dashboard *(planned — 5 plans, 4 waves)*
 - [ ] **Phase 3: Client Workout Execution** - Workout calculator, four home states, session execution, gym/home toggle, crash-safe local state, completion flow, duplicate guard
 - [ ] **Phase 4: History + Polish** - Paginated session history, trainer client history view, profiles with photos, empty states, adherence metrics, in-session navigation guard
 
@@ -60,8 +60,25 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Trainer can assign a program to a client with a start date — the system stores a full immutable snapshot so editing the original program does not affect the active assignment — and warns before overwriting an existing active program
   5. Trainer dashboard shows each client's name, photo, active program, and a visual indicator when no program is assigned
 
-**Plans**: TBD
+**Plans**: 5 plans (4 waves)
 **UI hint**: yes
+
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Types, Zod v4 schemas, Wave 0 test stubs, Firestore service refs, 4 new composite indexes (exercises/routines/programs/users), 5-tab trainer nav shell, package install checkpoint (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion — parallel: exercises and clients touch disjoint file trees)*
+
+- [ ] 02-02-PLAN.md — Exercise library: service + hooks + ExerciseForm + list/new/edit screens with search and filter (EXER-01..06) (Wave 2)
+- [ ] 02-03-PLAN.md — Client management: client.service + ClientPhoto + list/profile/add screens + useActiveAssignment hook for CLNT-05 indicator (CLNT-02..05) (Wave 2)
+
+**Wave 3** *(blocked on Wave 1+2 — routines reference exercises)*
+
+- [ ] 02-04-PLAN.md — Routine builder: service + hooks + RoutineBuilder with @gorhom/bottom-sheet picker + react-native-reanimated-dnd drag-reorder + alternatives + device verify checkpoint (ROUT-01..07) (Wave 3)
+
+**Wave 4** *(blocked on Wave 3 — programs reference routines; assignment needs both clients and programs)*
+
+- [ ] 02-05-PLAN.md — Programs + Assignment: program CRUD + Week×Day grid + DayPickerSheet + createAssignment v1 onCall Cloud Function + AssignProgramModal with ASGN-02 overwrite warning + end-to-end smoke test checkpoint (PROG-01..06, ASGN-01..04) (Wave 4)
 
 ### Phase 3: Client Workout Execution
 
@@ -103,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
-| 2. Trainer Content Creation | 0/TBD | Not started | - |
+| 2. Trainer Content Creation | 0/5 | Not started | - |
 | 3. Client Workout Execution | 0/TBD | Not started | - |
 | 4. History + Polish | 0/TBD | Not started | - |

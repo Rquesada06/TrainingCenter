@@ -13,7 +13,7 @@
 
 1. **5-tab trainer nav:** Clients | Exercises | Routines | Programs | Profile — replaces current 2-tab shell.
 2. **Program day model:** Week × Day 1–7 grid. `program.weeks[w].days[d]`, array index 0–6.
-3. **Drag-and-drop:** `react-native-draggable-flatlist` (decision recorded in CONTEXT.md).
+3. **Drag-and-drop:** `react-native-reanimated-dnd` (updated from `react-native-draggable-flatlist` — user approved switch; see Open Questions (RESOLVED) below).
 4. **Snapshot:** Cloud Function `createAssignment` — server-side atomic batch write.
 5. **Video display:** `Linking.openURL(videoUrl)` — external browser.
 6. **Firestore collections:** top-level `exercises`, `routines`, `programs`, `assignments` with `trainerId` field (already in `firestore.rules`).
@@ -689,27 +689,19 @@ export const createAssignmentCallable = functions().httpsCallable('createAssignm
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Drag-and-drop library — CONTEXT.md vs installed Reanimated version**
-   - What we know: CONTEXT.md locks `react-native-draggable-flatlist`; installed Reanimated is v4.2.1; `react-native-draggable-flatlist` targets Reanimated v2+/v3; `react-native-reanimated-dnd` is purpose-built for v4.
-   - What's unclear: Whether `react-native-draggable-flatlist` has any community-confirmed reports of working on Reanimated v4 without issues.
-   - Recommendation: **Flag to user before implementing.** Either (a) update CONTEXT.md to `react-native-reanimated-dnd`, or (b) run a 30-minute spike: install `react-native-draggable-flatlist`, build on device, test drag on Expo dev client with New Architecture. If it works, proceed with CONTEXT.md decision; if it flickers, switch to `react-native-reanimated-dnd`.
+   - **RESOLVED:** User approved switching to `react-native-reanimated-dnd`. CONTEXT.md Decision 3 updated. Plans use `react-native-reanimated-dnd`.
 
 2. **@gorhom/bottom-sheet — explicit listing in plan**
-   - What we know: Not mentioned in CONTEXT.md; needed for the program-day picker interaction.
-   - What's unclear: The user may prefer a simpler RN Modal approach for the day picker.
-   - Recommendation: Use `@gorhom/bottom-sheet` — it's the ecosystem standard and already peer-dep compatible. Add to the plan as a Wave 0 install step.
+   - **RESOLVED:** Use `@gorhom/bottom-sheet` v5 (peer dep compatible with Reanimated v4). Added to Wave 1 install step in 02-01.
 
 3. **Client photo display in CLNT-02 — photoURL availability**
-   - What we know: Profile photo upload is Phase 4. In Phase 2, we need to display photos in the client list.
-   - What's unclear: Whether Phase 1 clients have any `photoURL` set (likely null).
-   - Recommendation: Implement `expo-image` with a fallback to a default avatar. When `photoURL` is null, show initials or a placeholder image. This is the correct pattern regardless.
+   - **RESOLVED:** Implement `expo-image` with placeholder fallback (initials or default avatar). Phase 2 clients likely have null photoURL; Phase 4 adds upload.
 
 4. **Firestore composite indexes for Phase 2 queries**
-   - What we know: `firestore.indexes.json` has 4 indexes (sessions + assignments). Phase 2 queries need trainerId + name indexes for exercises, routines, programs.
-   - What's unclear: Whether orderBy('name') is even needed or if client-side sort is acceptable.
-   - Recommendation: Use `orderBy('createdAt', 'desc')` instead of `orderBy('name', 'asc')` for list queries — then client-side sort by name for display. This avoids needing composite indexes (trainerId == equality + createdAt desc). Single-field indexes on `trainerId` are auto-created by Firestore.
+   - **RESOLVED:** User approved sorting by name A-Z. Add 3 composite indexes: exercises(trainerId ASC + name ASC), routines(trainerId ASC + name ASC), programs(trainerId ASC + name ASC). Plans include this in 02-01.
 
 ---
 

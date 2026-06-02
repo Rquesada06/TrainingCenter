@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-05-28T15:25:07.990Z"
-last_activity: 2026-05-28
+status: planned
+last_updated: "2026-06-01T18:30:00.000Z"
+last_activity: 2026-06-01
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
+  total_plans: 9
   completed_plans: 4
   percent: 25
 ---
@@ -24,12 +24,19 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 01 (infrastructure-auth) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-05-28
+Phase: 02 (trainer-content-creation) — PLANNED, READY TO EXECUTE
+Plan: 0 of 5
+Status: Phase 1 complete (verified). Phase 2 plans finalized (5 plans, 4 waves, checker passed).
+Last activity: 2026-06-01
 
-Progress: [██████████] 100%
+Progress: [████████████████████░░░░░░░░░░░░░░░░░░░░] Phase 1 done, Phase 2 ready
+
+### Phase 2 Planning Notes (recorded 2026-06-01)
+- Reanimated v4.2.1 and Zod v4.4.3 are installed (CLAUDE.md tech table still shows v3 versions — update before execution)
+- Drag-and-drop: react-native-reanimated-dnd (switched from react-native-draggable-flatlist due to Reanimated v4 flicker bug)
+- Firestore index count: 4 existing + 4 new = 8 total (exercises/routines/programs/users by trainerId+name)
+- CLNT-04: Firestore rules for trainer-reads-client and trainer-updates-client added in 02-03 (role/trainerId/email field lock)
+- createAssignment uses v1 onCall CF (v2 has auth propagation bug with @react-native-firebase/functions.httpsCallable)
 
 ## Performance Metrics
 
