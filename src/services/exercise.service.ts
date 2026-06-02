@@ -13,6 +13,7 @@
 
 import firestore from '@react-native-firebase/firestore';
 import { exercisesCollection } from '@/firebase/firestore';
+import { stripUndefinedDeep } from '@/lib/firestoreWrite';
 import type { Exercise, CreateExerciseInput } from '@/types/exercise';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -69,7 +70,7 @@ export async function createExercise(args: {
 }): Promise<string> {
   const { trainerId, input } = args;
   const ref = await exercisesCollection().add({
-    ...input,
+    ...stripUndefinedDeep(input),
     trainerId,
     createdAt: firestore.FieldValue.serverTimestamp(),
     updatedAt: firestore.FieldValue.serverTimestamp(),
@@ -88,7 +89,7 @@ export async function updateExercise(
   await exercisesCollection()
     .doc(id)
     .update({
-      ...partial,
+      ...stripUndefinedDeep(partial),
       updatedAt: firestore.FieldValue.serverTimestamp(),
     });
 }

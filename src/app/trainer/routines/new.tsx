@@ -12,16 +12,19 @@ import { SafeAreaView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCreateRoutine } from '@/hooks/useCreateRoutine';
 import { RoutineBuilder } from '@/components/routines/RoutineBuilder';
+import { withSaveFeedback } from '@/lib/mutationFeedback';
 import type { RoutineFormValues } from '@/validation/routine.schema';
 
 export default function NewRoutineScreen() {
   const router = useRouter();
   const createMutation = useCreateRoutine();
 
-  const handleSubmit = async (values: RoutineFormValues) => {
-    await createMutation.mutateAsync(values);
-    router.back();
-  };
+  const handleSubmit = (values: RoutineFormValues) =>
+    withSaveFeedback(
+      () => createMutation.mutateAsync(values),
+      () => router.back(),
+      'Could not create routine',
+    );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>

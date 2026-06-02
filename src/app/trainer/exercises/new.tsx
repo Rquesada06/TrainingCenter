@@ -13,16 +13,19 @@ import { View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { ExerciseForm } from '@/components/exercises/ExerciseForm';
 import { useCreateExercise } from '@/hooks/useCreateExercise';
+import { withSaveFeedback } from '@/lib/mutationFeedback';
 import type { ExerciseFormValues } from '@/validation/exercise.schema';
 
 export default function NewExerciseScreen() {
   const router = useRouter();
   const mutation = useCreateExercise();
 
-  const handleSubmit = async (values: ExerciseFormValues) => {
-    await mutation.mutateAsync(values);
-    router.back();
-  };
+  const handleSubmit = (values: ExerciseFormValues) =>
+    withSaveFeedback(
+      () => mutation.mutateAsync(values),
+      () => router.back(),
+      'Could not create exercise',
+    );
 
   return (
     <View style={{ flex: 1, backgroundColor: '#0E0E0E' }}>

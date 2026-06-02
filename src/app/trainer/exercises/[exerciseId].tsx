@@ -22,6 +22,7 @@ import { ExerciseForm } from '@/components/exercises/ExerciseForm';
 import { useUpdateExercise } from '@/hooks/useUpdateExercise';
 import { useDeleteExercise } from '@/hooks/useDeleteExercise';
 import { getExercise } from '@/services/exercise.service';
+import { withSaveFeedback } from '@/lib/mutationFeedback';
 import type { ExerciseFormValues } from '@/validation/exercise.schema';
 
 export default function EditExerciseScreen() {
@@ -53,10 +54,12 @@ export default function EditExerciseScreen() {
   });
 
   // ── Save handler (EXER-02)
-  const handleSubmit = async (values: ExerciseFormValues) => {
-    await updateMutation.mutateAsync({ id: exerciseId, partial: values });
-    router.back();
-  };
+  const handleSubmit = (values: ExerciseFormValues) =>
+    withSaveFeedback(
+      () => updateMutation.mutateAsync({ id: exerciseId, partial: values }),
+      () => router.back(),
+      'Could not save exercise',
+    );
 
   // ── Delete handler (EXER-03) — always shows confirmation Alert
   const handleDelete = () => {
@@ -68,10 +71,12 @@ export default function EditExerciseScreen() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: async () => {
-            await deleteMutation.mutateAsync(exerciseId);
-            router.back();
-          },
+          onPress: () =>
+            withSaveFeedback(
+              () => deleteMutation.mutateAsync(exerciseId),
+              () => router.back(),
+              'Could not delete exercise',
+            ),
         },
       ]
     );

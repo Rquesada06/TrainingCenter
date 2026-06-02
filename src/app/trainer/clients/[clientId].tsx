@@ -16,6 +16,7 @@ import {
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useClient } from '@/hooks/useClient';
@@ -74,6 +75,12 @@ export default function ClientProfileScreen() {
         onSuccess: () => {
           setSavedConfirmation(true);
           setTimeout(() => setSavedConfirmation(false), 2000);
+        },
+        onError: (err) => {
+          Alert.alert(
+            'Could not save name',
+            err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+          );
         },
       }
     );

@@ -19,6 +19,7 @@ import { useRoutine } from '@/hooks/useRoutine';
 import { useUpdateRoutine } from '@/hooks/useUpdateRoutine';
 import { useDeleteRoutine } from '@/hooks/useDeleteRoutine';
 import { RoutineBuilder } from '@/components/routines/RoutineBuilder';
+import { withSaveFeedback } from '@/lib/mutationFeedback';
 import type { RoutineFormValues } from '@/validation/routine.schema';
 
 export default function EditRoutineScreen() {
@@ -48,10 +49,12 @@ export default function EditRoutineScreen() {
   }
 
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleSubmit = async (values: RoutineFormValues) => {
-    await updateMutation.mutateAsync({ id: routineId!, partial: values });
-    router.back();
-  };
+  const handleSubmit = (values: RoutineFormValues) =>
+    withSaveFeedback(
+      () => updateMutation.mutateAsync({ id: routineId!, partial: values }),
+      () => router.back(),
+      'Could not save routine',
+    );
 
   const handleDelete = () => {
     Alert.alert(
@@ -62,10 +65,12 @@ export default function EditRoutineScreen() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: async () => {
-            await deleteMutation.mutateAsync(routineId!);
-            router.back();
-          },
+          onPress: () =>
+            withSaveFeedback(
+              () => deleteMutation.mutateAsync(routineId!),
+              () => router.back(),
+              'Could not delete routine',
+            ),
         },
       ]
     );

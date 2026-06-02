@@ -15,6 +15,7 @@
 
 import firestore from '@react-native-firebase/firestore';
 import { routinesCollection } from '@/firebase/firestore';
+import { stripUndefinedDeep } from '@/lib/firestoreWrite';
 import type { Routine, CreateRoutineInput } from '@/types/routine';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -70,7 +71,7 @@ export async function createRoutine(args: {
 }): Promise<string> {
   const { trainerId, input } = args;
   const ref = await routinesCollection().add({
-    ...input,
+    ...stripUndefinedDeep(input),
     trainerId,
     createdAt: firestore.FieldValue.serverTimestamp(),
     updatedAt: firestore.FieldValue.serverTimestamp(),
@@ -89,7 +90,7 @@ export async function updateRoutine(
   await routinesCollection()
     .doc(id)
     .update({
-      ...partial,
+      ...stripUndefinedDeep(partial),
       updatedAt: firestore.FieldValue.serverTimestamp(),
     });
 }
