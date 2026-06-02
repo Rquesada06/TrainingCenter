@@ -92,6 +92,39 @@ beforeEach(async () => {
       name: 'Bench Press',
       description: 'Barbell bench press',
     });
+
+    // Routine owned by other trainer
+    await db.doc(`routines/routine-other`).set({
+      trainerId: OTHER_TRAINER_UID,
+      name: 'Other Push Day',
+      exercises: [],
+    });
+
+    // Program owned by other trainer
+    await db.doc(`programs/program-other`).set({
+      trainerId: OTHER_TRAINER_UID,
+      name: 'Other 8 Week',
+      durationWeeks: 8,
+      weeks: [],
+    });
+
+    // Assignment for OTHER trainer's client (trainerId = OTHER_TRAINER_UID)
+    await db.doc(`assignments/assignment-other`).set({
+      trainerId: OTHER_TRAINER_UID,
+      clientId: OTHER_CLIENT_UID,
+      programId: 'program-other',
+      status: 'active',
+      startDate: '2026-06-01',
+    });
+
+    // Assignment owned by TEST trainer, assigned to TEST client
+    await db.doc(`assignments/assignment-mine`).set({
+      trainerId: TRAINER_UID,
+      clientId: CLIENT_UID,
+      programId: 'program-mine',
+      status: 'active',
+      startDate: '2026-06-01',
+    });
   });
 });
 
@@ -187,5 +220,65 @@ describe('EXERCISES collection security rules', () => {
         description: 'Should be denied',
       })
     );
+  });
+});
+
+describe('Phase 2 — cross-trainer denial (T-02-01)', () => {
+  test('trainer-A cannot read trainer-B exercise', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(trainerDb.doc(`exercises/exercise-2`).get());
+  });
+
+  test('trainer cannot create exercise with foreign trainerId', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(
+      trainerDb.doc(`exercises/exercise-spoof`).set({
+        trainerId: OTHER_TRAINER_UID,
+        name: 'Spoofed',
+      })
+    );
+  });
+
+  test('trainer-A cannot read trainer-B routine', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(trainerDb.doc(`routines/routine-other`).get());
+  });
+
+  test('trainer-A cannot read trainer-B program', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(trainerDb.doc(`programs/program-other`).get());
+  });
+
+  test('trainer-A cannot read assignment for trainer-B client', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertFails(trainerDb.doc(`assignments/assignment-other`).get());
+  });
+
+  test('client can read assignment where clientId == own uid', async () => {
+    const clientDb = testEnv.authenticatedContext(CLIENT_UID).firestore();
+    await assertSucceeds(clientDb.doc(`assignments/assignment-mine`).get());
+  });
+
+  test('client cannot read another client assignment', async () => {
+    const clientDb = testEnv.authenticatedContext(CLIENT_UID).firestore();
+    await assertFails(clientDb.doc(`assignments/assignment-other`).get());
+  });
+
+  test('client cannot create an assignment (trainers only)', async () => {
+    const clientDb = testEnv.authenticatedContext(CLIENT_UID).firestore();
+    await assertFails(
+      clientDb.doc(`assignments/assignment-illegal`).set({
+        trainerId: TRAINER_UID,
+        clientId: CLIENT_UID,
+        programId: 'program-mine',
+        status: 'active',
+        startDate: '2026-06-01',
+      })
+    );
+  });
+
+  test('owning trainer can read own assignment', async () => {
+    const trainerDb = testEnv.authenticatedContext(TRAINER_UID).firestore();
+    await assertSucceeds(trainerDb.doc(`assignments/assignment-mine`).get());
   });
 });
