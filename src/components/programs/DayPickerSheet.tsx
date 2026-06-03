@@ -31,6 +31,7 @@ import {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoutines } from '@/hooks/useRoutines';
 import type { Routine } from '@/types/routine';
 
@@ -47,6 +48,7 @@ const SNAP_POINTS = ['60%'];
 export const DayPickerSheet = forwardRef<DayPickerSheetHandle, DayPickerSheetProps>(
   ({ onSelect }, ref) => {
     const sheetRef = useRef<BottomSheetModal>(null);
+    const insets = useSafeAreaInsets();
     const [activeCell, setActiveCell] = useState<{ w: number; d: number } | null>(null);
     const { data: routines = [] } = useRoutines();
 
@@ -154,6 +156,7 @@ export const DayPickerSheet = forwardRef<DayPickerSheetHandle, DayPickerSheetPro
           data={routines}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
           ListEmptyComponent={
             <View style={{ padding: 16 }}>
               <Text style={{ color: '#888888', fontSize: 14 }}>

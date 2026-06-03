@@ -24,6 +24,7 @@ import {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useClients } from '@/hooks/useClients';
 import { ClientPhoto } from '@/components/clients/ClientPhoto';
 import type { User } from '@/types/user';
@@ -41,6 +42,7 @@ const SNAP_POINTS = ['60%'];
 export const ClientPickerSheet = forwardRef<ClientPickerSheetHandle, ClientPickerSheetProps>(
   ({ onSelect }, ref) => {
     const sheetRef = useRef<BottomSheetModal>(null);
+    const insets = useSafeAreaInsets();
     const { data: clients = [] } = useClients();
 
     useImperativeHandle(ref, () => ({
@@ -126,6 +128,7 @@ export const ClientPickerSheet = forwardRef<ClientPickerSheetHandle, ClientPicke
           data={clients}
           keyExtractor={(item) => item.uid}
           renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
           ListEmptyComponent={
             <View style={{ padding: 16 }}>
               <Text style={{ color: '#888888', fontSize: 14 }}>

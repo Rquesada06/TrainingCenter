@@ -14,6 +14,7 @@ import { Pressable, Text, View } from 'react-native';
 import { BottomSheetModal, BottomSheetFlatList, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import type { BottomSheetDefaultBackdropProps } from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useExercises } from '@/hooks/useExercises';
 import type { Exercise } from '@/types/exercise';
 
@@ -41,6 +42,7 @@ export const AlternativeExercisePicker = forwardRef<
   AlternativeExercisePickerProps
 >(function AlternativeExercisePicker({ onSelect, excludeExerciseId }, ref) {
   const sheetRef = useRef<BottomSheetModal>(null);
+  const insets = useSafeAreaInsets();
   const exercisesQuery = useExercises();
 
   // T-02-XREF: filter out the primary exercise so it can't be its own alternative
@@ -118,6 +120,7 @@ export const AlternativeExercisePicker = forwardRef<
           data={exercises}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         />
       )}
     </BottomSheetModal>

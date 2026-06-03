@@ -26,7 +26,7 @@
 
 import React, { useRef, useState } from 'react';
 import { Modal, View, Text, TextInput, ActivityIndicator, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { findActiveAssignmentForClient } from '@/services/assignment.service';
@@ -162,6 +162,7 @@ export function AssignProgramModal({
         GestureHandlerRootView + BottomSheetModalProvider so the sheet appears.
       */}
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
         <BottomSheetModalProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
         <View style={{ flex: 1, padding: 24 }}>
@@ -291,6 +292,7 @@ export function AssignProgramModal({
         <ClientPickerSheet ref={clientPickerRef} onSelect={handleClientSelect} />
       </SafeAreaView>
         </BottomSheetModalProvider>
+        </SafeAreaProvider>
       </GestureHandlerRootView>
     </Modal>
   );
