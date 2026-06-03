@@ -55,6 +55,7 @@ export function RoutineBuilder({
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<z.input<typeof routineSchema>, unknown, z.output<typeof routineSchema>>({
     resolver: zodResolver(routineSchema),
     defaultValues: defaultValues ?? { name: '', exercises: [] },
@@ -64,6 +65,11 @@ export function RoutineBuilder({
     control,
     name: 'exercises',
   });
+
+  // useFieldArray's `fields` holds INITIAL values only — setValue on a nested
+  // field (e.g. picking an alternative) does not update it. Watch the live array
+  // so rows re-render with the current alternativeExerciseId.
+  const watchedExercises = watch('exercises');
 
   // ── Exercise name map for display ─────────────────────────────────────────
   const exercisesQuery = useExercises();
@@ -195,22 +201,23 @@ export function RoutineBuilder({
             <SortableExerciseList
               fields={fields as unknown as SortableField[]}
               onReorder={handleReorder}
-              renderItem={({ item, index, dragHandle }) => (
-                <RoutineExerciseRow
-                  key={item.id}
-                  index={index}
-                  control={control as never}
-                  exerciseName={exercisesMap[item.exerciseId]?.name ?? item.name ?? item.exerciseId}
-                  alternativeName={
-                    item.alternativeExerciseId
-                      ? (exercisesMap[item.alternativeExerciseId]?.name ?? null)
-                      : null
-                  }
-                  onRemove={() => remove(index)}
-                  onOpenAlternativePicker={() => openAlternativePicker(index)}
-                  dragHandle={dragHandle}
-                />
-              )}
+              renderItem={({ item, index, dragHandle }) => {
+                // Read the live alternative from the watched array, not the
+                // stale useFieldArray `item`, so the row reflects the picker.
+                const altId = watchedExercises?.[index]?.alternativeExerciseId;
+                return (
+                  <RoutineExerciseRow
+                    key={item.id}
+                    index={index}
+                    control={control as never}
+                    exerciseName={exercisesMap[item.exerciseId]?.name ?? item.name ?? item.exerciseId}
+                    alternativeName={altId ? (exercisesMap[altId]?.name ?? null) : null}
+                    onRemove={() => remove(index)}
+                    onOpenAlternativePicker={() => openAlternativePicker(index)}
+                    dragHandle={dragHandle}
+                  />
+                );
+              }}
             />
           </View>
         ) : (
