@@ -14,7 +14,7 @@
  */
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -153,106 +153,113 @@ export function RoutineBuilder({
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: '#0E0E0E' }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Routine name */}
-        <Controller
-          name="name"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              label="Routine name"
-              value={field.value}
-              onChangeText={field.onChange}
-              error={errors.name?.message}
-              placeholder="e.g. Push Day A"
-            />
-          )}
-        />
-
-        {/* Exercise list header */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600', flex: 1 }}>
-            Exercises
-          </Text>
-          {errors.exercises?.root?.message || (errors.exercises as { message?: string })?.message ? (
-            <Text style={{ color: '#F87171', fontSize: 13 }}>
-              {(errors.exercises?.root?.message ?? (errors.exercises as { message?: string })?.message) as string}
-            </Text>
-          ) : null}
-        </View>
-
-        {/* Sortable exercise rows */}
-        {fields.length > 0 ? (
-          <SortableExerciseList
-            fields={fields as unknown as SortableField[]}
-            onReorder={handleReorder}
-            renderItem={({ item, index, dragHandle }) => (
-              <RoutineExerciseRow
-                key={item.id}
-                index={index}
-                control={control as never}
-                exerciseName={exercisesMap[item.exerciseId]?.name ?? item.name ?? item.exerciseId}
-                alternativeName={
-                  item.alternativeExerciseId
-                    ? (exercisesMap[item.alternativeExerciseId]?.name ?? null)
-                    : null
-                }
-                onRemove={() => remove(index)}
-                onOpenAlternativePicker={() => openAlternativePicker(index)}
-                dragHandle={dragHandle}
+      {/*
+        No outer ScrollView: react-native-reanimated-dnd's <Sortable> renders its
+        own FlatList (a VirtualizedList). Nesting it in a ScrollView triggers the
+        "VirtualizedLists should never be nested" warning and breaks scroll/drag.
+        Layout instead as fixed header → Sortable (the only vertical scroller) →
+        fixed footer.
+      */}
+      <View style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+        {/* Fixed header: routine name + exercises label */}
+        <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Routine name"
+                value={field.value}
+                onChangeText={field.onChange}
+                error={errors.name?.message}
+                placeholder="e.g. Push Day A"
               />
             )}
           />
-        ) : (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              paddingVertical: 32,
-              borderWidth: 1,
-              borderColor: '#2A2A2A',
-              borderStyle: 'dashed',
-              borderRadius: 8,
-              marginBottom: 12,
-            }}
-          >
-            <Text style={{ color: '#888888', fontSize: 14 }}>
-              No exercises added yet
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600', flex: 1 }}>
+              Exercises
             </Text>
+            {errors.exercises?.root?.message || (errors.exercises as { message?: string })?.message ? (
+              <Text style={{ color: '#F87171', fontSize: 13 }}>
+                {(errors.exercises?.root?.message ?? (errors.exercises as { message?: string })?.message) as string}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+
+        {/* Exercise list — Sortable owns the vertical scroll (flex:1) */}
+        {fields.length > 0 ? (
+          <View style={{ flex: 1 }}>
+            <SortableExerciseList
+              fields={fields as unknown as SortableField[]}
+              onReorder={handleReorder}
+              renderItem={({ item, index, dragHandle }) => (
+                <RoutineExerciseRow
+                  key={item.id}
+                  index={index}
+                  control={control as never}
+                  exerciseName={exercisesMap[item.exerciseId]?.name ?? item.name ?? item.exerciseId}
+                  alternativeName={
+                    item.alternativeExerciseId
+                      ? (exercisesMap[item.alternativeExerciseId]?.name ?? null)
+                      : null
+                  }
+                  onRemove={() => remove(index)}
+                  onOpenAlternativePicker={() => openAlternativePicker(index)}
+                  dragHandle={dragHandle}
+                />
+              )}
+            />
+          </View>
+        ) : (
+          <View style={{ flex: 1, paddingHorizontal: 16 }}>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 32,
+                borderWidth: 1,
+                borderColor: '#2A2A2A',
+                borderStyle: 'dashed',
+                borderRadius: 8,
+              }}
+            >
+              <Text style={{ color: '#888888', fontSize: 14 }}>
+                No exercises added yet
+              </Text>
+            </View>
           </View>
         )}
 
-        {/* Add exercises button */}
-        <View style={{ marginBottom: 16 }}>
-          <PrimaryButton
-            label="+ Add Exercises"
-            variant="outline"
-            onPress={() => pickerRef.current?.present()}
-          />
-        </View>
+        {/* Fixed footer: add / submit / delete */}
+        <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
+          <View style={{ marginBottom: 12 }}>
+            <PrimaryButton
+              label="+ Add Exercises"
+              variant="outline"
+              onPress={() => pickerRef.current?.present()}
+            />
+          </View>
 
-        {/* Submit */}
-        <View style={{ marginBottom: onDelete ? 12 : 0 }}>
-          <PrimaryButton
-            label={submitLabel}
-            onPress={handleSubmit(onSubmit as (data: z.output<typeof routineSchema>) => Promise<void>)}
-            loading={submitting}
-          />
-        </View>
+          <View style={{ marginBottom: onDelete ? 12 : 0 }}>
+            <PrimaryButton
+              label={submitLabel}
+              onPress={handleSubmit(onSubmit as (data: z.output<typeof routineSchema>) => Promise<void>)}
+              loading={submitting}
+            />
+          </View>
 
-        {/* Delete (edit screen only) */}
-        {onDelete ? (
-          <PrimaryButton
-            label="Delete Routine"
-            variant="outline"
-            onPress={handleDeletePress}
-          />
-        ) : null}
-      </ScrollView>
+          {onDelete ? (
+            <PrimaryButton
+              label="Delete Routine"
+              variant="outline"
+              onPress={handleDeletePress}
+            />
+          ) : null}
+        </View>
+      </View>
 
       {/* Exercise picker bottom sheet */}
       <ExercisePickerSheet

@@ -115,6 +115,9 @@ export function SortableExerciseList({ fields, onReorder, renderItem }: Sortable
       data={fields}
       renderItem={renderSortableItem}
       itemHeight={ITEM_HEIGHT}
+      // Sortable's internal FlatList defaults to a white background; match theme.
+      style={{ backgroundColor: '#0E0E0E' }}
+      contentContainerStyle={{ paddingHorizontal: 16 }}
     />
   );
 }
