@@ -25,15 +25,8 @@
  */
 
 import React, { useRef, useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TextInput,
-  ActivityIndicator,
-  Pressable,
-  SafeAreaView,
-} from 'react-native';
+import { Modal, View, Text, TextInput, ActivityIndicator, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { findActiveAssignmentForClient } from '@/services/assignment.service';

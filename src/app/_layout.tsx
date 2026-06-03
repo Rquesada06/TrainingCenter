@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { initAuthListener } from '@/firebase/auth';
 import { queryClient } from '@/lib/queryClient';
@@ -56,24 +57,26 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <BottomSheetModalProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Protected guard={!uid}>
-              <Stack.Screen name="sign-in" />
-            </Stack.Protected>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <QueryClientProvider client={queryClient}>
+          <BottomSheetModalProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Protected guard={!uid}>
+                <Stack.Screen name="sign-in" />
+              </Stack.Protected>
 
-            <Stack.Protected guard={uid !== null && role === 'trainer'}>
-              <Stack.Screen name="trainer" />
-            </Stack.Protected>
+              <Stack.Protected guard={uid !== null && role === 'trainer'}>
+                <Stack.Screen name="trainer" />
+              </Stack.Protected>
 
-            <Stack.Protected guard={uid !== null && role === 'client'}>
-              <Stack.Screen name="client" />
-            </Stack.Protected>
-          </Stack>
-        </BottomSheetModalProvider>
-      </QueryClientProvider>
-    </GestureHandlerRootView>
+              <Stack.Protected guard={uid !== null && role === 'client'}>
+                <Stack.Screen name="client" />
+              </Stack.Protected>
+            </Stack>
+          </BottomSheetModalProvider>
+        </QueryClientProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

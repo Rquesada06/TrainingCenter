@@ -10,14 +10,8 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  Pressable,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useRoutines } from '@/hooks/useRoutines';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';

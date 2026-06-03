@@ -6,7 +6,8 @@
  */
 
 import React from 'react';
-import { Alert, SafeAreaView, Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut } from '@/firebase/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';

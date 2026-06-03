@@ -14,15 +14,8 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  ActivityIndicator,
-  SafeAreaView,
-  StatusBar,
-} from 'react-native';
+import { View, Text, FlatList, Pressable, ActivityIndicator, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { usePrograms } from '@/hooks/usePrograms';
 import type { Program } from '@/types/program';

@@ -13,7 +13,8 @@
  */
 
 import React from 'react';
-import { ActivityIndicator, Alert, SafeAreaView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRoutine } from '@/hooks/useRoutine';
 import { useUpdateRoutine } from '@/hooks/useUpdateRoutine';
