@@ -16,6 +16,7 @@ import type { Exercise } from '@/types/exercise';
 import type { Routine } from '@/types/routine';
 import type { Program } from '@/types/program';
 import type { Assignment } from '@/types/assignment';
+import type { Session } from '@/types/session';
 
 // ────────────────────────────────────────────────────────────────────────────
 // Typed collection references
@@ -52,3 +53,10 @@ export const programsCollection = (): FirebaseFirestoreTypes.CollectionReference
  */
 export const assignmentsCollection = (): FirebaseFirestoreTypes.CollectionReference<Assignment> =>
   firestore().collection('assignments') as FirebaseFirestoreTypes.CollectionReference<Assignment>;
+
+/**
+ * Typed reference to the 'sessions' collection (Phase 3 — WORK-*).
+ * Use `sessionsCollection().where('clientId', '==', uid)` to scope reads.
+ */
+export const sessionsCollection = (): FirebaseFirestoreTypes.CollectionReference<Session> =>
+  firestore().collection('sessions') as FirebaseFirestoreTypes.CollectionReference<Session>;
