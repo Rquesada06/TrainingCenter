@@ -7,9 +7,14 @@
  * DO NOT use httpsCallableFromURL — that is the v2 path and requires
  * knowing the full Cloud Run URL. v1 functions are identified by name.
  *
- * Reference: RESEARCH Pattern 4, Pitfall 5
- * T-04-05 mitigation: v1 onCall ensures context.auth propagates correctly
- * when called via @react-native-firebase/functions httpsCallable('name').
+ * IMPORTANT — lazy callable creation:
+ *   The httpsCallable reference is created INSIDE each call, not at module
+ *   scope. Expo Router eager-loads route modules at startup, so a module-scope
+ *   `functions().httpsCallable(...)` ref can be created before Firebase Auth has
+ *   a current user. That stale ref invokes the function WITHOUT an auth token,
+ *   and the onCall handler rejects it with `unauthenticated` even though the
+ *   user is signed in. Creating the callable per-invocation attaches the current
+ *   ID token. (Reference: RESEARCH Pattern 4, Pitfall 5 / T-04-05.)
  */
 
 import functions from '@react-native-firebase/functions';
@@ -17,33 +22,31 @@ import type { CreateClientAccountInput, CreateClientAccountResult } from '@/type
 import type { CreateAssignmentInput, CreateAssignmentResult } from '@/types/assignment';
 
 /**
- * Callable reference for the createClientAccount Cloud Function.
- * The function is identified by name — v1 onCall is deployed and
- * called by name via httpsCallable('createClientAccount').
+ * Calls the createClientAccount Cloud Function (v1 onCall, by name).
+ * Returns the raw httpsCallable result envelope (callers read `.data`).
  */
-export const createClientAccountCallable = functions().httpsCallable<
-  CreateClientAccountInput,
-  CreateClientAccountResult
->('createClientAccount');
+export function createClientAccountCallable(input: CreateClientAccountInput) {
+  return functions().httpsCallable<CreateClientAccountInput, CreateClientAccountResult>(
+    'createClientAccount',
+  )(input);
+}
 
 /**
- * Callable reference for the createAssignment Cloud Function (Phase 02 Plan 05).
- * Uses v1 onCall — same pattern as createClientAccount (Pitfall 5, STATE.md).
- *
- * Input: { programId, clientId, startDate: YYYY-MM-DD }
- * Output: { assignmentId: string }
+ * Calls the createAssignment Cloud Function (v1 onCall, by name).
+ * Returns the raw httpsCallable result envelope (callers read `.data`).
  */
-export const createAssignmentCallable = functions().httpsCallable<
-  CreateAssignmentInput,
-  CreateAssignmentResult
->('createAssignment');
+export function createAssignmentCallable(input: CreateAssignmentInput) {
+  return functions().httpsCallable<CreateAssignmentInput, CreateAssignmentResult>(
+    'createAssignment',
+  )(input);
+}
 
 /**
  * Typed wrapper for calling createAssignment.
  * Unwraps result.data from the httpsCallable envelope.
  */
 export async function callCreateAssignment(
-  input: CreateAssignmentInput
+  input: CreateAssignmentInput,
 ): Promise<CreateAssignmentResult> {
   const result = await createAssignmentCallable(input);
   return result.data;
