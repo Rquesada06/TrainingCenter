@@ -17,15 +17,33 @@
  *   ID token. (Reference: RESEARCH Pattern 4, Pitfall 5 / T-04-05.)
  */
 
+import auth from '@react-native-firebase/auth';
 import functions from '@react-native-firebase/functions';
 import type { CreateClientAccountInput, CreateClientAccountResult } from '@/types/user';
 import type { CreateAssignmentInput, CreateAssignmentResult } from '@/types/assignment';
 
 /**
+ * Ensures a signed-in user with a fresh ID token before a callable invocation.
+ * If `auth().currentUser` is null, the callable would reach the function without
+ * a token → `unauthenticated`. Force-refreshing the token surfaces a clear error
+ * and guarantees the SDK has a valid token to attach.
+ */
+async function requireFreshAuth(): Promise<void> {
+  const user = auth().currentUser;
+  if (!user) {
+    throw new Error(
+      'You appear to be signed out (no active session). Please sign out and sign in again.',
+    );
+  }
+  await user.getIdToken(true);
+}
+
+/**
  * Calls the createClientAccount Cloud Function (v1 onCall, by name).
  * Returns the raw httpsCallable result envelope (callers read `.data`).
  */
-export function createClientAccountCallable(input: CreateClientAccountInput) {
+export async function createClientAccountCallable(input: CreateClientAccountInput) {
+  await requireFreshAuth();
   return functions().httpsCallable<CreateClientAccountInput, CreateClientAccountResult>(
     'createClientAccount',
   )(input);
@@ -35,7 +53,8 @@ export function createClientAccountCallable(input: CreateClientAccountInput) {
  * Calls the createAssignment Cloud Function (v1 onCall, by name).
  * Returns the raw httpsCallable result envelope (callers read `.data`).
  */
-export function createAssignmentCallable(input: CreateAssignmentInput) {
+export async function createAssignmentCallable(input: CreateAssignmentInput) {
+  await requireFreshAuth();
   return functions().httpsCallable<CreateAssignmentInput, CreateAssignmentResult>(
     'createAssignment',
   )(input);
