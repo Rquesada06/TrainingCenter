@@ -58,11 +58,11 @@
 
 ### Client Workout Execution
 
-- [ ] **WORK-01**: Client's home screen shows today's workout on open — no additional navigation required
+- [x] **WORK-01**: Client's home screen shows today's workout on open — no additional navigation required
 - [ ] **WORK-02**: Home screen has four explicit states: (1) no program assigned, (2) program starts in N days, (3) rest day with motivational message, (4) active workout with exercise list
 - [ ] **WORK-03**: Client can view exercise detail: name, description, sets × reps / duration, rest, trainer notes, embedded video or image
 - [ ] **WORK-04**: Client can mark each exercise as completed with a checkbox
-- [ ] **WORK-05**: Client can toggle gym/home mode at the session level — exercises with alternatives switch their variant; toggle choice persists for the session
+- [x] **WORK-05**: Client can toggle gym/home mode at the session level — exercises with alternatives switch their variant; toggle choice persists for the session
 - [ ] **WORK-06**: Client can tap "Finish Workout" when all exercises are marked complete (or manually bypass)
 - [ ] **WORK-07**: Completing a session shows a celebration/summary screen and saves the session to Firestore
 - [ ] **WORK-08**: In-progress session state is saved locally (AsyncStorage) so a crash or app close does not lose progress; app offers to resume on next open
@@ -168,11 +168,11 @@ Requirements mapped to phases by roadmapper.
 | ASGN-02 | Phase 2 | Complete |
 | ASGN-03 | Phase 2 | Complete |
 | ASGN-04 | Phase 2 | Complete |
-| WORK-01 | Phase 3 | Pending |
+| WORK-01 | Phase 3 | Complete |
 | WORK-02 | Phase 3 | Pending |
 | WORK-03 | Phase 3 | Pending |
 | WORK-04 | Phase 3 | Pending |
-| WORK-05 | Phase 3 | Pending |
+| WORK-05 | Phase 3 | Complete |
 | WORK-06 | Phase 3 | Pending |
 | WORK-07 | Phase 3 | Pending |
 | WORK-08 | Phase 3 | Pending |

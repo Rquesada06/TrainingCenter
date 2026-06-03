@@ -98,7 +98,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Foundation: Session type, sessionsCollection ref, workoutDayComputer (date-only math + 6-state machine, WORK-01) + variantResolver (gym/home swap, WORK-05) + Wave 0 unit tests (Wave 1)
+- [x] 03-01-PLAN.md — Foundation: Session type, sessionsCollection ref, workoutDayComputer (date-only math + 6-state machine, WORK-01) + variantResolver (gym/home swap, WORK-05) + Wave 0 unit tests (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 — needs Session type + sessionsCollection + localTodayString)*
 
@@ -138,5 +138,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
-| 3. Client Workout Execution | 0/5 | Planned | - |
+| 3. Client Workout Execution | 1/5 | In Progress|  |
 | 4. History + Polish | 0/TBD | Not started | - |
