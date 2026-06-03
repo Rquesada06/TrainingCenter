@@ -120,6 +120,7 @@ export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, ExercisePi
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={SNAP_POINTS}
+        enableDynamicSizing={false}
         bottomInset={insets.bottom}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: '#1A1A1A' }}

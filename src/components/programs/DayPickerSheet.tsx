@@ -102,6 +102,7 @@ export const DayPickerSheet = forwardRef<DayPickerSheetHandle, DayPickerSheetPro
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={SNAP_POINTS}
+        enableDynamicSizing={false}
         bottomInset={insets.bottom}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: '#1A1A1A' }}

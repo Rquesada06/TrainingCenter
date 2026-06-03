@@ -106,6 +106,7 @@ export const ClientPickerSheet = forwardRef<ClientPickerSheetHandle, ClientPicke
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={SNAP_POINTS}
+        enableDynamicSizing={false}
         bottomInset={insets.bottom}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: '#1A1A1A' }}
