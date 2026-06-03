@@ -46,7 +46,11 @@ interface CreateClientAccountResult {
  *   T-04-03: Auth user creation only via Admin SDK (client SDK cannot do this)
  *   T-04-05: v1 onCall used to ensure context.auth propagates correctly
  */
-export const createClientAccount = functions.https.onCall(
+export const createClientAccount = functions
+  // maxInstances bounds worst-case concurrency (and therefore cost) — an MVP
+  // with one trainer never needs more, and it caps runaway-loop spend.
+  .runWith({ maxInstances: 10 })
+  .https.onCall(
   async (data: CreateClientAccountInput, context) => {
     // Step 1: Reject unauthenticated callers
     if (!context.auth) {
@@ -181,7 +185,10 @@ interface AssignmentSnapshot {
   weeks: Array<{ days: SnapshotDay[] }>;
 }
 
-export const createAssignment = functions.https.onCall(
+export const createAssignment = functions
+  // maxInstances bounds worst-case concurrency (and therefore cost).
+  .runWith({ maxInstances: 10 })
+  .https.onCall(
   async (data: CreateAssignmentInput, context) => {
     // Step 1: Reject unauthenticated callers
     if (!context.auth) {
