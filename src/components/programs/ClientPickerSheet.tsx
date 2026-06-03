@@ -37,7 +37,7 @@ export interface ClientPickerSheetProps {
   onSelect: (client: User) => void;
 }
 
-const SNAP_POINTS = ['60%'];
+const SNAP_POINTS = ['92%'];
 
 export const ClientPickerSheet = forwardRef<ClientPickerSheetHandle, ClientPickerSheetProps>(
   ({ onSelect }, ref) => {
@@ -106,6 +106,7 @@ export const ClientPickerSheet = forwardRef<ClientPickerSheetHandle, ClientPicke
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={SNAP_POINTS}
+        bottomInset={insets.bottom}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: '#1A1A1A' }}
         handleIndicatorStyle={{ backgroundColor: '#444444' }}
@@ -128,7 +129,7 @@ export const ClientPickerSheet = forwardRef<ClientPickerSheetHandle, ClientPicke
           data={clients}
           keyExtractor={(item) => item.uid}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
           ListEmptyComponent={
             <View style={{ padding: 16 }}>
               <Text style={{ color: '#888888', fontSize: 14 }}>

@@ -43,7 +43,7 @@ export interface DayPickerSheetProps {
   onSelect: (weekIndex: number, dayIndex: number, choice: string | 'rest' | null) => void;
 }
 
-const SNAP_POINTS = ['60%'];
+const SNAP_POINTS = ['92%'];
 
 export const DayPickerSheet = forwardRef<DayPickerSheetHandle, DayPickerSheetProps>(
   ({ onSelect }, ref) => {
@@ -102,6 +102,7 @@ export const DayPickerSheet = forwardRef<DayPickerSheetHandle, DayPickerSheetPro
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={SNAP_POINTS}
+        bottomInset={insets.bottom}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: '#1A1A1A' }}
         handleIndicatorStyle={{ backgroundColor: '#444444' }}
@@ -156,7 +157,7 @@ export const DayPickerSheet = forwardRef<DayPickerSheetHandle, DayPickerSheetPro
           data={routines}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
           ListEmptyComponent={
             <View style={{ padding: 16 }}>
               <Text style={{ color: '#888888', fontSize: 14 }}>

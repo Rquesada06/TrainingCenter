@@ -27,7 +27,7 @@ export interface ExercisePickerSheetProps {
 
 export type ExercisePickerSheetRef = Pick<BottomSheetModalMethods, 'present' | 'dismiss'>;
 
-const SNAP_POINTS = ['80%'];
+const SNAP_POINTS = ['92%'];
 
 const renderBackdrop = (props: BottomSheetDefaultBackdropProps) => (
   <BottomSheetBackdrop
@@ -120,6 +120,7 @@ export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, ExercisePi
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={SNAP_POINTS}
+        bottomInset={insets.bottom}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: '#1A1A1A' }}
         handleIndicatorStyle={{ backgroundColor: '#555555' }}
@@ -164,7 +165,7 @@ export const ExercisePickerSheet = forwardRef<ExercisePickerSheetRef, ExercisePi
             data={exercises}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+            contentContainerStyle={{ paddingBottom: 24 }}
           />
         )}
       </BottomSheetModal>
