@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -9,11 +10,19 @@ const tabIcon =
     <Ionicons name={name} size={size} color={color} />;
 
 export default function ClientLayout() {
+  // Reserve Android nav-bar height (edge-to-edge) so the tab bar clears it.
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: '#0E0E0E', borderTopColor: '#1A1A1A' },
+        tabBarStyle: {
+          backgroundColor: '#0E0E0E',
+          borderTopColor: '#1A1A1A',
+          height: 56 + insets.bottom,
+          paddingBottom: insets.bottom + 4,
+          paddingTop: 4,
+        },
         tabBarActiveTintColor: '#00FF66',
         tabBarInactiveTintColor: '#888888',
       }}
