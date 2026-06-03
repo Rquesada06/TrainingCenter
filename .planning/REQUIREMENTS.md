@@ -63,10 +63,10 @@
 - [ ] **WORK-03**: Client can view exercise detail: name, description, sets × reps / duration, rest, trainer notes, embedded video or image
 - [ ] **WORK-04**: Client can mark each exercise as completed with a checkbox
 - [x] **WORK-05**: Client can toggle gym/home mode at the session level — exercises with alternatives switch their variant; toggle choice persists for the session
-- [ ] **WORK-06**: Client can tap "Finish Workout" when all exercises are marked complete (or manually bypass)
-- [ ] **WORK-07**: Completing a session shows a celebration/summary screen and saves the session to Firestore
-- [ ] **WORK-08**: In-progress session state is saved locally (AsyncStorage) so a crash or app close does not lose progress; app offers to resume on next open
-- [ ] **WORK-09**: App prevents creating a duplicate session if client already completed today's workout
+- [x] **WORK-06**: Client can tap "Finish Workout" when all exercises are marked complete (or manually bypass)
+- [x] **WORK-07**: Completing a session shows a celebration/summary screen and saves the session to Firestore
+- [x] **WORK-08**: In-progress session state is saved locally (AsyncStorage) so a crash or app close does not lose progress; app offers to resume on next open
+- [x] **WORK-09**: App prevents creating a duplicate session if client already completed today's workout
 
 ### Session History
 
@@ -173,10 +173,10 @@ Requirements mapped to phases by roadmapper.
 | WORK-03 | Phase 3 | Pending |
 | WORK-04 | Phase 3 | Pending |
 | WORK-05 | Phase 3 | Complete |
-| WORK-06 | Phase 3 | Pending |
-| WORK-07 | Phase 3 | Pending |
-| WORK-08 | Phase 3 | Pending |
-| WORK-09 | Phase 3 | Pending |
+| WORK-06 | Phase 3 | Complete |
+| WORK-07 | Phase 3 | Complete |
+| WORK-08 | Phase 3 | Complete |
+| WORK-09 | Phase 3 | Complete |
 | HIST-01 | Phase 4 | Pending |
 | HIST-02 | Phase 4 | Pending |
 | HIST-03 | Phase 4 | Pending |

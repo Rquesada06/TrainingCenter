@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-03T20:37:36.156Z"
+last_updated: "2026-06-03T20:46:04.638Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 14
-  completed_plans: 10
+  completed_plans: 11
   percent: 50
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 ## Current Position
 
 Phase: 03 (client-workout-execution) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-03
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 79%
 
 ### Phase 2 Planning Notes (recorded 2026-06-01)
 
@@ -67,6 +67,7 @@ Progress: [███████░░░] 71%
 | Phase 02-trainer-content-creation P02-02 | 12 | 3 tasks | 12 files |
 | Phase 02 P02-03 | 25 | 3 tasks | 14 files |
 | Phase 03 P03-01 | 4 | 2 tasks | 6 files |
+| Phase 03 P03-02 | 6 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 2 foundation locked Zod v4 + expo-router patterns; types/schemas/refs/indexes + 5-tab shell
 - [Phase ?]: photoURL added to User type — null in MVP, Phase 4 PROF-02/03 wires upload
 - [Phase ?]: useActiveAssignment re-exports findActiveAssignmentForClient for Plan 02-04 ASGN-02 overwrite check (single source of truth)
+- [Phase ?]: Phase 3: expo-video ~55.0.17 + async-storage 2.2.0 installed via npx expo install (SDK-55 pins); expo-video config plugin added to app.config.js
+- [Phase ?]: Phase 3: findMyActiveAssignment drops trainerId filter — client reads its own assignment (rule clientId==uid)
+- [Phase ?]: Phase 3: lastWorkoutMode in separate AsyncStorage key so it survives sessionStore.clearSession on day roll-over (D-09)
 
 ### Pending Todos
 
@@ -113,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-03T20:37:36.147Z
+Last session: 2026-06-03T20:45:48.245Z
 Stopped at: Phase 3 UI-SPEC approved
 Resume file: None

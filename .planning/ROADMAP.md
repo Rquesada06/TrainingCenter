@@ -102,7 +102,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(blocked on Wave 1 — needs Session type + sessionsCollection + localTodayString)*
 
-- [ ] 03-02-PLAN.md — Data layer: session.service (client-scoped read + duplicate guard + finish write), sessionStore (Zustand+persist+AsyncStorage), 3 query/mutation hooks, last-mode helper, expo-video install checkpoint + Wave 0 tests (WORK-06..09) (Wave 2)
+- [x] 03-02-PLAN.md — Data layer: session.service (client-scoped read + duplicate guard + finish write), sessionStore (Zustand+persist+AsyncStorage), 3 query/mutation hooks, last-mode helper, expo-video install checkpoint + Wave 0 tests (WORK-06..09) (Wave 2)
 
 **Wave 3** *(blocked on Wave 1+2 — screens consume the pure functions, hooks, and store; Plans 03 & 04 touch disjoint files → parallel)*
 
@@ -138,5 +138,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
-| 3. Client Workout Execution | 1/5 | In Progress|  |
+| 3. Client Workout Execution | 2/5 | In Progress|  |
 | 4. History + Polish | 0/TBD | Not started | - |
