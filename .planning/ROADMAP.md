@@ -93,8 +93,25 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Tapping "Finish Workout" saves a complete session record to Firestore and shows a celebration/summary screen; if the app crashed mid-session the client is offered to resume on next open
   5. App prevents creating a duplicate session if the client already completed today's workout
 
-**Plans**: TBD
+**Plans**: 5 plans (4 waves)
 **UI hint**: yes
+
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Foundation: Session type, sessionsCollection ref, workoutDayComputer (date-only math + 6-state machine, WORK-01) + variantResolver (gym/home swap, WORK-05) + Wave 0 unit tests (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 — needs Session type + sessionsCollection + localTodayString)*
+
+- [ ] 03-02-PLAN.md — Data layer: session.service (client-scoped read + duplicate guard + finish write), sessionStore (Zustand+persist+AsyncStorage), 3 query/mutation hooks, last-mode helper, expo-video install checkpoint + Wave 0 tests (WORK-06..09) (Wave 2)
+
+**Wave 3** *(blocked on Wave 1+2 — screens consume the pure functions, hooks, and store; Plans 03 & 04 touch disjoint files → parallel)*
+
+- [ ] 03-03-PLAN.md — Client Home: HomeStateCards (six states) + stateful index.tsx wiring computeTodayWorkout + hooks + stale-date clear (WORK-01, WORK-02) (Wave 3)
+- [ ] 03-04-PLAN.md — Workout execution: GymHomeToggle + ExerciseRow (inline video/image) + FinishButton + session screen (resume/finish/read-only) + celebration screen (WORK-03..08) (Wave 3)
+
+**Wave 4** *(blocked on Wave 3 — end-to-end UAT needs the full feature + native rebuild)*
+
+- [ ] 03-05-PLAN.md — On-device UAT: full jest+tsc gate, native dev-client rebuild for expo-video, manual end-to-end verification of all six states, video, toggle, crash-resume, finish, duplicate guard (WORK-01..09) (Wave 4)
 
 ### Phase 4: History + Polish
 
@@ -121,5 +138,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
-| 3. Client Workout Execution | 0/TBD | Not started | - |
+| 3. Client Workout Execution | 0/5 | Planned | - |
 | 4. History + Polish | 0/TBD | Not started | - |
