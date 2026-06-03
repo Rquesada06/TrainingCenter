@@ -84,12 +84,16 @@ export async function updateClientProfile(
  *   - ClientListItem (CLNT-02/05): per-row active program label + no-program indicator
  *   - Plan 02-04 (ASGN-02): overwrite check before creating a new assignment
  *
- * The composite index (clientId ASC + status ASC) is already in firestore.indexes.json.
+ * The `where('trainerId','==',trainerId)` filter is REQUIRED — the assignments
+ * read rule only allows a trainer to read docs where trainerId == their uid, so
+ * a query without it is rejected with permission-denied (defense-in-depth).
  */
 export async function findActiveAssignmentForClient(
-  clientId: string
+  clientId: string,
+  trainerId: string
 ): Promise<Assignment | null> {
   const snap = await assignmentsCollection()
+    .where('trainerId', '==', trainerId)
     .where('clientId', '==', clientId)
     .where('status', '==', 'active')
     .limit(1)

@@ -24,9 +24,10 @@ jest.mock('@react-native-firebase/firestore', () => {
   const _mockDoc = jest.fn(() => ({ get: _mockGet, update: _mockUpdate }));
   const _mockLimit = jest.fn(() => ({ get: _mockGet }));
   const _mockOrderBy = jest.fn(() => ({ get: _mockGet }));
-  // where chains: second where returns { orderBy, limit, doc }
-  // We need where().where().orderBy().get() AND where().where().limit().get()
-  const _mockWhere2 = jest.fn(() => ({ orderBy: _mockOrderBy, limit: _mockLimit }));
+  // where chains: support where().where().orderBy().get() (listClients) AND
+  // where().where().where().limit().get() (findActiveAssignmentForClient — 3 filters)
+  const _mockWhere3 = jest.fn(() => ({ limit: _mockLimit }));
+  const _mockWhere2 = jest.fn(() => ({ where: _mockWhere3, orderBy: _mockOrderBy, limit: _mockLimit }));
   const _mockWhere = jest.fn(() => ({ where: _mockWhere2, orderBy: _mockOrderBy, limit: _mockLimit }));
   const _mockCollection = jest.fn(() => ({ where: _mockWhere, doc: _mockDoc }));
 
@@ -38,6 +39,7 @@ jest.mock('@react-native-firebase/firestore', () => {
     doc: _mockDoc,
     limit: _mockLimit,
     orderBy: _mockOrderBy,
+    where3: _mockWhere3,
     where2: _mockWhere2,
     where: _mockWhere,
     collection: _mockCollection,
@@ -70,6 +72,7 @@ const mocks = (firestoreMock as any).__mocks as {
   doc: jest.Mock;
   limit: jest.Mock;
   orderBy: jest.Mock;
+  where3: jest.Mock;
   where2: jest.Mock;
   where: jest.Mock;
   collection: jest.Mock;
@@ -198,12 +201,14 @@ describe('findActiveAssignmentForClient', () => {
     jest.clearAllMocks();
     mocks.collection.mockReturnValue({ where: mocks.where, doc: mocks.doc });
     mocks.where.mockReturnValue({ where: mocks.where2, orderBy: mocks.orderBy, limit: mocks.limit });
-    mocks.where2.mockReturnValue({ orderBy: mocks.orderBy, limit: mocks.limit });
+    mocks.where2.mockReturnValue({ where: mocks.where3, orderBy: mocks.orderBy, limit: mocks.limit });
+    mocks.where3.mockReturnValue({ limit: mocks.limit });
     mocks.limit.mockReturnValue({ get: mocks.get });
   });
 
-  it("calls where('clientId',clientId) + where('status','active') + limit(1) and returns the assignment", async () => {
+  it("calls where('trainerId') + where('clientId') + where('status','active') + limit(1) and returns the assignment", async () => {
     const clientId = 'client-id-789';
+    const trainerId = 'trainer-uid';
     const assignmentData = {
       id: 'assignment-1',
       trainerId: 'trainer-uid',
@@ -225,10 +230,11 @@ describe('findActiveAssignmentForClient', () => {
     };
     mocks.get.mockResolvedValueOnce({ docs: [fakeDoc] });
 
-    const result = await findActiveAssignmentForClient(clientId);
+    const result = await findActiveAssignmentForClient(clientId, trainerId);
 
-    expect(mocks.where).toHaveBeenCalledWith('clientId', '==', clientId);
-    expect(mocks.where2).toHaveBeenCalledWith('status', '==', 'active');
+    expect(mocks.where).toHaveBeenCalledWith('trainerId', '==', trainerId);
+    expect(mocks.where2).toHaveBeenCalledWith('clientId', '==', clientId);
+    expect(mocks.where3).toHaveBeenCalledWith('status', '==', 'active');
     expect(mocks.limit).toHaveBeenCalledWith(1);
     expect(result).not.toBeNull();
     expect(result?.snapshot.name).toBe('Strength 8 Week');
@@ -237,7 +243,7 @@ describe('findActiveAssignmentForClient', () => {
   it('returns null when no active assignment exists', async () => {
     mocks.get.mockResolvedValueOnce({ docs: [] });
 
-    const result = await findActiveAssignmentForClient('client-no-assign');
+    const result = await findActiveAssignmentForClient('client-no-assign', 'trainer-uid');
 
     expect(result).toBeNull();
   });

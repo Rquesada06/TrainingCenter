@@ -38,6 +38,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { findActiveAssignmentForClient } from '@/services/assignment.service';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
+import { useAuthStore } from '@/stores/authStore';
 import { withSaveFeedback } from '@/lib/mutationFeedback';
 import { ClientPickerSheet, type ClientPickerSheetHandle } from './ClientPickerSheet';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
@@ -76,6 +77,7 @@ export function AssignProgramModal({
 }: AssignProgramModalProps) {
   const clientPickerRef = useRef<ClientPickerSheetHandle>(null);
   const createAssignment = useCreateAssignment();
+  const trainerId = useAuthStore((s) => s.uid);
 
   const [step, setStep] = useState<AssignStep>('pickClient');
   const [selectedClient, setSelectedClient] = useState<User | null>(null);
@@ -106,16 +108,24 @@ export function AssignProgramModal({
     }
     setDateError('');
 
-    if (!selectedClient) return;
+    if (!selectedClient || !trainerId) return;
 
-    // ASGN-02: check for existing active assignment before calling CF
-    const existing = await findActiveAssignmentForClient(selectedClient.uid);
-    if (existing) {
-      setExistingAssignment(existing);
-      setStep('confirmOverwrite');
-    } else {
-      await submitAssignment();
-    }
+    // ASGN-02: check for existing active assignment before calling CF.
+    // Wrapped so a query failure surfaces as an Alert instead of an uncaught
+    // promise rejection that crashes the modal.
+    await withSaveFeedback(
+      async () => {
+        const existing = await findActiveAssignmentForClient(selectedClient.uid, trainerId);
+        if (existing) {
+          setExistingAssignment(existing);
+          setStep('confirmOverwrite');
+        } else {
+          await submitAssignment();
+        }
+      },
+      () => {},
+      'Could not check existing assignments',
+    );
   };
 
   const submitAssignment = async () => {

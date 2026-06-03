@@ -12,6 +12,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { findActiveAssignmentForClient } from '@/services/client.service';
+import { useAuthStore } from '@/stores/authStore';
 
 // Re-export for Plan 02-04 ASGN-02 overwrite check
 export { findActiveAssignmentForClient };
@@ -23,10 +24,12 @@ export { findActiveAssignmentForClient };
  * staleTime: 10s — assignments update more frequently than client list.
  */
 export function useActiveAssignment(clientId: string | undefined) {
+  // A trainer's uid is required by the assignments read rule (defense-in-depth).
+  const trainerId = useAuthStore((s) => s.uid);
   return useQuery({
-    queryKey: ['activeAssignment', clientId],
-    queryFn: () => findActiveAssignmentForClient(clientId!),
-    enabled: !!clientId,
+    queryKey: ['activeAssignment', clientId, trainerId],
+    queryFn: () => findActiveAssignmentForClient(clientId!, trainerId!),
+    enabled: !!clientId && !!trainerId,
     staleTime: 10_000, // 10s
   });
 }
