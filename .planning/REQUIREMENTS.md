@@ -59,7 +59,7 @@
 ### Client Workout Execution
 
 - [x] **WORK-01**: Client's home screen shows today's workout on open — no additional navigation required
-- [ ] **WORK-02**: Home screen has four explicit states: (1) no program assigned, (2) program starts in N days, (3) rest day with motivational message, (4) active workout with exercise list
+- [x] **WORK-02**: Home screen has four explicit states: (1) no program assigned, (2) program starts in N days, (3) rest day with motivational message, (4) active workout with exercise list
 - [ ] **WORK-03**: Client can view exercise detail: name, description, sets × reps / duration, rest, trainer notes, embedded video or image
 - [ ] **WORK-04**: Client can mark each exercise as completed with a checkbox
 - [x] **WORK-05**: Client can toggle gym/home mode at the session level — exercises with alternatives switch their variant; toggle choice persists for the session
@@ -169,7 +169,7 @@ Requirements mapped to phases by roadmapper.
 | ASGN-03 | Phase 2 | Complete |
 | ASGN-04 | Phase 2 | Complete |
 | WORK-01 | Phase 3 | Complete |
-| WORK-02 | Phase 3 | Pending |
+| WORK-02 | Phase 3 | Complete |
 | WORK-03 | Phase 3 | Pending |
 | WORK-04 | Phase 3 | Pending |
 | WORK-05 | Phase 3 | Complete |

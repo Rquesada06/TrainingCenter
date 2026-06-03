@@ -106,7 +106,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(blocked on Wave 1+2 — screens consume the pure functions, hooks, and store; Plans 03 & 04 touch disjoint files → parallel)*
 
-- [ ] 03-03-PLAN.md — Client Home: HomeStateCards (six states) + stateful index.tsx wiring computeTodayWorkout + hooks + stale-date clear (WORK-01, WORK-02) (Wave 3)
+- [x] 03-03-PLAN.md — Client Home: HomeStateCards (six states) + stateful index.tsx wiring computeTodayWorkout + hooks + stale-date clear (WORK-01, WORK-02) (Wave 3)
 - [ ] 03-04-PLAN.md — Workout execution: GymHomeToggle + ExerciseRow (inline video/image) + FinishButton + session screen (resume/finish/read-only) + celebration screen (WORK-03..08) (Wave 3)
 
 **Wave 4** *(blocked on Wave 3 — end-to-end UAT needs the full feature + native rebuild)*
@@ -138,5 +138,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
-| 3. Client Workout Execution | 2/5 | In Progress|  |
+| 3. Client Workout Execution | 3/5 | In Progress|  |
 | 4. History + Polish | 0/TBD | Not started | - |
