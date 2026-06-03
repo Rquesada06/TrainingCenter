@@ -55,6 +55,7 @@ module.exports = {
       ],
       'expo-secure-store',
       '@react-native-google-signin/google-signin',
+      'expo-video',
     ],
     extra: {
       googleWebClientId: '911229291499-vs0j44h5ehl0bo6la8c4ks1r6if1on9n.apps.googleusercontent.com',
