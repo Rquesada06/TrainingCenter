@@ -43,6 +43,7 @@ import {
   Platform,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useProgram } from '@/hooks/useProgram';
 import { useUpdateProgram } from '@/hooks/useUpdateProgram';
@@ -54,11 +55,12 @@ import { DayPickerSheet, type DayPickerSheetHandle } from '@/components/programs
 import { AssignProgramModal } from '@/components/programs/AssignProgramModal';
 import { ProgramMetaForm } from '@/components/programs/ProgramMetaForm';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
-import type { ProgramWeek } from '@/types/program';
+import type { Program, ProgramWeek } from '@/types/program';
 
 export default function ProgramDetailScreen() {
   const { programId } = useLocalSearchParams<{ programId: string }>();
   const dayPickerRef = useRef<DayPickerSheetHandle>(null);
+  const queryClient = useQueryClient();
 
   const { data: program, isLoading } = useProgram(programId);
   const { data: routines = [] } = useRoutines();
@@ -79,13 +81,22 @@ export default function ProgramDetailScreen() {
   };
 
   const handleDaySelect = (w: number, d: number, choice: string | 'rest' | null) => {
-    if (!program) return;
-    // Deep copy weeks and update the chosen cell
-    const newWeeks: ProgramWeek[] = program.weeks.map((week, wi) =>
+    // Read the LATEST program from the query cache (not the render-closure
+    // `program`, which is stale between rapid edits) so concurrent day edits
+    // build on each other instead of overwriting.
+    const current = queryClient.getQueryData<Program | null>(['program', programId]);
+    if (!current) return;
+
+    const newWeeks: ProgramWeek[] = current.weeks.map((week, wi) =>
       wi === w
         ? { ...week, days: week.days.map((day, di) => (di === d ? choice : day)) }
         : week
     );
+
+    // Optimistically update the cache so the grid refreshes instantly (instead
+    // of waiting for the Firestore write + refetch round-trip).
+    queryClient.setQueryData<Program>(['program', programId], { ...current, weeks: newWeeks });
+
     withSaveFeedback(
       () => updateProgram.mutateAsync({ id: programId!, partial: { weeks: newWeeks } }),
       () => {

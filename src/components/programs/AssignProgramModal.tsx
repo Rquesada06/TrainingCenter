@@ -34,6 +34,8 @@ import {
   Pressable,
   SafeAreaView,
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { findActiveAssignmentForClient } from '@/services/assignment.service';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { withSaveFeedback } from '@/lib/mutationFeedback';
@@ -149,6 +151,15 @@ export function AssignProgramModal({
       presentationStyle="pageSheet"
       onRequestClose={onCancel}
     >
+      {/*
+        A React Native <Modal> creates a separate native view hierarchy. The
+        @gorhom BottomSheetModal (ClientPickerSheet) portals to the nearest
+        BottomSheetModalProvider — without one INSIDE this Modal it renders at
+        the app root, behind the Modal ("button does nothing"). Provide a local
+        GestureHandlerRootView + BottomSheetModalProvider so the sheet appears.
+      */}
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
         <View style={{ flex: 1, padding: 24 }}>
           {/* Header */}
@@ -273,9 +284,11 @@ export function AssignProgramModal({
           )}
         </View>
 
-        {/* ClientPickerSheet — rendered inside Modal */}
+        {/* ClientPickerSheet — rendered inside the local BottomSheetModalProvider */}
         <ClientPickerSheet ref={clientPickerRef} onSelect={handleClientSelect} />
       </SafeAreaView>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
