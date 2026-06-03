@@ -237,7 +237,7 @@ Accent `#00FF66` NOT used for:
 - Checkbox: 24px × 24px circle. Unchecked: `border-2 border-[#444444]`. Checked: `bg-[#00FF66] border-[#00FF66]` with white checkmark (Ionicons `checkmark` 16px color `#0E0E0E`). Minimum touch target 44pt (use `hitSlop`).
 - Exercise name: 16px/400/#FFFFFF when unchecked. When checked: 16px/400/#888888 + strikethrough (`textDecorationLine: 'line-through'`).
 - Secondary line: sets × reps/duration in 14px/400/#888888. Format: `{sets}×{reps}` or `{sets}×{duration}s`. If both reps and duration are non-null, prefer reps.
-- Mode tag (D-10): If `modeTag !== null`, render a small pill badge immediately after the exercise name on the same line (or second line if name is long): text `gym only` or `home only` in 12px/400, bg `#FFD600` with opacity 20%, border `#FFD600`, `rounded-full px-2 py-0.5`. Text color `#FFD600`.
+- Mode tag (D-10): If `modeTag !== null`, render a small pill badge immediately after the exercise name on the same line (or second line if name is long): text `gym only` or `home only` in 14px/400, bg `#FFD600` with opacity 20%, border `#FFD600`, `rounded-full px-2 py-0.5`. Text color `#FFD600`.
 - Expand chevron: Ionicons `chevron-down` 16px color `#444444`. Rotates to `chevron-up` when expanded. Tap entire row to expand/collapse.
 - Accessibility: `accessibilityRole="button"`, `accessibilityLabel="{exercise name}, {checked/unchecked}"`.
 
@@ -258,7 +258,7 @@ Accent `#00FF66` NOT used for:
 ```
 - Expanded section uses `Animated.View entering={FadeIn.duration(200)}` (mirroring existing `collapsible.tsx` pattern).
 - Detail grid: horizontal row with 3 labeled cells, each `bg-[#0E0E0E]`, `rounded-lg p-2`, `flex-1`.
-  - Cell label: 12px/400/#888888 (e.g. "Sets", "Reps", "Rest")
+  - Cell label: 14px/400/#888888 (e.g. "Sets", "Reps", "Rest")
   - Cell value: 16px/600/#FFFFFF
   - Duration cell label: "Duration" with value `{N}s`.
   - Rest cell value: `{N}s`.
@@ -325,7 +325,7 @@ If the client taps the system back button or the header back arrow while a sessi
 **Reuse approach:** The session screen (`workout/session.tsx`) accepts a `readOnly` prop (or a route param `readOnly=true`). When in read-only mode:
 - All checkboxes are rendered in their final `completedExerciseIds` state, visually checked or unchecked, but the `Pressable` is disabled (`pointerEvents="none"` wrapper).
 - GymHomeToggle is visible but non-interactive (visual only, shows the mode the session was completed in).
-- Finish button is replaced by a `PrimaryButton variant="outline"` labeled "Close" that navigates back.
+- Finish button is replaced by a `PrimaryButton variant="outline"` labeled "Close Session" that navigates back.
 - Header shows "Session Complete" instead of the routine name.
 - Row expansion still works for viewing exercise detail (read-only, no interaction change needed for expansion).
 
@@ -391,7 +391,7 @@ New component: `src/components/workout/HomeStateCards.tsx` — exports six named
 | Primary CTA — continue in-progress session | "Continue Workout" |
 | Primary CTA — finish session | "Finish Workout" |
 | Primary CTA — celebration return | "Back to Home" |
-| Read-only close | "Close" |
+| Read-only close | "Close Session" |
 | Home state 1a — heading | "No program yet" |
 | Home state 1a — body | "Your trainer hasn't assigned a program yet. Check back soon." |
 | Home state 1b — heading (N > 1) | "Your program starts in {N} days" |
@@ -478,6 +478,7 @@ New component: `src/components/workout/HomeStateCards.tsx` — exports six named
 | Element | Contract |
 |---------|----------|
 | All Pressable touch targets | Minimum 44×44pt (hitSlop where visual size is smaller) |
+| Header back button | Ionicons `arrow-back`; `accessibilityRole="button"`, `accessibilityLabel="Go back"` |
 | Checkboxes | `accessibilityRole="checkbox"`, `accessibilityState={{ checked }}`, `accessibilityLabel="{exercise name}"` |
 | GymHomeToggle segments | `accessibilityRole="button"`, `accessibilityState={{ selected: isActive }}` |
 | "Finish Workout" button | `accessibilityState={{ disabled: mutation.isPending, busy: mutation.isPending }}` |
