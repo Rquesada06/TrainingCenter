@@ -186,6 +186,7 @@ Requirements mapped to phases by roadmapper.
 | PROF-03 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 42 total
 - Mapped to phases: 42
 - Unmapped: 0 ✓
