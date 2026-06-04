@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure + Auth** - Firebase setup, EAS dev build, auth flow, role-based navigation shell, Cloud Function, composite indexes (completed 2026-05-28)
 - [~] **Phase 2: Trainer Content Creation** - Exercise library, routine builder, program builder, client management, program assignment with snapshot transaction, trainer dashboard *(planned — 5 plans, 4 waves)*
-- [ ] **Phase 3: Client Workout Execution** - Workout calculator, four home states, session execution, gym/home toggle, crash-safe local state, completion flow, duplicate guard
+- [x] **Phase 3: Client Workout Execution** - Workout calculator, four home states, session execution, gym/home toggle, crash-safe local state, completion flow, duplicate guard (completed 2026-06-04)
 - [ ] **Phase 4: History + Polish** - Paginated session history, trainer client history view, profiles with photos, empty states, adherence metrics, in-session navigation guard
 
 ## Phase Details
@@ -111,7 +111,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 4** *(blocked on Wave 3 — end-to-end UAT needs the full feature + native rebuild)*
 
-- [ ] 03-05-PLAN.md — On-device UAT: full jest+tsc gate, native dev-client rebuild for expo-video, manual end-to-end verification of all six states, video, toggle, crash-resume, finish, duplicate guard (WORK-01..09) (Wave 4)
+- [x] 03-05-PLAN.md — On-device UAT: full jest+tsc gate, native dev-client rebuild for expo-video, manual end-to-end verification of all six states, video, toggle, crash-resume, finish, duplicate guard (WORK-01..09) (Wave 4)
 
 ### Phase 4: History + Polish
 
@@ -138,5 +138,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
-| 3. Client Workout Execution | 4/5 | In Progress|  |
+| 3. Client Workout Execution | 5/5 | Complete   | 2026-06-04 |
 | 4. History + Polish | 0/TBD | Not started | - |
