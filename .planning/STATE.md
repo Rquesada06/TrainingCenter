@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-04T23:21:27.531Z"
+last_updated: "2026-06-04T23:31:15.497Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 21
-  completed_plans: 16
+  completed_plans: 17
   percent: 75
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 ## Current Position
 
 Phase: 04 (history-polish) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-06-04
 
-Progress: [████████░░] 76%
+Progress: [████████░░] 81%
 
 ### Phase 2 Planning Notes (recorded 2026-06-01)
 
@@ -71,6 +71,7 @@ Progress: [████████░░] 76%
 | Phase 03 P03-02 | 6 | 3 tasks | 11 files |
 | Phase 03 P03-03 | 2 | 2 tasks | 2 files |
 | Phase 04 P04-01 | 15 | 3 tasks | 9 files |
+| Phase 04 P02 | 15min | 4 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 3: expo-video ~55.0.17 + async-storage 2.2.0 installed via npx expo install (SDK-55 pins); expo-video config plugin added to app.config.js
 - [Phase ?]: Phase 3: findMyActiveAssignment drops trainerId filter — client reads its own assignment (rule clientId==uid)
 - [Phase ?]: Phase 3: lastWorkoutMode in separate AsyncStorage key so it survives sessionStore.clearSession on day roll-over (D-09)
+- [Phase ?]: 04-02: useUser reuses getClient under ['user', uid] key for cache alignment with useUpdateProfile
+- [Phase ?]: 04-02: Live firebase deploy --only storage deferred to orchestrator — pending user enabling Storage bucket in Firebase console
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-04T23:21:27.521Z
+Last session: 2026-06-04T23:31:08.365Z
 Stopped at: Phase 4 UI-SPEC approved
 Resume file: None

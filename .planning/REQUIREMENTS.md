@@ -78,8 +78,8 @@
 ### Profile
 
 - [x] **PROF-01**: Client can view and edit their name and profile photo
-- [ ] **PROF-02**: Trainer can view and edit their own name and profile photo
-- [ ] **PROF-03**: Profile photos stored in Firebase Storage; loaded with caching (expo-image)
+- [x] **PROF-02**: Trainer can view and edit their own name and profile photo
+- [x] **PROF-03**: Profile photos stored in Firebase Storage; loaded with caching (expo-image)
 
 ---
 
@@ -182,8 +182,8 @@ Requirements mapped to phases by roadmapper.
 | HIST-03 | Phase 4 | Complete |
 | HIST-04 | Phase 4 | Complete |
 | PROF-01 | Phase 4 | Complete |
-| PROF-02 | Phase 4 | Pending |
-| PROF-03 | Phase 4 | Pending |
+| PROF-02 | Phase 4 | Complete |
+| PROF-03 | Phase 4 | Complete |
 
 **Coverage:**
 
