@@ -16,8 +16,10 @@
 import React from 'react';
 import { View, Text, FlatList, Pressable, ActivityIndicator, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { usePrograms } from '@/hooks/usePrograms';
+import { EmptyState } from '@/components/ui/EmptyState';
 import type { Program } from '@/types/program';
 
 function ProgramListItem({ program, onPress }: { program: Program; onPress: () => void }) {
@@ -114,23 +116,13 @@ export default function ProgramsScreen() {
             />
           )}
           ListEmptyComponent={
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingVertical: 60,
-              }}
-            >
-              <Text style={{ color: '#888888', fontSize: 16, textAlign: 'center' }}>
-                No programs yet.
-              </Text>
-              <Text
-                style={{ color: '#888888', fontSize: 14, marginTop: 8, textAlign: 'center' }}
-              >
-                Tap "+ Add" to create your first program.
-              </Text>
-            </View>
+            <EmptyState
+              icon={<Ionicons name="calendar-outline" size={40} color="#444444" />}
+              title="No programs yet"
+              message="Build a multi-week program by assigning routines to days."
+              ctaLabel="+ New Program"
+              onCta={() => router.push('/trainer/programs/new')}
+            />
           }
         />
       )}

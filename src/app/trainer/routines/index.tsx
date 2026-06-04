@@ -12,8 +12,10 @@
 import React from 'react';
 import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useRoutines } from '@/hooks/useRoutines';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { Routine } from '@/types/routine';
 
@@ -82,18 +84,13 @@ export default function RoutinesScreen() {
               flexGrow: 1,
             }}
             ListEmptyComponent={
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingTop: 60,
-                }}
-              >
-                <Text style={{ color: '#888888', fontSize: 16, textAlign: 'center' }}>
-                  No routines yet — tap Add to create one.
-                </Text>
-              </View>
+              <EmptyState
+                icon={<Ionicons name="list-outline" size={40} color="#444444" />}
+                title="No routines yet"
+                message="Create a routine by combining exercises from your library."
+                ctaLabel="+ New Routine"
+                onCta={() => router.push('/trainer/routines/new')}
+              />
             }
           />
         )}

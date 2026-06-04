@@ -11,13 +11,15 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, FlatList, ActivityIndicator, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useExercises } from '@/hooks/useExercises';
 import { filterExercises } from '@/firebase/exerciseFilter';
 import { ExerciseFilterBar } from '@/components/exercises/ExerciseFilterBar';
 import { ExerciseListItem } from '@/components/exercises/ExerciseListItem';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { ExerciseCategory, LocationType } from '@/types/exercise';
 
@@ -91,13 +93,23 @@ export default function ExercisesScreen() {
               flexGrow: 1,
             }}
             ListEmptyComponent={
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 }}>
-                <Text style={{ color: '#888888', fontSize: 16, textAlign: 'center' }}>
-                  {search || category || locationType
-                    ? 'No exercises match your filters.'
-                    : 'No exercises yet — tap Add to create one.'}
-                </Text>
-              </View>
+              search || category || locationType ? (
+                // Filter-active: message-only EmptyState (no CTA — Add would be misleading)
+                <EmptyState
+                  icon={<Ionicons name="search-outline" size={40} color="#444444" />}
+                  title="No matches"
+                  message="No exercises match your filters."
+                />
+              ) : (
+                // No-data: actionable EmptyState with Add CTA
+                <EmptyState
+                  icon={<Ionicons name="barbell-outline" size={40} color="#444444" />}
+                  title="No exercises yet"
+                  message="Add exercises to your library to start building routines."
+                  ctaLabel="+ Add Exercise"
+                  onCta={() => router.push('/trainer/exercises/new')}
+                />
+              )
             }
           />
         )}

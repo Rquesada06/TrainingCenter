@@ -12,9 +12,11 @@
 import React from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useClients } from '@/hooks/useClients';
 import { ClientListItem } from '@/components/clients/ClientListItem';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { User } from '@/types/user';
 
@@ -59,18 +61,13 @@ export default function ClientsScreen() {
               />
             )}
             ListEmptyComponent={
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingTop: 80,
-                }}
-              >
-                <Text style={{ color: '#888888', fontSize: 15, textAlign: 'center' }}>
-                  No clients yet — tap Add Client to create one.
-                </Text>
-              </View>
+              <EmptyState
+                icon={<Ionicons name="people-outline" size={40} color="#444444" />}
+                title="No clients yet"
+                message="Add your first client to get started."
+                ctaLabel="+ Add Client"
+                onCta={() => router.push('/trainer/clients/add')}
+              />
             }
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 24 }}
