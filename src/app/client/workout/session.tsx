@@ -226,6 +226,19 @@ export default function SessionScreen() {
     setExpandedId((prev) => (prev === exerciseId ? null : exerciseId));
   }, []);
 
+  // Marking an exercise done collapses it so the user flows to the next one.
+  const handleToggleComplete = useCallback(
+    (exerciseId: string) => {
+      if (readOnly) return;
+      const willComplete = !storeCompletedIds.includes(exerciseId);
+      toggleExercise(exerciseId);
+      if (willComplete) {
+        setExpandedId((prev) => (prev === exerciseId ? null : prev));
+      }
+    },
+    [readOnly, storeCompletedIds, toggleExercise]
+  );
+
   // ── Finish flow (WORK-06/07, D-13) ──────────────────────────────────────────
   const handleFinish = useCallback(() => {
     if (!uid || !assignment || weekIndex === null || dayIndex === null) return;
@@ -361,7 +374,7 @@ export default function SessionScreen() {
               exercise={item.exercise}
               modeTag={item.modeTag}
               isCompleted={isCompleted}
-              onToggleComplete={() => !readOnly && toggleExercise(exId)}
+              onToggleComplete={() => handleToggleComplete(exId)}
               isExpanded={expandedId === exId}
               onToggleExpand={() => handleToggleExpand(exId)}
               readOnly={readOnly}
