@@ -16,10 +16,15 @@
  *   - Loading placeholder: #888888
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, View, Text } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 import { ClientPhoto } from '@/components/clients/ClientPhoto';
+import { AdherenceBadge } from '@/components/clients/AdherenceBadge';
 import { useActiveAssignment } from '@/hooks/useActiveAssignment';
+import { fetchSessionsForAssignment } from '@/services/session.service';
+import { computeAdherence } from '@/lib/adherence';
+import { localTodayString } from '@/lib/workoutDayComputer';
 import type { User } from '@/types/user';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -54,6 +59,24 @@ export interface ClientListItemProps {
 
 export function ClientListItem({ client, onPress }: ClientListItemProps) {
   const activeAssignment = useActiveAssignment(client.uid);
+
+  // HIST-04: lazy per-client sessions fetch for the current active program.
+  // Enabled only once an active assignment exists (RESEARCH.md Open Q2 — MVP ~5 clients).
+  const sessionsQ = useQuery({
+    queryKey: ['adherenceSessions', client.uid, activeAssignment.data?.id],
+    queryFn: () => fetchSessionsForAssignment(client.uid, activeAssignment.data!.id),
+    enabled: !!activeAssignment.data?.id,
+  });
+
+  // Compute adherence in a useMemo (never in render body — RESEARCH.md Anti-Patterns).
+  // null until both the assignment and its sessions resolve, or when not computable.
+  const adherence = useMemo(
+    () =>
+      activeAssignment.data && sessionsQ.data
+        ? computeAdherence(activeAssignment.data, sessionsQ.data, localTodayString())
+        : null,
+    [activeAssignment.data, sessionsQ.data]
+  );
 
   // Active program label slot
   let programLabel: React.ReactNode;
@@ -94,6 +117,8 @@ export function ClientListItem({ client, onPress }: ClientListItemProps) {
           {client.name}
         </Text>
         {programLabel}
+        {/* HIST-04: render nothing until adherence resolves (no per-row spinner — avoid layout shift) */}
+        {adherence !== null && <AdherenceBadge adherence={adherence} />}
       </View>
 
       {/* Chevron hint */}
