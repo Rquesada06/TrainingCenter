@@ -35,6 +35,9 @@ export default function ClientLayout() {
         name="profile"
         options={{ title: 'Profile', tabBarIcon: tabIcon('person-outline') }}
       />
+      {/* `workout` is a pushed stack (navigated from Home), not a tab — hide it
+          from the tab bar so it doesn't render as an unlabeled/iconless tab. */}
+      <Tabs.Screen name="workout" options={{ href: null }} />
     </Tabs>
   );
 }
