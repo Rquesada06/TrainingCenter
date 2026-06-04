@@ -1,5 +1,5 @@
 /**
- * session.service tests — Phase 03 Plan 02 (WORK-06/07/09)
+ * session.service tests — Phase 03 Plan 02 (WORK-06/07/09) + Phase 04 (HIST-01/03)
  *
  * Covers:
  *   - findMyActiveAssignment: client-scoped query (clientId + status, NO trainerId
@@ -7,14 +7,16 @@
  *   - findTodaySession: duplicate-guard query (clientId + date), empty → null,
  *     present → { ...data, id }  (WORK-09)
  *   - createSession: .add(stripUndefinedDeep(data)) → returns ref id (WORK-06/07)
+ *   - fetchSessionPage: paged query (clientId, orderBy date desc, limit 20),
+ *     cursor-less first page, startAfter(cursor) on subsequent pages (HIST-01/03)
+ *   - fetchSessionsForAssignment: two-where query (clientId + assignmentId),
+ *     snap.empty → [], present → array (HIST-04 adherence reads)
  *
  * Threat T-03-04: queries filter clientId == self; no other-client reads.
  *
- * Mock strategy mirrors exercise.service.test.ts: jest.mock() is hoisted above
- * imports, all mock fns created inside the factory (avoids TDZ), exposed via
- * __mocks and retrieved with jest.requireMock(). The chainable query mock
- * returns the same chain object from where()/limit() so .where().where().limit()
- * resolves to .get().
+ * Mock strategy: jest.mock() is hoisted above imports, all mock fns created inside
+ * the factory (avoids TDZ). The chainable query mock (`_chain`) returns itself from
+ * where()/limit()/orderBy()/startAfter() so any call order resolves to .get().
  */
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -24,27 +26,41 @@
 jest.mock('@react-native-firebase/firestore', () => {
   const _mockGet = jest.fn();
   const _mockAdd = jest.fn();
-  // Chainable query node: where() and limit() return the same chain so that
-  // .where().where().limit().get() resolves correctly.
-  const _chain: { where: jest.Mock; limit: jest.Mock; get: jest.Mock } = {
+
+  // Chainable query node — every query method returns the same chain so that
+  // any combination of .where().where().orderBy().limit().startAfter().get()
+  // resolves to the single _mockGet spy.
+  const _chain: {
+    where: jest.Mock;
+    limit: jest.Mock;
+    orderBy: jest.Mock;
+    startAfter: jest.Mock;
+    get: jest.Mock;
+  } = {
     where: jest.fn(() => _chain),
     limit: jest.fn(() => _chain),
+    orderBy: jest.fn(() => _chain),
+    startAfter: jest.fn(() => _chain),
     get: _mockGet,
   };
-  const _mockWhere = _chain.where;
-  const _mockLimit = _chain.limit;
+
   const _mockCollection = jest.fn(() => ({
-    where: _mockWhere,
-    limit: _mockLimit,
+    where: _chain.where,
+    limit: _chain.limit,
+    orderBy: _chain.orderBy,
+    startAfter: _chain.startAfter,
     add: _mockAdd,
   }));
+
   const firestoreFn = jest.fn(() => ({ collection: _mockCollection }));
 
   (firestoreFn as any).__mocks = {
     get: _mockGet,
     add: _mockAdd,
-    where: _mockWhere,
-    limit: _mockLimit,
+    where: _chain.where,
+    limit: _chain.limit,
+    orderBy: _chain.orderBy,
+    startAfter: _chain.startAfter,
     collection: _mockCollection,
     chain: _chain,
   };
@@ -60,6 +76,9 @@ import {
   findMyActiveAssignment,
   findTodaySession,
   createSession,
+  fetchSessionPage,
+  fetchSessionsForAssignment,
+  SESSION_PAGE_SIZE,
 } from '../session.service';
 import type { Session } from '@/types/session';
 
@@ -71,8 +90,16 @@ const mocks = (firestoreMock as any).__mocks as {
   add: jest.Mock;
   where: jest.Mock;
   limit: jest.Mock;
+  orderBy: jest.Mock;
+  startAfter: jest.Mock;
   collection: jest.Mock;
-  chain: { where: jest.Mock; limit: jest.Mock; get: jest.Mock };
+  chain: {
+    where: jest.Mock;
+    limit: jest.Mock;
+    orderBy: jest.Mock;
+    startAfter: jest.Mock;
+    get: jest.Mock;
+  };
 };
 
 beforeEach(() => {
@@ -81,10 +108,15 @@ beforeEach(() => {
   mocks.collection.mockReturnValue({
     where: mocks.where,
     limit: mocks.limit,
+    orderBy: mocks.orderBy,
+    startAfter: mocks.startAfter,
     add: mocks.add,
   });
+  // Each method returns the chain so the full fluent chain resolves to .get().
   mocks.where.mockReturnValue(mocks.chain);
   mocks.limit.mockReturnValue(mocks.chain);
+  mocks.orderBy.mockReturnValue(mocks.chain);
+  mocks.startAfter.mockReturnValue(mocks.chain);
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -207,5 +239,127 @@ describe('createSession', () => {
     const written = mocks.add.mock.calls[0][0];
     expect('routineName' in written).toBe(false);
     expect(written.clientId).toBe('client-1');
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// fetchSessionPage — paginated reads (HIST-01/03)
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('fetchSessionPage', () => {
+  it('SESSION_PAGE_SIZE is 20', () => {
+    expect(SESSION_PAGE_SIZE).toBe(20);
+  });
+
+  it('queries with where(clientId) + orderBy(date, desc) + limit(20) on first page (no cursor)', async () => {
+    const docData = { clientId: 'client-1', date: '2026-06-01', assignmentId: 'a1' };
+    const mockDocs = Array.from({ length: 20 }, (_, i) => ({
+      id: `session-${i}`,
+      data: () => ({ ...docData, date: `2026-06-${String(i + 1).padStart(2, '0')}` }),
+    }));
+
+    mocks.get.mockResolvedValueOnce({ empty: false, docs: mockDocs });
+
+    const result = await fetchSessionPage('client-1', undefined);
+
+    expect(mocks.where).toHaveBeenCalledWith('clientId', '==', 'client-1');
+    expect(mocks.orderBy).toHaveBeenCalledWith('date', 'desc');
+    expect(mocks.limit).toHaveBeenCalledWith(SESSION_PAGE_SIZE);
+    // No startAfter on first page
+    expect(mocks.startAfter).not.toHaveBeenCalled();
+    expect(result.items).toHaveLength(20);
+  });
+
+  it('includes startAfter(cursor) when a cursor is provided', async () => {
+    const cursor = { id: 'cursor-doc' } as any;
+    mocks.get.mockResolvedValueOnce({ empty: false, docs: [{ id: 'session-21', data: () => ({ clientId: 'client-1' }) }] });
+
+    await fetchSessionPage('client-1', cursor);
+
+    expect(mocks.startAfter).toHaveBeenCalledWith(cursor);
+  });
+
+  it('returns lastDoc as the last document when page is full (20 items)', async () => {
+    const lastDocMock = { id: 'last-doc', data: () => ({ clientId: 'client-1', date: '2026-06-20' }) };
+    const docs = Array.from({ length: 20 }, (_, i) =>
+      i === 19
+        ? lastDocMock
+        : { id: `session-${i}`, data: () => ({ clientId: 'client-1', date: `2026-06-${String(i + 1).padStart(2, '0')}` }) }
+    );
+
+    mocks.get.mockResolvedValueOnce({ empty: false, docs });
+
+    const result = await fetchSessionPage('client-1', undefined);
+
+    // lastDoc is defined when items.length === SESSION_PAGE_SIZE
+    expect(result.lastDoc).toBe(lastDocMock);
+  });
+
+  it('returns lastDoc as undefined when page is NOT full (< 20 items — last page)', async () => {
+    const docs = [{ id: 'session-1', data: () => ({ clientId: 'client-1' }) }];
+    mocks.get.mockResolvedValueOnce({ empty: false, docs });
+
+    const result = await fetchSessionPage('client-1', undefined);
+
+    // lastDoc is undefined when items.length < SESSION_PAGE_SIZE → signals last page
+    expect(result.lastDoc).toBeUndefined();
+  });
+
+  it('returns empty items array when snap is empty', async () => {
+    mocks.get.mockResolvedValueOnce({ empty: true, docs: [] });
+
+    const result = await fetchSessionPage('client-1', undefined);
+
+    expect(result.items).toHaveLength(0);
+    expect(result.lastDoc).toBeUndefined();
+  });
+
+  it('maps docs to { ...data(), id } shape', async () => {
+    const docData = { clientId: 'client-1', date: '2026-06-01', assignmentId: 'a1' };
+    mocks.get.mockResolvedValueOnce({
+      empty: false,
+      docs: [{ id: 'session-1', data: () => docData }],
+    });
+
+    const result = await fetchSessionPage('client-1', undefined);
+
+    expect(result.items[0]).toEqual({ ...docData, id: 'session-1' });
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// fetchSessionsForAssignment — adherence batch read (HIST-04)
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('fetchSessionsForAssignment', () => {
+  it('queries with where(clientId) + where(assignmentId)', async () => {
+    mocks.get.mockResolvedValueOnce({ empty: true, docs: [] });
+
+    await fetchSessionsForAssignment('client-1', 'assignment-1');
+
+    expect(mocks.where).toHaveBeenCalledWith('clientId', '==', 'client-1');
+    expect(mocks.where).toHaveBeenCalledWith('assignmentId', '==', 'assignment-1');
+  });
+
+  it('returns empty array when snap.empty is true (RNFB v24: empty is a property)', async () => {
+    // RNFB v24: snap.empty is a PROPERTY (no parentheses in the service).
+    mocks.get.mockResolvedValueOnce({ empty: true, docs: [] });
+
+    const result = await fetchSessionsForAssignment('client-1', 'assignment-1');
+
+    expect(result).toEqual([]);
+  });
+
+  it('returns array of sessions when docs exist', async () => {
+    const docData = { clientId: 'client-1', assignmentId: 'assignment-1', date: '2026-06-01' };
+    mocks.get.mockResolvedValueOnce({
+      empty: false,
+      docs: [{ id: 'session-1', data: () => docData }],
+    });
+
+    const result = await fetchSessionsForAssignment('client-1', 'assignment-1');
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({ ...docData, id: 'session-1' });
   });
 });

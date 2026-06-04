@@ -22,6 +22,7 @@ import { assignmentsCollection, sessionsCollection } from '@/firebase/firestore'
 import { stripUndefinedDeep } from '@/lib/firestoreWrite';
 import type { Assignment } from '@/types/assignment';
 import type { Session } from '@/types/session';
+import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 // ────────────────────────────────────────────────────────────────────────────
 // Reads
@@ -65,6 +66,81 @@ export async function findTodaySession(
   if (snap.empty) return null;
   const doc = snap.docs[0];
   return { ...doc.data(), id: doc.id } as Session;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Pagination + adherence reads (Phase 04 — HIST-01/03/04)
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Page size for session history queries (HIST-01/03).
+ * Exposed so useSessionHistory hook's getNextPageParam can reference the same constant.
+ */
+export const SESSION_PAGE_SIZE = 20;
+
+/**
+ * One page of session history results.
+ *
+ * `lastDoc` is the Firestore cursor to pass as `startAfter` on the next call.
+ * It is `undefined` when `items.length < SESSION_PAGE_SIZE`, signalling the last page.
+ */
+export interface SessionPage {
+  items: Session[];
+  lastDoc: FirebaseFirestoreTypes.QueryDocumentSnapshot<Session> | undefined;
+}
+
+/**
+ * Fetch one page of sessions for a client, newest-first.
+ *
+ * Pass `cursor = undefined` for the first page. Pass `lastDoc` from the previous
+ * result to fetch the next page (.startAfter cursor pagination — RNFB v24).
+ *
+ * Security: `where('clientId', '==', clientId)` ensures no cross-client reads.
+ * Firestore sessions read rule (`resource.data.clientId == request.auth.uid` for
+ * clients, `resource.data.trainerId == request.auth.uid` for trainers) enforces
+ * this server-side as well (T-04-01).
+ */
+export async function fetchSessionPage(
+  clientId: string,
+  cursor: FirebaseFirestoreTypes.QueryDocumentSnapshot<Session> | undefined
+): Promise<SessionPage> {
+  let q = sessionsCollection()
+    .where('clientId', '==', clientId)
+    .orderBy('date', 'desc')
+    .limit(SESSION_PAGE_SIZE);
+
+  if (cursor) {
+    q = q.startAfter(cursor);
+  }
+
+  const snap = await q.get();
+  const items = snap.docs.map((d) => ({ ...d.data(), id: d.id } as Session));
+  // lastDoc is defined only when the page is full — undefined signals last page.
+  const lastDoc =
+    items.length === SESSION_PAGE_SIZE
+      ? (snap.docs[snap.docs.length - 1] as FirebaseFirestoreTypes.QueryDocumentSnapshot<Session>)
+      : undefined;
+
+  return { items, lastDoc };
+}
+
+/**
+ * Fetch ALL sessions for a specific assignment (used to compute adherence — HIST-04).
+ *
+ * MVP assumption: session count per assignment is small (<200), so one query suffices.
+ * Returns empty array when `snap.empty` (RNFB v24: `.empty` is a property).
+ */
+export async function fetchSessionsForAssignment(
+  clientId: string,
+  assignmentId: string
+): Promise<Session[]> {
+  const snap = await sessionsCollection()
+    .where('clientId', '==', clientId)
+    .where('assignmentId', '==', assignmentId)
+    .get();
+
+  if (snap.empty) return []; // RNFB v24: .empty is a PROPERTY, not a method
+  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Session));
 }
 
 // ────────────────────────────────────────────────────────────────────────────
