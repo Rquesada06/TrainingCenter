@@ -126,8 +126,24 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Client and trainer can view and edit their profile name and photo, with photos stored in Firebase Storage and loaded with caching
   5. All screens that can be empty (no exercises, no routines, no programs, no clients, no sessions) show a purposeful empty state rather than a blank screen
 
-**Plans**: TBD
+**Plans**: 7 plans (3 waves)
 **UI hint**: yes
+
+**Wave 1** *(foundation — disjoint files, parallel)*
+
+- [ ] 04-01-PLAN.md — Adherence + session-detail pure helpers, session.service pagination, useSessionHistory/useAssignment hooks, Wave 0 tests (HIST-01..04)
+- [ ] 04-02-PLAN.md — Firebase Storage infra: storage.rules create+deploy [BLOCKING], storage.service, useUpdateProfile/useUser, expo-image-picker install (supply-chain checkpoint), Wave 0 tests (PROF-01..03)
+- [ ] 04-03-PLAN.md — Presentational components: EmptyState, StatusBadge, SessionListItem, AdherenceBadge
+
+**Wave 2** *(screens — consume Wave 1; disjoint files, parallel)*
+
+- [ ] 04-04-PLAN.md — Session history screens: client History tab + list, session detail, trainer client-profile inline history (HIST-01/02/03)
+- [ ] 04-05-PLAN.md — Adherence on ClientListItem + EmptyState wiring on all four trainer lists (HIST-04 + criterion 5)
+- [ ] 04-06-PLAN.md — Profile edit screens (client + trainer): name + photo via expo-image-picker (PROF-01/02)
+
+**Wave 3** *(on-device UAT — needs native rebuild + deployed storage.rules)*
+
+- [ ] 04-07-PLAN.md — Full jest+tsc gate, dev-client rebuild for expo-image-picker, on-device UAT of photos/history/adherence/empty states (HIST-01..04, PROF-01..03)
 
 ## Progress
 
