@@ -56,6 +56,19 @@ module.exports = {
       'expo-secure-store',
       '@react-native-google-signin/google-signin',
       'expo-video',
+      // NOTE: native dev-client rebuild required before expo-image-picker is usable on
+      // device (new native module). The rebuild + on-device photo UAT is plan 04-07.
+      // Permission copy is mandatory — a blank string produces a blank iOS permission
+      // dialog (04-RESEARCH.md Pitfall 2).
+      [
+        'expo-image-picker',
+        {
+          photosPermission:
+            'Allow TrainingCenter to access your photos to set a profile picture.',
+          cameraPermission:
+            'Allow TrainingCenter to use your camera to take a profile photo.',
+        },
+      ],
     ],
     extra: {
       googleWebClientId: '911229291499-vs0j44h5ehl0bo6la8c4ks1r6if1on9n.apps.googleusercontent.com',
