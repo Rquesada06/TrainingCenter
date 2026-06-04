@@ -138,5 +138,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
-| 3. Client Workout Execution | 5/5 | Complete   | 2026-06-04 |
+| 3. Client Workout Execution | 5/5 | Complete    | 2026-06-04 |
 | 4. History + Polish | 0/TBD | Not started | - |
