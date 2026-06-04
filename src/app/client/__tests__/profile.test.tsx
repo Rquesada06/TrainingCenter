@@ -47,6 +47,8 @@ jest.mock('expo-image-picker', () => ({
 
 jest.mock('@/firebase/auth', () => ({ signOut: jest.fn() }));
 
+jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
+
 import ClientProfileScreen from '../profile';
 
 beforeEach(() => {
@@ -74,7 +76,9 @@ describe('ClientProfileScreen — PROF-01', () => {
     render(<ClientProfileScreen />);
     fireEvent.changeText(screen.getByDisplayValue('Ada Client'), '  Ada Lovelace  ');
     fireEvent.press(screen.getByText('Save Name'));
-    expect(mockMutate).toHaveBeenCalledWith({
+    // mutate(vars, options) — assert the variables payload (first arg).
+    expect(mockMutate).toHaveBeenCalled();
+    expect(mockMutate.mock.calls[0][0]).toEqual({
       uid: 'client-uid-1',
       partial: { name: 'Ada Lovelace' },
     });

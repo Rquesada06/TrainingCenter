@@ -32,6 +32,10 @@ export default function ClientLayout() {
         options={{ title: 'Home', tabBarIcon: tabIcon('home-outline') }}
       />
       <Tabs.Screen
+        name="history"
+        options={{ title: 'History', tabBarIcon: tabIcon('time-outline') }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{ title: 'Profile', tabBarIcon: tabIcon('person-outline') }}
       />
