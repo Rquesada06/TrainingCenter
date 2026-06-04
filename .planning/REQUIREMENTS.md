@@ -70,10 +70,10 @@
 
 ### Session History
 
-- [ ] **HIST-01**: Client can view a paginated list of their completed sessions (date, routine name, status: completed/partial)
-- [ ] **HIST-02**: Client can tap a session to see which exercises were completed
-- [ ] **HIST-03**: Trainer can view a paginated list of a specific client's sessions (from the client profile screen)
-- [ ] **HIST-04**: Trainer's client list card shows adherence percentage (sessions completed / sessions programmed)
+- [x] **HIST-01**: Client can view a paginated list of their completed sessions (date, routine name, status: completed/partial)
+- [x] **HIST-02**: Client can tap a session to see which exercises were completed
+- [x] **HIST-03**: Trainer can view a paginated list of a specific client's sessions (from the client profile screen)
+- [x] **HIST-04**: Trainer's client list card shows adherence percentage (sessions completed / sessions programmed)
 
 ### Profile
 
@@ -177,10 +177,10 @@ Requirements mapped to phases by roadmapper.
 | WORK-07 | Phase 3 | Complete |
 | WORK-08 | Phase 3 | Complete |
 | WORK-09 | Phase 3 | Complete |
-| HIST-01 | Phase 4 | Pending |
-| HIST-02 | Phase 4 | Pending |
-| HIST-03 | Phase 4 | Pending |
-| HIST-04 | Phase 4 | Pending |
+| HIST-01 | Phase 4 | Complete |
+| HIST-02 | Phase 4 | Complete |
+| HIST-03 | Phase 4 | Complete |
+| HIST-04 | Phase 4 | Complete |
 | PROF-01 | Phase 4 | Pending |
 | PROF-02 | Phase 4 | Pending |
 | PROF-03 | Phase 4 | Pending |

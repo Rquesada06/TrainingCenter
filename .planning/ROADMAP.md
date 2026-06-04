@@ -131,7 +131,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 1** *(foundation — disjoint files, parallel)*
 
-- [ ] 04-01-PLAN.md — Adherence + session-detail pure helpers, session.service pagination, useSessionHistory/useAssignment hooks, Wave 0 tests (HIST-01..04)
+- [x] 04-01-PLAN.md — Adherence + session-detail pure helpers, session.service pagination, useSessionHistory/useAssignment hooks, Wave 0 tests (HIST-01..04)
 - [ ] 04-02-PLAN.md — Firebase Storage infra: storage.rules create+deploy [BLOCKING], storage.service, useUpdateProfile/useUser, expo-image-picker install (supply-chain checkpoint), Wave 0 tests (PROF-01..03)
 - [ ] 04-03-PLAN.md — Presentational components: EmptyState, StatusBadge, SessionListItem, AdherenceBadge
 
@@ -155,4 +155,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
 | 3. Client Workout Execution | 5/5 | Complete    | 2026-06-04 |
-| 4. History + Polish | 0/TBD | Not started | - |
+| 4. History + Polish | 1/7 | In Progress|  |
