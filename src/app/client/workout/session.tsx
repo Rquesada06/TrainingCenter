@@ -226,14 +226,16 @@ export default function SessionScreen() {
     setExpandedId((prev) => (prev === exerciseId ? null : exerciseId));
   }, []);
 
-  // Marking an exercise done collapses it so the user flows to the next one.
+  // Marking an exercise done collapses it and opens the next unfinished one,
+  // so the workout flows naturally. `nextExpandId` is the next not-yet-completed
+  // exercise after this one (null = none left → just collapse).
   const handleToggleComplete = useCallback(
-    (exerciseId: string) => {
+    (exerciseId: string, nextExpandId: string | null) => {
       if (readOnly) return;
       const willComplete = !storeCompletedIds.includes(exerciseId);
       toggleExercise(exerciseId);
       if (willComplete) {
-        setExpandedId((prev) => (prev === exerciseId ? null : prev));
+        setExpandedId(nextExpandId);
       }
     },
     [readOnly, storeCompletedIds, toggleExercise]
@@ -363,18 +365,24 @@ export default function SessionScreen() {
       <FlatList<ResolvedItem>
         data={resolvedExercises}
         keyExtractor={(item) => item.exercise.exerciseId}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const exId = item.exercise.exerciseId;
           const isCompleted = readOnly
             ? readOnlyCompletedIds.includes(exId)
             : storeCompletedIds.includes(exId);
+          // Next not-yet-completed exercise after this one (guided flow).
+          const nextExpandId =
+            resolvedExercises
+              .slice(index + 1)
+              .find((r) => !storeCompletedIds.includes(r.exercise.exerciseId))
+              ?.exercise.exerciseId ?? null;
 
           return (
             <ExerciseRow
               exercise={item.exercise}
               modeTag={item.modeTag}
               isCompleted={isCompleted}
-              onToggleComplete={() => handleToggleComplete(exId)}
+              onToggleComplete={() => handleToggleComplete(exId, nextExpandId)}
               isExpanded={expandedId === exId}
               onToggleExpand={() => handleToggleExpand(exId)}
               readOnly={readOnly}
