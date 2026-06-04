@@ -18,6 +18,8 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
+import { parseYouTubeId } from '@/lib/youtube';
+import { YouTubeEmbed } from './YouTubeEmbed';
 import type { AssignmentSnapshotExercise } from '@/types/assignment';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -257,8 +259,13 @@ export function ExerciseRow({
             </Text>
           )}
 
-          {/* Media: prefer video over image; only mount VideoView while expanded */}
-          {exercise.videoUrl !== null ? (
+          {/* Media (only mounted while expanded): YouTube → embed player;
+              direct video file (.mp4/HLS) → expo-video; else → image. */}
+          {exercise.videoUrl !== null && parseYouTubeId(exercise.videoUrl) !== null ? (
+            <View style={{ marginTop: 8 }}>
+              <YouTubeEmbed videoId={parseYouTubeId(exercise.videoUrl)!} />
+            </View>
+          ) : exercise.videoUrl !== null ? (
             <View style={{ marginTop: 8 }}>
               <InlineVideo videoUrl={exercise.videoUrl} />
             </View>
