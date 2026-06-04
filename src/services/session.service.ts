@@ -125,6 +125,23 @@ export async function fetchSessionPage(
 }
 
 /**
+ * Fetch a single session by document ID (HIST-02 — session detail deep link).
+ *
+ * Used when the session is not already in the `['sessionHistory', uid]` infinite
+ * query cache (e.g. cold deep link into a detail screen). The sessions read rule
+ * (`resource.data.clientId == request.auth.uid` for clients,
+ * `resource.data.trainerId == request.auth.uid` for trainers) enforces access
+ * server-side, so a guessed id for another user's session returns no data (T-04-08).
+ *
+ * RNFB v24: `snap.exists()` is a METHOD (with parentheses). Returns null when absent.
+ */
+export async function getSession(id: string): Promise<Session | null> {
+  const snap = await sessionsCollection().doc(id).get();
+  if (!snap.exists()) return null; // RNFB v24: exists() is a METHOD
+  return { ...snap.data()!, id: snap.id } as Session;
+}
+
+/**
  * Fetch ALL sessions for a specific assignment (used to compute adherence — HIST-04).
  *
  * MVP assumption: session count per assignment is small (<200), so one query suffices.
