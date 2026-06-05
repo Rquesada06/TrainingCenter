@@ -2,7 +2,7 @@
  * Client profile screen — Phase 02 Plan 03 (CLNT-03, CLNT-04)
  *
  * CLNT-03: Trainer taps a client row to view their profile — active program + start date.
- *          Session history section is a placeholder (Phase 4 — HIST-04).
+ * HIST-03: Inline paginated session history for this client (shared useSessionHistory + SessionListItem).
  *
  * CLNT-04: Trainer can edit the client's name from this screen.
  *          Authorized server-side by the trainer-update-client Firestore rule added in Task 3.
@@ -13,12 +13,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useClient } from '@/hooks/useClient';
 import { useActiveAssignment } from '@/hooks/useActiveAssignment';
 import { useUpdateClient } from '@/hooks/useUpdateClient';
+import { useSessionHistory } from '@/hooks/useSessionHistory';
 import { ClientPhoto } from '@/components/clients/ClientPhoto';
+import { SessionListItem } from '@/components/sessions/SessionListItem';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { TextField } from '@/components/ui/TextField';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
+import type { Session } from '@/types/session';
 
 export default function ClientProfileScreen() {
   const { clientId } = useLocalSearchParams<{ clientId: string }>();
@@ -27,6 +32,10 @@ export default function ClientProfileScreen() {
   const client = useClient(clientId);
   const activeAssignment = useActiveAssignment(clientId);
   const updateClient = useUpdateClient();
+
+  // HIST-03: this client's session history, newest-first paginated (shared hook + components)
+  const history = useSessionHistory(clientId);
+  const sessions: Session[] = history.data?.pages.flatMap((p) => p.items) ?? [];
 
   // Local state for the editable name field
   const [nameValue, setNameValue] = useState('');
@@ -209,22 +218,43 @@ export default function ClientProfileScreen() {
           )}
         </View>
 
-        {/* ── Session history placeholder (Phase 4 — HIST-04) ───────────── */}
-        <View
-          style={{
-            backgroundColor: '#1A1A1A',
-            borderRadius: 8,
-            padding: 16,
-          }}
-        >
+        {/* ── Session history (HIST-03) — inline list, no nested scroll ──── */}
+        <View>
           <Text
             style={{ color: '#888888', fontSize: 13, marginBottom: 8, fontWeight: '600' }}
           >
             SESSION HISTORY
           </Text>
-          <Text style={{ color: '#888888', fontSize: 14, fontStyle: 'italic' }}>
-            Session history coming in Phase 4.
-          </Text>
+
+          {history.isLoading ? (
+            <ActivityIndicator color="#00FF66" style={{ marginVertical: 24 }} />
+          ) : sessions.length === 0 ? (
+            <EmptyState
+              icon={<Ionicons name="time-outline" size={40} color="#444444" />}
+              title="No sessions yet"
+              message="This client hasn't completed any workouts yet."
+            />
+          ) : (
+            <>
+              {sessions.map((s) => (
+                <SessionListItem
+                  key={s.id}
+                  session={s}
+                  onPress={() => router.push(`/client/history/${s.id}`)}
+                />
+              ))}
+              {history.hasNextPage && (
+                <View style={{ marginTop: 12 }}>
+                  <PrimaryButton
+                    label="Load more"
+                    variant="outline"
+                    loading={history.isFetchingNextPage}
+                    onPress={() => history.fetchNextPage()}
+                  />
+                </View>
+              )}
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
