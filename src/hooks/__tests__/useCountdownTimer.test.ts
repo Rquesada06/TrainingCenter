@@ -10,38 +10,35 @@
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mocks — must be before all imports (jest hoists these)
+// Mocks — must be before all imports (jest hoists these).
+// Factory functions cannot reference outer-scope vars (they run before the var
+// declarations). We use jest.fn() inline and retrieve the mocks via
+// jest.mocked() / module reference after imports.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const mockPlay = jest.fn();
-const mockRemove = jest.fn();
-const mockCreateAudioPlayer = jest.fn(() => ({ play: mockPlay, remove: mockRemove }));
-
 jest.mock('expo-audio', () => ({
-  createAudioPlayer: mockCreateAudioPlayer,
+  createAudioPlayer: jest.fn(() => ({ play: jest.fn(), remove: jest.fn() })),
 }));
 
-const mockNotificationAsync = jest.fn().mockResolvedValue(undefined);
 jest.mock('expo-haptics', () => ({
-  notificationAsync: mockNotificationAsync,
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
   NotificationFeedbackType: { Success: 'success' },
 }));
 
-const mockActivateKeepAwakeAsync = jest.fn().mockResolvedValue(undefined);
-const mockDeactivateKeepAwake = jest.fn().mockResolvedValue(undefined);
 jest.mock('expo-keep-awake', () => ({
-  activateKeepAwakeAsync: mockActivateKeepAwakeAsync,
-  deactivateKeepAwake: mockDeactivateKeepAwake,
+  activateKeepAwakeAsync: jest.fn().mockResolvedValue(undefined),
+  deactivateKeepAwake: jest.fn().mockResolvedValue(undefined),
 }));
 
-// AppState mock — we capture the listener so we can trigger it
+// AppState mock — we capture the listener so tests can trigger 'active' events
 let appStateListener: ((state: string) => void) | null = null;
-const mockAddEventListener = jest.fn((_event: string, handler: (state: string) => void) => {
-  appStateListener = handler;
-  return { remove: jest.fn() };
-});
-jest.mock('react-native/Libraries/AppState/AppState', () => ({
-  addEventListener: mockAddEventListener,
+jest.mock('react-native', () => ({
+  AppState: {
+    addEventListener: jest.fn((_event: string, handler: (state: string) => void) => {
+      appStateListener = handler;
+      return { remove: jest.fn() };
+    }),
+  },
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -49,6 +46,9 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { renderHook, act } from '@testing-library/react-native';
+import * as ExpoAudio from 'expo-audio';
+import * as Haptics from 'expo-haptics';
+import * as KeepAwake from 'expo-keep-awake';
 import { useCountdownTimer } from '../useCountdownTimer';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -58,13 +58,14 @@ import { useCountdownTimer } from '../useCountdownTimer';
 beforeEach(() => {
   jest.useFakeTimers();
   jest.setSystemTime(0);
-  mockPlay.mockClear();
-  mockRemove.mockClear();
-  mockCreateAudioPlayer.mockClear();
-  mockNotificationAsync.mockClear();
-  mockActivateKeepAwakeAsync.mockClear();
-  mockDeactivateKeepAwake.mockClear();
+  jest.clearAllMocks();
   appStateListener = null;
+
+  // Reset the createAudioPlayer mock to return a fresh player each call
+  (ExpoAudio.createAudioPlayer as jest.Mock).mockImplementation(() => ({
+    play: jest.fn(),
+    remove: jest.fn(),
+  }));
 });
 
 afterEach(() => {
@@ -116,6 +117,37 @@ describe('useCountdownTimer — fire-once alarm guard', () => {
 
     expect(onExpire).toHaveBeenCalledTimes(1);
   });
+
+  it('plays alarm audio via createAudioPlayer on expiry', () => {
+    const { result } = renderHook(() => useCountdownTimer());
+    const mockPlayer = { play: jest.fn(), remove: jest.fn() };
+    (ExpoAudio.createAudioPlayer as jest.Mock).mockReturnValue(mockPlayer);
+
+    act(() => {
+      result.current.start(2);
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(2500);
+    });
+
+    expect(ExpoAudio.createAudioPlayer).toHaveBeenCalled();
+    expect(mockPlayer.play).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires haptic notification on expiry', () => {
+    const { result } = renderHook(() => useCountdownTimer());
+
+    act(() => {
+      result.current.start(2);
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(2500);
+    });
+
+    expect(Haptics.notificationAsync).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('useCountdownTimer — skip suppresses alarm', () => {
@@ -144,6 +176,28 @@ describe('useCountdownTimer — skip suppresses alarm', () => {
     expect(onExpire).not.toHaveBeenCalled();
     expect(result.current.isRunning).toBe(false);
   });
+
+  it('skip() fires no alarm audio', () => {
+    const { result } = renderHook(() => useCountdownTimer());
+
+    act(() => {
+      result.current.start(10);
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    act(() => {
+      result.current.skip();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(ExpoAudio.createAudioPlayer).not.toHaveBeenCalled();
+  });
 });
 
 describe('useCountdownTimer — add15 extends endsAt', () => {
@@ -168,7 +222,6 @@ describe('useCountdownTimer — add15 extends endsAt', () => {
       result.current.add15();
     });
 
-    // Timer should NOT have expired yet (remaining ≈ 16s before, now ≈ 16s)
     // Advance 5 more seconds (past original expiry) — should still be running
     act(() => {
       jest.advanceTimersByTime(5000);
@@ -180,20 +233,20 @@ describe('useCountdownTimer — add15 extends endsAt', () => {
 });
 
 describe('useCountdownTimer — keep-awake lifecycle', () => {
-  it('activates keep-awake when timer starts, deactivates on expiry', async () => {
+  it('activates keep-awake when timer starts, deactivates on expiry', () => {
     const { result } = renderHook(() => useCountdownTimer());
 
     act(() => {
       result.current.start(2);
     });
 
-    expect(mockActivateKeepAwakeAsync).toHaveBeenCalledWith('countdown-timer');
+    expect(KeepAwake.activateKeepAwakeAsync).toHaveBeenCalledWith('countdown-timer');
 
     act(() => {
       jest.advanceTimersByTime(2500);
     });
 
-    expect(mockDeactivateKeepAwake).toHaveBeenCalledWith('countdown-timer');
+    expect(KeepAwake.deactivateKeepAwake).toHaveBeenCalledWith('countdown-timer');
   });
 });
 
@@ -205,7 +258,7 @@ describe('useCountdownTimer — foreground recompute (AppState)', () => {
       result.current.start(30);
     });
 
-    // Simulate app returning to foreground at a specific time
+    // Simulate app returning to foreground after 15s elapsed
     act(() => {
       jest.setSystemTime(15_000); // 15s have elapsed
       if (appStateListener) {
@@ -213,7 +266,7 @@ describe('useCountdownTimer — foreground recompute (AppState)', () => {
       }
     });
 
-    // remainingMs should reflect the advanced time (endsAt=30000, now=15000)
+    // endsAt = 30000, now recomputed to 15000 → remaining = 15000
     expect(result.current.remainingMs).toBeLessThanOrEqual(15_500);
     expect(result.current.remainingMs).toBeGreaterThan(14_000);
   });

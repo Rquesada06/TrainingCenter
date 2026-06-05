@@ -56,6 +56,7 @@ module.exports = {
       'expo-secure-store',
       '@react-native-google-signin/google-signin',
       'expo-video',
+      'expo-audio',
       // NOTE: native dev-client rebuild required before expo-image-picker is usable on
       // device (new native module). The rebuild + on-device photo UAT is plan 04-07.
       // Permission copy is mandatory — a blank string produces a blank iOS permission
