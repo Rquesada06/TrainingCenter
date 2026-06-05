@@ -1,5 +1,5 @@
 /**
- * Routine schema validation tests — Phase 02 Plan 01 (ROUT-01).
+ * Routine schema validation tests — Phase 02 Plan 01 (ROUT-01) + Phase 05 Plan 01 (PRES-01/02/03).
  */
 
 import { routineSchema } from '@/validation/routine.schema';
@@ -51,6 +51,90 @@ describe('routineSchema', () => {
       exercises: [
         { ...validEntry, notes: 'Go deep', alternativeExerciseId: 'ex-99' },
       ],
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 05 Plan 01 — PRES-01/02/03: rep range, targetRpe, timed flag
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('routineSchema — prescription fields (PRES-01/02/03)', () => {
+  const baseEntry = {
+    exerciseId: 'ex-2',
+    name: 'Deadlift',
+    sets: 3,
+    rest: 90,
+    order: 0,
+  };
+
+  test('rejects repsMin > repsMax with message "Min must be <= max" on path repsMax', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry, repsMin: 10, repsMax: 8 }],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const repMaxError = result.error.errors.find(
+        (e) => e.path.includes('repsMax') && e.message === 'Min must be ≤ max'
+      );
+      expect(repMaxError).toBeDefined();
+    }
+  });
+
+  test('accepts valid rep range repsMin <= repsMax', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry, repsMin: 8, repsMax: 10 }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test('rejects targetRpe > 10', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry, targetRpe: 11 }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  test('accepts targetRpe: 8.5 (half-step allowed)', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry, targetRpe: 8.5 }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts omitted targetRpe (optional)', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts timed: true', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry, timed: true }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts omitting timed (v1.0 back-compat — missing means weighted)', () => {
+    const result = routineSchema.safeParse({
+      name: 'Pull Day',
+      exercises: [{ ...baseEntry }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts v1.0 legacy exercise with only reps field (back-compat)', () => {
+    const result = routineSchema.safeParse({
+      name: 'Leg Day',
+      exercises: [{ exerciseId: 'ex-1', name: 'Squat', sets: 3, reps: 8, rest: 60, order: 0 }],
     });
     expect(result.success).toBe(true);
   });
