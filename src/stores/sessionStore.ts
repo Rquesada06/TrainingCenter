@@ -1,9 +1,18 @@
 /**
  * Zustand sessionStore — Phase 03 Plan 02 (WORK-08, D-11/D-14)
+ *                       + Phase 05 Plan 02 (LOG-01/LOG-02)
  *
  * Crash-safe in-progress workout session state. This is the FIRST `persist`
  * usage in the codebase — it wraps the store with AsyncStorage-backed
  * persistence so a force-kill mid-workout can be resumed.
+ *
+ * Phase 05 Plan 02 additions:
+ *   - `loggedSets: Record<string, LoggedSet[]>` — per-exercise per-set live state
+ *   - `setSetValue` — immutable-update for a single set field (weight/reps/rpe)
+ *   - `toggleSet` — flips a set's `completed` flag
+ *   - `seedExercise` — seeds loggedSets[exerciseId] from prefill resolver output
+ *   - `loggedSets` added to `partialize` for crash-safe persistence
+ *   - `clearSession` already calls `set(INITIAL)` → resets loggedSets to {} automatically
  *
  * Persistence discipline:
  *   - `partialize` persists ONLY data fields (never the action functions).
@@ -14,11 +23,15 @@
  * Across-session preferences (the last gym/home mode, D-09) live in a SEPARATE
  * AsyncStorage key — see src/lib/lastWorkoutMode.ts — NOT in this store, because
  * they must outlive `clearSession`.
+ *
+ * Back-compat: pre-Phase-5 persisted blobs have no `loggedSets` key. The custom
+ * `merge` function provides `{}` as the default so hydration never yields undefined.
  */
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { LoggedSet } from '@/types/session';
 
 // ────────────────────────────────────────────────────────────────────────────
 // State shape
@@ -43,6 +56,13 @@ export interface LocalSessionState {
   startedAt: string | null;
   /** True while a workout is in progress (drives the resume prompt) */
   isActive: boolean;
+  /**
+   * Per-exercise per-set live state (LOG-01/02 — Phase 05 Plan 02).
+   * Key: exerciseId, Value: ordered array of LoggedSet for that exercise.
+   * INITIAL: {} — a pre-Phase-5 hydrated blob may have this undefined;
+   * the custom `merge` function ensures it defaults to {} on hydration.
+   */
+  loggedSets: Record<string, LoggedSet[]>;
 }
 
 /** Fields supplied when starting a session (everything except mode/completed/isActive). */
@@ -64,6 +84,26 @@ export interface SessionStoreActions {
   setMode: (mode: 'gym' | 'home') => void;
   /** Resets all data fields back to INITIAL (roll-over + finish path). */
   clearSession: () => void;
+  /**
+   * Sets a single field on a specific set for an exercise (LOG-01).
+   * Immutable update — mirrors toggleExercise style.
+   */
+  setSetValue: (
+    exerciseId: string,
+    setNumber: number,
+    field: 'weight' | 'reps' | 'rpe',
+    value: number | null
+  ) => void;
+  /**
+   * Flips a set's `completed` flag (LOG-02).
+   * Immutable update — does not alter weight/reps/rpe.
+   */
+  toggleSet: (exerciseId: string, setNumber: number) => void;
+  /**
+   * Seeds loggedSets[exerciseId] from a prefill resolver result (LOG-01).
+   * Called once per exercise on first expand (avoids re-seeding on re-render).
+   */
+  seedExercise: (exerciseId: string, seeds: LoggedSet[]) => void;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -80,6 +120,7 @@ export const INITIAL: LocalSessionState = {
   completedExerciseIds: [],
   startedAt: null,
   isActive: false,
+  loggedSets: {},
 };
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -96,6 +137,7 @@ export const useSessionStore = create<LocalSessionState & SessionStoreActions>()
           ...params,
           isActive: true,
           completedExerciseIds: [],
+          loggedSets: {},
         }),
 
       toggleExercise: (id) => {
@@ -109,6 +151,29 @@ export const useSessionStore = create<LocalSessionState & SessionStoreActions>()
       setMode: (mode) => set({ mode }),
 
       clearSession: () => set(INITIAL),
+
+      setSetValue: (exerciseId, setNumber, field, value) => {
+        const { loggedSets } = get();
+        const currentSets = loggedSets[exerciseId] ?? [];
+        const updatedSets = currentSets.map((s) =>
+          s.setNumber === setNumber ? { ...s, [field]: value } : s
+        );
+        set({ loggedSets: { ...loggedSets, [exerciseId]: updatedSets } });
+      },
+
+      toggleSet: (exerciseId, setNumber) => {
+        const { loggedSets } = get();
+        const currentSets = loggedSets[exerciseId] ?? [];
+        const updatedSets = currentSets.map((s) =>
+          s.setNumber === setNumber ? { ...s, completed: !s.completed } : s
+        );
+        set({ loggedSets: { ...loggedSets, [exerciseId]: updatedSets } });
+      },
+
+      seedExercise: (exerciseId, seeds) => {
+        const { loggedSets } = get();
+        set({ loggedSets: { ...loggedSets, [exerciseId]: seeds } });
+      },
     }),
     {
       name: 'laufit:session',
@@ -124,6 +189,14 @@ export const useSessionStore = create<LocalSessionState & SessionStoreActions>()
         completedExerciseIds: s.completedExerciseIds,
         startedAt: s.startedAt,
         isActive: s.isActive,
+        loggedSets: s.loggedSets,  // crash-safe: survives force-kill mid-workout (LOG-01/02)
+      }),
+      // Custom merge: ensures loggedSets from pre-Phase-5 blobs (no key) defaults to {}
+      // rather than being left undefined (Zustand's default merge is Object.assign).
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<LocalSessionState>),
+        loggedSets: (persisted as Partial<LocalSessionState>)?.loggedSets ?? {},
       }),
     }
   )
