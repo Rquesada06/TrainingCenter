@@ -76,7 +76,8 @@ describe('routineSchema — prescription fields (PRES-01/02/03)', () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      const repMaxError = result.error.errors.find(
+      // zod v4 uses .issues (not .errors)
+      const repMaxError = result.error.issues.find(
         (e) => e.path.includes('repsMax') && e.message === 'Min must be ≤ max'
       );
       expect(repMaxError).toBeDefined();

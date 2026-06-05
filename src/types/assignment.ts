@@ -21,6 +21,11 @@ export type AssignmentStatus = 'active' | 'completed';
 /**
  * Snapshot of a single exercise as it appeared when the program was assigned.
  * `alternativeExercise` is a nested one-level snapshot of the substitute (if any).
+ *
+ * Phase 05 Plan 01 (PRES-01/02/03): added prescription snapshot fields.
+ * Uses `T | null` (not undefined) per the null-not-undefined doc convention above.
+ * `timed` uses `boolean` (not null) since it always has a value on new snapshots
+ * (defaults to `false` when not set by the trainer).
  */
 export interface AssignmentSnapshotExercise {
   exerciseId: string;
@@ -35,6 +40,14 @@ export interface AssignmentSnapshotExercise {
   imageUrl: string | null;
   alternativeExerciseId: string | null;
   alternativeExercise: AssignmentSnapshotExercise | null;
+  /** Rep range lower bound prescribed by the trainer (PRES-01). null if not set. */
+  repsMin: number | null;
+  /** Rep range upper bound prescribed by the trainer (PRES-01). null if not set. */
+  repsMax: number | null;
+  /** Target RPE 1–10 prescribed by the trainer (PRES-02). null if not set. */
+  targetRpe: number | null;
+  /** True if this is a timed exercise (PRES-03). Defaults false (weighted) when not set. */
+  timed: boolean;
 }
 
 /**
