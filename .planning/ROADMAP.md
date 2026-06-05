@@ -143,7 +143,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(on-device UAT — needs native rebuild + deployed storage.rules)*
 
-- [ ] 04-07-PLAN.md — Full jest+tsc gate, dev-client rebuild for expo-image-picker, on-device UAT of photos/history/adherence/empty states (HIST-01..04, PROF-01..03)
+- [x] 04-07-PLAN.md — Full jest+tsc gate, dev-client rebuild for expo-image-picker, on-device UAT of photos/history/adherence/empty states (HIST-01..04, PROF-01..03)
 
 ## Progress
 
