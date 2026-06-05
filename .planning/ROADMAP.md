@@ -167,7 +167,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 0** *(foundation — schema/types/CF propagation + pure libs + store; disjoint, parallel)*
 
-- [ ] 05-01-PLAN.md — Five-tier prescription schema: RoutineExercise + AssignmentSnapshotExercise types, routine zod refine, Cloud Function buildSnapshotExercise propagation + tests (PRES-01/02/03) (Wave 0)
+- [x] 05-01-PLAN.md — Five-tier prescription schema: RoutineExercise + AssignmentSnapshotExercise types, routine zod refine, Cloud Function buildSnapshotExercise propagation + tests (PRES-01/02/03) (Wave 0)
 - [ ] 05-02-PLAN.md — Wave-0 pure units: sessionFinalize + prefill + timer libs, loggedExercise zod, sessionStore loggedSets extension + session types (LOG-01..04, TIMR-03) (Wave 0)
 
 **Wave 1** *(blocked on Wave 0 — logging UI and builder touch disjoint trees → parallel)*
@@ -211,5 +211,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
 | 3. Client Workout Execution | 5/5 | Complete    | 2026-06-04 |
 | 4. History + Polish | 3/7 | In Progress|  |
-| 5. Per-Set Logging, Prescription & Timers | 0/6 | Planned | - |
+| 5. Per-Set Logging, Prescription & Timers | 1/6 | In Progress|  |
 | 6. Training Insights & Coach Visibility | 0/0 | Not started | - |
