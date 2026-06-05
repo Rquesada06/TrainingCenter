@@ -12,6 +12,14 @@ import type { AssignmentSnapshotExercise } from '@/types/assignment';
 // Fixtures
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Phase 05 Plan 01 — default prescription fields for existing test fixtures (PRES-01/02/03)
+const DEFAULT_PRESCRIPTION = {
+  repsMin: null,
+  repsMax: null,
+  targetRpe: null,
+  timed: false,
+} as const;
+
 function makeExercise(
   locationTypes: ('gym' | 'home' | 'both')[],
   alternative: AssignmentSnapshotExercise | null = null
@@ -29,6 +37,7 @@ function makeExercise(
     imageUrl: null,
     alternativeExerciseId: alternative ? 'ex-2' : null,
     alternativeExercise: alternative,
+    ...DEFAULT_PRESCRIPTION,
   };
 }
 
@@ -49,6 +58,7 @@ const ALT_GYM_EXERCISE: AssignmentSnapshotExercise = {
   imageUrl: null,
   alternativeExerciseId: null,
   alternativeExercise: null,
+  ...DEFAULT_PRESCRIPTION,
 };
 
 const ALT_HOME_EXERCISE: AssignmentSnapshotExercise = {
@@ -64,6 +74,7 @@ const ALT_HOME_EXERCISE: AssignmentSnapshotExercise = {
   imageUrl: null,
   alternativeExerciseId: null,
   alternativeExercise: null,
+  ...DEFAULT_PRESCRIPTION,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -48,6 +48,11 @@ const ROUTINE_DAY: AssignmentSnapshotDay = {
         imageUrl: null,
         alternativeExerciseId: null,
         alternativeExercise: null,
+        // Phase 05 Plan 01 — prescription fields (PRES-01/02/03)
+        repsMin: null,
+        repsMax: null,
+        targetRpe: null,
+        timed: false,
       },
     ],
   },

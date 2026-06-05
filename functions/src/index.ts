@@ -170,6 +170,11 @@ interface SnapshotExercise {
   imageUrl: string | null;
   alternativeExerciseId: string | null;
   alternativeExercise: SnapshotExercise | null;
+  // Phase 05 Plan 01 — PRES-01/02/03: prescription snapshot fields (TIER 4)
+  repsMin: number | null;
+  repsMax: number | null;
+  targetRpe: number | null;
+  timed: boolean;
 }
 
 interface SnapshotDay {
@@ -306,6 +311,12 @@ export const createAssignment = functions
         videoUrl: (exData.videoUrl as string | undefined) ?? null,
         imageUrl: (exData.imageUrl as string | undefined) ?? null,
         alternativeExerciseId: altId,
+        // Phase 05 Plan 01 — PRES-01/02/03 (TIER 4): copy prescription fields from routineEx.
+        // Mirror the reps/duration ?? null coalescing pattern (T-05-01: named fields only, no spread).
+        repsMin: (routineEx.repsMin as number | undefined) ?? null,
+        repsMax: (routineEx.repsMax as number | undefined) ?? null,
+        targetRpe: (routineEx.targetRpe as number | undefined) ?? null,
+        timed: (routineEx.timed as boolean | undefined) ?? false,
         alternativeExercise: altData
           ? {
               exerciseId: altId!,
@@ -320,6 +331,11 @@ export const createAssignment = functions
               imageUrl: (altData.imageUrl as string | undefined) ?? null,
               alternativeExerciseId: null,
               alternativeExercise: null,
+              // Alternative exercise defaults: timed=false, others=null (no per-alt prescription)
+              repsMin: null,
+              repsMax: null,
+              targetRpe: null,
+              timed: false,
             }
           : null,
       };
