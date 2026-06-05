@@ -80,27 +80,27 @@ Which phase covers which requirement. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOG-01 | TBD | Pending |
-| LOG-02 | TBD | Pending |
-| LOG-03 | TBD | Pending |
-| LOG-04 | TBD | Pending |
-| PRES-01 | TBD | Pending |
-| PRES-02 | TBD | Pending |
-| PRES-03 | TBD | Pending |
-| TIMR-01 | TBD | Pending |
-| TIMR-02 | TBD | Pending |
-| TIMR-03 | TBD | Pending |
-| TIMR-04 | TBD | Pending |
-| INST-01 | TBD | Pending |
-| INST-02 | TBD | Pending |
-| COAV-01 | TBD | Pending |
-| COAV-02 | TBD | Pending |
+| LOG-01 | Phase 5 | Pending |
+| LOG-02 | Phase 5 | Pending |
+| LOG-03 | Phase 5 | Pending |
+| LOG-04 | Phase 5 | Pending |
+| PRES-01 | Phase 5 | Pending |
+| PRES-02 | Phase 5 | Pending |
+| PRES-03 | Phase 5 | Pending |
+| TIMR-01 | Phase 5 | Pending |
+| TIMR-02 | Phase 5 | Pending |
+| TIMR-03 | Phase 5 | Pending |
+| TIMR-04 | Phase 5 | Pending |
+| INST-01 | Phase 6 | Pending |
+| INST-02 | Phase 6 | Pending |
+| COAV-01 | Phase 6 | Pending |
+| COAV-02 | Phase 6 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 15 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15 (Phase 5: 11 · Phase 6: 4)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-05*
-*Last updated: 2026-06-05 after milestone v1.1 discussion + research*
+*Last updated: 2026-06-05 after roadmap creation — all 15 requirements mapped (Phases 5–6)*

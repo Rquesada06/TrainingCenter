@@ -4,6 +4,8 @@
 
 LauFit ships as four vertical slices, each delivering a complete working capability. Phase 1 establishes the Firebase backbone and auth shell so both roles can log in with correct navigation. Phase 2 gives the trainer the full content-creation and client-management toolchain, culminating in assigning an immutable snapshot of a program to a client. Phase 3 puts that assignment to work on the client side — calculating today's workout, executing the session, and persisting state across crashes. Phase 4 closes the loop with history, profiles, and the polish that makes the product trustworthy for real daily use.
 
+**Milestone v1.1 (Phases 5–6)** layers performance tracking on top of the shipped MVP. Phase 5 turns passive "mark complete" workouts into logged, measurable training — the trainer prescribes set targets and timer values, the client logs actual weight/reps/RPE per set, and runs trainer-set rest and work timers with alarm + vibration (additive, back-compatible `Session.loggedExercises`; native dev-client rebuild). Phase 6 makes that data visible — auto-detected Personal Records and volume trends in a new client Insights tab, plus zero-extra-step coach visibility into per-set loads and per-client trends.
+
 ## Phases
 
 **Phase Numbering:**
@@ -17,6 +19,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Trainer Content Creation** - Exercise library, routine builder, program builder, client management, program assignment with snapshot transaction, trainer dashboard (completed 2026-06-02)
 - [x] **Phase 3: Client Workout Execution** - Workout calculator, four home states, session execution, gym/home toggle, crash-safe local state, completion flow, duplicate guard (completed 2026-06-04)
 - [x] **Phase 4: History + Polish** - Paginated session history, trainer client history view, profiles with photos, empty states, adherence metrics (completed 2026-06-05) — **MVP complete** 🎉
+- [ ] **Phase 5: Per-Set Logging, Prescription & Timers** - Extend Session with per-set logs (additive, single finalize write), trainer prescribes sets/rep-range/target-RPE + rest + duration, per-set weight/reps/RPE/done logging UI, rest + work timers with keep-awake + alarm sound + vibration (native rebuild)
+- [ ] **Phase 6: Training Insights & Coach Visibility** - PR + volume pure functions, client Insights tab with PR cards + volume trend charts, per-set loads surfaced in existing coach session-detail, per-client Insights for the coach (zero extra trainer steps)
 
 ## Phase Details
 
@@ -145,10 +149,43 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] 04-07-PLAN.md — Full jest+tsc gate, dev-client rebuild for expo-image-picker, on-device UAT of photos/history/adherence/empty states (HIST-01..04, PROF-01..03)
 
+### Phase 5: Per-Set Logging, Prescription & Timers
+
+**Goal**: Turn passive "mark complete" workouts into logged, measurable training — the trainer prescribes set targets and timer values per exercise, and the client records actual weight/reps/RPE for each set while running trainer-set rest and work timers, with all per-set state held crash-safe mid-session and written once on finalize.
+**Depends on**: Phase 4 (extends the Phase 3 session store + finalize write and the Phase 2 routine builder)
+**Requirements**: LOG-01, LOG-02, LOG-03, LOG-04, PRES-01, PRES-02, PRES-03, TIMR-01, TIMR-02, TIMR-03, TIMR-04
+**Success Criteria** (what must be TRUE):
+
+  1. In the routine builder, the trainer can set per-exercise targets — sets count, rep range, and target RPE — plus a rest period (seconds) and, for timed exercises, a work duration (seconds), and these prescriptions appear to the client on the workout screen
+  2. On the workout screen the client sees one row per set (weight / reps / RPE / done), enters actual values, and checks each set off individually — each set prefills from the trainer's target or the client's previous same-exercise session so an unchanged set is a single tap
+  3. After checking a set done the client can start a rest-timer countdown from the trainer's rest period, and for timed exercises can start a work-timer from the trainer's duration — a running timer shows remaining time, keeps the screen awake, and on returning from a brief background resolves correctly from its absolute end-time
+  4. A timer reaching zero fires an alarm sound plus vibration
+  5. Per-set logs survive a mid-session crash (live state in Zustand + AsyncStorage) and persist to Firestore in a single write on finalize via additive `Session.loggedExercises` — old sessions without it still load, and an exercise still counts complete (adherence + status) when at least one set is checked
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 6: Training Insights & Coach Visibility
+
+**Goal**: Make the logged training data visible on both sides — the client sees auto-detected Personal Records and volume trends in a new Insights tab, and the trainer sees per-set loads inside the existing session detail plus per-client PRs and trends, all derived from existing logs with zero extra trainer steps.
+**Depends on**: Phase 5 (reads the `Session.loggedExercises` written by per-set logging)
+**Requirements**: INST-01, INST-02, COAV-01, COAV-02
+**Success Criteria** (what must be TRUE):
+
+  1. The client has an Insights tab showing auto-detected Personal Records per lift — best estimated 1RM and heaviest weight — with a "NEW" badge when the latest session set a fresh PR
+  2. The client's Insights view shows a volume trend chart (total volume Σ weight×reps over time), both overall and per-exercise (no push/pull/legs grouping)
+  3. Opening a client's session in the existing coach session-detail screen shows that session's logged per-set loads (weight / reps / RPE) — with no new step added to the trainer's flow
+  4. The trainer can open a per-client Insights view showing that client's Personal Records and volume trend, reusing the same PR/trend computation as the client view
+  5. Insights and coach views handle sessions logged before v1.1 gracefully — sessions without `loggedExercises` show a "no load data" state rather than breaking PR/trend computation
+
+**Plans**: TBD
+**UI hint**: yes
+
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -156,3 +193,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
 | 3. Client Workout Execution | 5/5 | Complete    | 2026-06-04 |
 | 4. History + Polish | 3/7 | In Progress|  |
+| 5. Per-Set Logging, Prescription & Timers | 0/0 | Not started | - |
+| 6. Training Insights & Coach Visibility | 0/0 | Not started | - |

@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Performance Tracking & Timers
-status: planning
+status: planned
 last_updated: "2026-06-05T17:28:31.738Z"
 last_activity: 2026-06-05
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Trainer can create a program and assign it to a client in under 3 minutes
-**Current focus:** MVP complete — all 4 phases shipped & verified
+**Current focus:** v1.1 Performance Tracking & Timers — roadmap created (Phases 5–6); ready to plan Phase 5
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 5 — Per-Set Logging, Prescription & Timers (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-05 — Milestone v1.1 started
+Status: Roadmap created — ready to plan Phase 5
+Last activity: 2026-06-05 — Milestone v1.1 roadmap created (2 phases, 15 requirements mapped)
+
+### v1.1 Roadmap Notes (recorded 2026-06-05)
+
+- Phase 5 (LOG-01..04, PRES-01..03, TIMR-01..04 — 11 reqs): schema + logging + prescription + timers. Native dev-client rebuild required (react-native-svg / expo-audio / expo-haptics / expo-keep-awake).
+- Phase 6 (INST-01/02, COAV-01/02 — 4 reqs): PR/volume pure functions (Wave-0 testable, mirror src/lib/adherence.ts), client Insights tab + react-native-gifted-charts, coach per-set loads in existing session-detail, per-client Insights.
+- Locked: weight in kg (no unit toggle); volume trend = overall + per-exercise (no push/pull/legs — v2 INST-03); timers foreground-only keep-awake (no background notif — v2 TIMR-05); RPE kept per set; trainer prescribes at exercise level; coach visibility adds zero required trainer steps.
+- Conventions: Firestore via stripUndefinedDeep (nulls not undefined); RNFB v24 snap.exists() is a method; session written once on finalize (D-12/D-13); live mid-session state in Zustand+AsyncStorage; loggedExercises additive/optional → every reader null-guards.
 
 ### Phase 2 Planning Notes (recorded 2026-06-01)
 
