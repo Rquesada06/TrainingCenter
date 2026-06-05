@@ -1,195 +1,93 @@
-# Research Summary: LauFit
+# v1.1 Research Summary — Performance Tracking & Timers
 
-**Project:** LauFit
-**Domain:** Trainer-client fitness coaching mobile app (React Native + Firebase)
-**Researched:** 2026-05-27
-**Confidence:** HIGH
-
----
-
-## TL;DR
-
-- **The SESSION data model is incomplete.** The mockups already show per-set weight/reps/RPE logging, but the current SESSIONS schema only stores `completed: boolean` per exercise. This must be fixed before Phase 1 ships — it is expensive to retrofit after sessions are being written.
-- **Never use Expo Go.** react-native-firebase requires a development build (EAS Dev Client) from day one. Any developer who starts on Expo Go will waste significant time and produce untestable code.
-- **Target Expo SDK 55, not 51.** SDK 55 (RN 0.83, React 19.2) is current stable. New Architecture is mandatory and cannot be disabled. All chosen libraries are compatible.
-- **One mandatory Cloud Function exists before any client can log in:** `createClientAccount` — trainers cannot create Firebase Auth users from client-side code. This function must ship in Phase 1.
-- **Session state must use two layers (Zustand + AsyncStorage), not real-time Firestore writes.** Writing every exercise completion to Firestore mid-workout is expensive, fragile under poor connectivity, and architecturally wrong. Commit only on finalize; use AsyncStorage as crash recovery backup.
+**Milestone:** v1.1 (Phases 5+) · **Scope:** per-set logging, trainer set/timer config, rest+work timers with alarm, Training Insights (PRs + strength/volume trends), coach visibility.
+**Method:** focused inline research (web + codebase) — the unknowns were narrow (RN charting lib, SDK-55 timer/alarm stack, per-set session schema). Date: 2026-06-05.
+**Note:** v1.0 project-level research is archived alongside as `SUMMARY-v1.0.md` (+ STACK/FEATURES/ARCHITECTURE/PITFALLS from May 27).
 
 ---
 
-## Validated Stack (2025)
+## Stack additions (use `npx expo install` to get SDK-55-pinned versions; run the supply-chain checkpoint before approving each)
 
-| Package | Version | Note |
-|---------|---------|------|
-| expo | ~55.0.14 | Upgrade from "SDK 51+" — SDK 55 is current stable |
-| react-native | 0.83.4 | Pinned by SDK 55; New Architecture always on |
-| react | 19.2.0 | Pinned by SDK 55 |
-| expo-router | ~5.0.7 | Bundled with SDK 55 |
-| @react-native-firebase/* | ^22.x | Use this, NOT the `firebase` JS SDK |
-| @tanstack/react-query | ^5.x | v5 API changed to single-object — not v4 |
-| zustand | ^5.0.x | `useShallow` hook replaces `shallow` comparator |
-| react-hook-form | ^7.66.x | + `@hookform/resolvers/zod` |
-| nativewind | ^4.x (stable) | Do NOT use v5 (pre-release) |
-| tailwindcss | ^3.4.17 | Paired with NativeWind v4 |
-| expo-video | latest | Replaces expo-av (removed in SDK 54) |
-| expo-image | latest | Replaces RN Image for cached photo loading |
-| date-fns + date-fns-tz | latest | Timezone-safe workout day calculation |
+| Need | Library | Why | Confidence |
+|------|---------|-----|------------|
+| Charts (strength/volume bars, PR sparkline) | **react-native-gifted-charts** (+ `react-native-svg`) | SVG-based, no Skia, Expo-friendly, actively maintained, simple declarative API; matches our modest chart needs (a few bars + a line). Works on our existing dev-client. | HIGH |
+| Alarm sound on timer finish | **expo-audio** | `expo-av` is **removed in SDK 55**; expo-audio is the official replacement (lock-screen/background support). Play a short bundled alarm asset on countdown==0. | HIGH |
+| Vibration on timer finish | **expo-haptics** | Official Expo module; Android Vibrator + iOS haptics + web Vibration API. `notificationAsync(Success)` or a `Vibration` pattern. | HIGH |
+| Keep screen on during a running timer | **expo-keep-awake** | Prevents the device sleeping mid-rest; JS timers suspend when the screen locks. Activate while a timer runs, deactivate on stop. | HIGH |
+| (Optional) background alarm | expo-notifications | If the app is backgrounded, JS timers pause. Schedule a one-shot local notification at the computed end-time so the alarm still fires. **Nice-to-have**, not required for MVP timer. | MEDIUM |
 
-**iOS config requirement:** `expo-build-properties` with `useFrameworks: "static"` in `app.json` is mandatory for react-native-firebase on iOS.
-
-**Gluestack UI: skip it.** The Obsidian Performance design system requires direct NativeWind control.
+**Rejected / deferred:**
+- **victory-native (XL)** — Skia + Reanimated GPU charts; excellent but heavier (adds `@shopify/react-native-skia`) and overkill for non-interactive bars. Documented as the upgrade path if Insights grows interactive/large-dataset charts.
+- **react-native-timer-picker** — nice duration picker w/ haptics, but the trainer sets rest/duration as plain numbers in the builder; a numeric field is enough. Not needed.
+- **Native AlarmKit / expo-alarm modules** — true OS alarms (fire when app killed) are overkill for an in-workout rest timer and add native complexity. Out of scope.
 
 ---
 
-## Critical Decisions Required Before Phase 1
+## Feature behavior (how these typically work)
 
-### 1. Expand the SESSION data model now
+### Per-set logging (table-stakes for strength apps)
+- Trainer **prescribes at the exercise level**: `sets` (count), `reps` (or a rep range — see schema note), optional `targetRpe`, plus `rest`/`duration` (already present). No per-set prescription.
+- Client sees one **row per set** (1..sets): inputs for **weight**, **reps**, **RPE**, and a **done** checkbox — exactly the `Rutina del Día` mockup (`SET | PESO | REPS | RPE | STATUS`).
+- Sensible UX: prefill each set's weight/reps from the **previous session's** same-exercise log (or the trainer target) so logging is one tap when nothing changed. Last-set values carry down to the next set.
+- Units: store weight in **kg** (numeric); display unit can be a later concern. The mockup shows both KG and LB per-exercise — defer unit toggle; standardize on kg for v1.1.
 
-The current schema stores `completedExercises: [{exerciseId, completed: boolean, variantUsed}]`. The model must be:
+### Rest + work timers
+- **Rest timer**: after a set is checked done, offer a "Rest 90s" countdown from `RoutineExercise.rest`. Visual ring + remaining seconds; alarm + vibration at 0.
+- **Work timer**: for timed exercises (those with `duration` and no rep target — e.g. plank 60s), a "Start 60s" countdown from `RoutineExercise.duration`.
+- **Reliability pattern**: store `endsAt = Date.now() + seconds*1000`; render remaining = `endsAt - now` on a 250ms tick (`setInterval`/Reanimated). On app foreground, recompute from `endsAt` (don't trust accumulated ticks). Keep-awake while running. Fire sound+haptics once when remaining ≤ 0.
 
+### Training Insights (client) — derived, no new logging
+- **Personal Records**: per exercise, best set by **estimated 1RM** (Epley: `weight * (1 + reps/30)`) across all logged sessions; also show heaviest weight. "NEW" badge when the latest session set a PR.
+- **Strength/volume trend**: per session (or per week), **total volume = Σ(weight × reps)** over completed sets; render as a bar/line trend. Optionally per-exercise volume.
+- ⚠️ The mockup's **push/pull/legs** grouping needs a *movement-pattern* tag we don't have (`ExerciseCategory` is strength/cardio/hypertrophy/HIIT/mobility/functional, not push/pull/legs). Either (a) add an optional `movementPattern` tag to Exercise, or (b) **simplify v1.1 to overall + per-exercise volume** (recommended — avoids re-tagging the library). Decision deferred to discuss/plan.
+
+---
+
+## Architecture / integration
+
+### Existing schema (verified in code)
+- `RoutineExercise` (in `src/types/routine.ts`) **already has** `sets`, `reps?`, `duration?`, `rest`, `notes?`, `alternativeExerciseId?`, `order`. → **Timer config already in the data model.** Gaps: (a) the builder UI must actually capture `rest`/`duration` (verify in `src/app/trainer/routines/*`), (b) optional `targetRpe?` to show an RPE target.
+- `Session` (in `src/types/session.ts`) stores `completedExerciseIds: string[]` + `totalExercises` + derived `routineName`. Written **once on finish, never mutated** (D-12/D-13).
+
+### New data: per-set actuals on Session
+Extend `Session` with a detailed log (additive, back-compatible):
+```ts
+interface LoggedSet { setNumber: number; weight: number | null; reps: number | null; rpe: number | null; completed: boolean }
+interface LoggedExercise { exerciseId: string; name: string; sets: LoggedSet[] }
+// add to Session:
+loggedExercises?: LoggedExercise[];   // optional → old sessions omit it; PR/trend code must null-guard
 ```
-completedExercises: [
-  {
-    exerciseId, completed, variantUsed,
-    sets: [
-      { setNumber, targetReps, actualReps, actualWeight, weightUnit, rpe, completedAt }
-    ]
-  }
-]
-```
+- Keep `completedExerciseIds`/`totalExercises` (adherence HIST-04 + StatusBadge still derive from them — an exercise counts "complete" when ≥1 set checked, matching the existing partial-counts adherence rule).
+- Still a **single write on finalize** (Zustand + AsyncStorage hold live per-set state mid-session; persists D-13 crash-safety). The session store already exists from Phase 3 — extend its shape.
+- **Firestore writes** must go through `stripUndefinedDeep` (nulls not undefined) — existing convention.
 
-Without this, session history is meaningless for strength tracking. Trainers will revert to spreadsheets.
+### PR / trend computation
+- Pure functions over a client's sessions (mirror `src/lib/adherence.ts` style): `computePersonalRecords(sessions)`, `computeVolumeTrend(sessions)`. Unit-testable (Wave 0), no Firestore. Feed both client Insights and the coach's per-client view.
+- Data fetch: reuse `useSessionHistory(clientId)` / `fetchSessionsForAssignment`; PRs/trends are all-time or per-active-program (decide in discuss).
 
-### 2. Development build from day one
-
-No Expo Go. Set up `expo-dev-client` + EAS development build profile before writing a single line of Firebase code.
-
-### 3. Firestore security rules before writing data
-
-Write rules before writing application code. The `role` field on USERS documents must not be writable by the document owner — a client who can write their own profile could elevate to trainer and read all data.
-
-### 4. Store `startDate` as a date string, not a timestamp
-
-`startDate` on ASSIGNMENT documents must be stored as `YYYY-MM-DD` (computed from the client's local timezone at assignment time). Using a Firestore Timestamp causes timezone bugs where clients see the wrong workout day at midnight boundaries. This is a data model decision that must be made before any session data is written.
-
-### 5. Client onboarding flow (recommend Option A for MVP)
-
-**(a) Trainer creates client accounts** via `createClientAccount` Cloud Function and shares credentials — simpler, eliminates orphaned-account problem.
-**(b) Client self-registers** and trainer links by email/UID.
-
-Recommend option (a) for MVP.
-
-### 6. Commit google-services.json handling
-
-Add Firebase config files to `.gitignore` immediately. Upload as EAS secret file variables. Reference via `process.env` in `app.config.js`. Do this before the first EAS build.
+### New navigation
+- Client **Insights tab** (the mockup's 4th nav item: Training / Insights / Programs / Profile). Add Insights to the client tab set.
 
 ---
 
-## Feature Scope Adjustments
+## Pitfalls / watch-outs
 
-### Add to MVP scope (small effort, high value)
-
-| Feature | Reason |
-|---------|--------|
-| Per-set weight/reps/RPE logging | Mockup already shows this UI. Table stakes in every competing product (Trainerize, TrueCoach). |
-| Exercise notes visible during session execution | `notes` field already exists on routine exercises. One-component change with high trainer value. |
-| "Already trained today" guard | Prevents duplicate session creation when client opens app after completing a session. |
-| Adherence badge on trainer client list | US-16 defines the metric but puts it only in history subscreen. Trainers need it on client list card (T04). |
-
-### Confirmed post-MVP (never in MVP)
-
-Program phases/periodization, superset support, weight progress charts, training streak, wearables, body measurements, in-app chat, nutrition, payments, custom video upload, public program marketplace, AI workouts.
+1. **expo-av is gone (SDK 55).** Do NOT add expo-av for the alarm. Use expo-audio. (Project already avoids expo-video for YouTube; sound is separate.)
+2. **JS timers pause when backgrounded/locked.** Never count ticks; always derive remaining from an absolute `endsAt`. Add keep-awake while running. Background firing needs a scheduled notification (optional).
+3. **Back-compat for old sessions.** `loggedExercises` is optional; every PR/trend/detail reader must handle its absence (Phase 1–4 sessions have none) — show "no load data" gracefully.
+4. **push/pull/legs grouping isn't in our taxonomy.** Don't silently mis-map `ExerciseCategory`. Either add a movement tag or simplify the trend to overall/per-exercise (recommended).
+5. **Native rebuild required.** expo-audio/expo-haptics/react-native-svg are native → another **dev-client rebuild** (EAS, no local Android SDK) before on-device timer/chart testing. Same pattern as expo-image-picker in v1.0.
+6. **Supply-chain checkpoint.** react-native-gifted-charts is third-party (not Expo-maintained) — verify maintainer/repo/install-hooks via npm metadata before install (project convention).
+7. **Single-write invariant.** Keep the "session written once on finalize" rule; don't introduce per-set Firestore writes (cost + offline + matches D-12/D-13). Live state stays in Zustand+AsyncStorage.
+8. **Don't bloat the trainer flow.** Coach visibility must add zero required steps — surface in existing session detail; the per-client Insights is opt-in/view-only.
 
 ---
 
-## Architecture Patterns to Follow
+## Suggested build order (for the roadmapper)
+1. **Schema + logging foundation** — extend Session type + session store + finalize write; trainer builder captures rest/duration/(targetRpe); per-set logging UI on the workout screen; rest+work timers w/ alarm. (Native rebuild here.)
+2. **Insights + coach visibility** — PR/volume pure functions (Wave 0 tests), client Insights tab + charts, per-set loads in session detail, per-client Insights for the coach.
 
-### 1. `app/` is navigation only; `src/` is everything else
-No business logic in route files. Route files import from `src/hooks`, `src/services`, `src/stores`.
-
-### 2. Two protected route groups with Stack.Protected
-```
-app/_layout.tsx — reads Zustand authStore, renders Stack.Protected guards
-app/sign-in.tsx — public
-app/(trainer)/ — guard: role === 'trainer'
-app/(client)/ — guard: role === 'client'
-```
-Auth race condition prevented by `isLoaded` boolean (renders SplashScreen until Firebase fires first auth event).
-
-### 3. Session state: Zustand + AsyncStorage, Firestore only on finalize
-Mid-workout state in Zustand. Snapshot to AsyncStorage on each exercise completion for crash recovery. Single Firestore batch write on "Finish Workout". Check AsyncStorage on app open and offer to resume unfinished sessions.
-
-### 4. ASSIGNMENT contains the full program snapshot
-A transaction at assignment time reads all referenced exercise documents and embeds them. Trainer can edit their library or program without affecting active client assignments.
-
-### 5. `workout-calculator.ts` is a pure function
-`getTodaysWorkout(assignment, userTimezone, nowUtc)` has no Firestore dependency. Use `differenceInCalendarDays` from date-fns — not millisecond math (breaks across DST transitions).
-
-### 6. One mandatory Cloud Function: `createClientAccount`
-Creates Firebase Auth user (requires Admin SDK) and writes USERS doc with `role: 'client'` and `trainerId`. All other operations are client-side Firestore SDK.
-
-### 7. Composite indexes defined upfront
-Required: `sessions (clientId ASC, date DESC)`, `assignments (clientId ASC, status ASC)`, `assignments (trainerId ASC, status ASC)`. Commit `firestore.indexes.json` in Phase 1.
+(Roadmapper decides exact phase split + success criteria.)
 
 ---
-
-## Top Pitfalls by Phase
-
-### Phase 1: Firebase Setup + Auth
-
-| Pitfall | Prevention |
-|---------|------------|
-| Auth state race condition (flash of login screen on cold start) | `isLoaded` boolean in Zustand; render SplashScreen until `onAuthStateChanged` fires |
-| Firestore rules left open | Write rules before data; deploy with `firebase deploy --only firestore:rules` |
-| Using Expo Go with react-native-firebase | EAS development build on day one |
-| google-services.json not in EAS | Upload as EAS secret file variables before first build |
-| Role elevation via client self-write | Security rules deny writes to `role` field from document owner |
-
-### Phase 2: Program Builder + Assignment
-
-| Pitfall | Prevention |
-|---------|------------|
-| Snapshot not deep-copying exercise references | Transaction at assignment time resolves all exerciseIds and embeds full objects |
-| Timezone bug in workout day calculation | `YYYY-MM-DD` string for `startDate`; `differenceInCalendarDays` not millisecond math |
-| Drag-to-reorder gesture conflicts on Android | `GestureHandlerRootView` wraps root `_layout.tsx`; never nest `DraggableFlatList` inside `ScrollView` |
-
-### Phase 3: Client Workout Execution
-
-| Pitfall | Prevention |
-|---------|------------|
-| Firestore listener leak during workout | Every `onSnapshot` cleanup in `useEffect` return |
-| Rest timer causing cascade re-renders every second | Timer state in isolated component using `useSharedValue` on UI thread (Reanimated) |
-| FlatList re-rendering all exercise rows on timer tick | `useCallback` on `renderItem`; `React.memo` on exercise row components |
-| Video exits the app | Use `WebBrowser.openBrowserAsync` (expo-web-browser), not `Linking.openURL` |
-| Client confusion on rest days / not-started state | Four explicitly designed home states: no assignment, starts in N days, rest day, active workout |
-
-### Phase 4: History + Dashboard
-
-| Pitfall | Prevention |
-|---------|------------|
-| Unbounded session history query | `orderBy('date', 'desc').limit(20)` with cursor pagination |
-
----
-
-## Phase Sequencing Implications
-
-**Phase 1 — Infrastructure + Auth**
-Firebase project setup, security rules, EAS dev build, auth flow with `isLoaded` guard, role-based navigation shell, `createClientAccount` Cloud Function, composite indexes committed.
-
-**Phase 2 — Trainer Content Creation**
-Exercise CRUD with instant local search, routine builder with drag-to-reorder, program builder, client management, program assignment with deep-copy snapshot transaction, trainer dashboard.
-
-**Phase 3 — Client Workout Execution** (validate with Lau)
-`workout-calculator.ts` pure function with unit tests, all four client home states, per-set session logging, gym/home toggle, rest timer (Reanimated isolated), Zustand + AsyncStorage session state, single Firestore finalize, session completion, duplicate-session guard.
-
-**Phase 4 — History + Polish**
-Paginated session history, trainer view of client sessions, profiles with Firebase Storage photos, empty states for all screens, in-session navigation guard.
-
-**Research flags for planning:**
-- Phase 3 needs extra research (Reanimated rest timer + offline session pattern)
-- Phase 2 benefits from a drag-reorder spike before building the full program builder
-
----
-
-*Research completed: 2026-05-27*
-*Ready for roadmap: yes*
+*Research completed 2026-06-05 · consumed by requirements definition + roadmap.*
