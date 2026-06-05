@@ -6,6 +6,10 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+
+// Mock vector-icons (not supported in jest-expo environment)
+jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
+
 import { SetRow } from '../SetRow';
 import { RpeStepper } from '../RpeStepper';
 
@@ -101,9 +105,9 @@ describe('RpeStepper', () => {
     expect(getByText('Clear')).toBeTruthy();
   });
 
-  it('renders with accessibilityRole="adjustable"', () => {
-    const { getByRole } = render(<RpeStepper {...defaultProps} />);
-    expect(getByRole('adjustable')).toBeTruthy();
+  it('renders with accessibilityRole="adjustable" on its container', () => {
+    const { UNSAFE_getByProps } = render(<RpeStepper {...defaultProps} />);
+    expect(UNSAFE_getByProps({ accessibilityRole: 'adjustable' })).toBeTruthy();
   });
 
   it('shows em-dash when value is null', () => {
