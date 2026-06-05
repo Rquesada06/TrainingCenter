@@ -137,9 +137,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(screens — consume Wave 1; disjoint files, parallel)*
 
-- [ ] 04-04-PLAN.md — Session history screens: client History tab + list, session detail, trainer client-profile inline history (HIST-01/02/03)
-- [ ] 04-05-PLAN.md — Adherence on ClientListItem + EmptyState wiring on all four trainer lists (HIST-04 + criterion 5)
-- [ ] 04-06-PLAN.md — Profile edit screens (client + trainer): name + photo via expo-image-picker (PROF-01/02)
+- [x] 04-04-PLAN.md — Session history screens: client History tab + list, session detail, trainer client-profile inline history (HIST-01/02/03)
+- [x] 04-05-PLAN.md — Adherence on ClientListItem + EmptyState wiring on all four trainer lists (HIST-04 + criterion 5)
+- [x] 04-06-PLAN.md — Profile edit screens (client + trainer): name + photo via expo-image-picker (PROF-01/02)
 
 **Wave 3** *(on-device UAT — needs native rebuild + deployed storage.rules)*
 
