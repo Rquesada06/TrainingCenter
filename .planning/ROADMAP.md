@@ -162,8 +162,26 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A timer reaching zero fires an alarm sound plus vibration
   5. Per-set logs survive a mid-session crash (live state in Zustand + AsyncStorage) and persist to Firestore in a single write on finalize via additive `Session.loggedExercises` — old sessions without it still load, and an exercise still counts complete (adherence + status) when at least one set is checked
 
-**Plans**: TBD
+**Plans**: 6 plans (4 waves)
 **UI hint**: yes
+
+**Wave 0** *(foundation — schema/types/CF propagation + pure libs + store; disjoint, parallel)*
+
+- [ ] 05-01-PLAN.md — Five-tier prescription schema: RoutineExercise + AssignmentSnapshotExercise types, routine zod refine, Cloud Function buildSnapshotExercise propagation + tests (PRES-01/02/03) (Wave 0)
+- [ ] 05-02-PLAN.md — Wave-0 pure units: sessionFinalize + prefill + timer libs, loggedExercise zod, sessionStore loggedSets extension + session types (LOG-01..04, TIMR-03) (Wave 0)
+
+**Wave 1** *(blocked on Wave 0 — logging UI and builder touch disjoint trees → parallel)*
+
+- [ ] 05-03-PLAN.md — Per-set logging UI: SetRow + RpeStepper + session.tsx prefill/finalize wiring (LOG-01..04) (Wave 1)
+- [ ] 05-04-PLAN.md — Trainer builder prescription: rep range + target RPE + Timed toggle in RoutineExerciseRow + RoutineBuilder seed (PRES-01/02/03) (Wave 1)
+
+**Wave 2** *(blocked on Wave 0+1 — timers wire into the logged session screen; native installs + rebuild)*
+
+- [ ] 05-05-PLAN.md — Timers: useCountdownTimer hook + RestTimerBar + WorkTimerControl + native installs (supply-chain + EAS rebuild checkpoints) (TIMR-01..04) (Wave 2)
+
+**Wave 3** *(on-device UAT — needs the rebuilt dev client + redeployed function)*
+
+- [ ] 05-06-PLAN.md — firestore.rules verify + rules/functions redeploy + full jest/tsc gate + on-device UAT (alarm/haptics/keep-awake, prescription round-trip, back-compat) (LOG/PRES/TIMR) (Wave 3)
 
 ### Phase 6: Training Insights & Coach Visibility
 
@@ -193,5 +211,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
 | 3. Client Workout Execution | 5/5 | Complete    | 2026-06-04 |
 | 4. History + Polish | 3/7 | In Progress|  |
-| 5. Per-Set Logging, Prescription & Timers | 0/0 | Not started | - |
+| 5. Per-Set Logging, Prescription & Timers | 0/6 | Planned | - |
 | 6. Training Insights & Coach Visibility | 0/0 | Not started | - |
