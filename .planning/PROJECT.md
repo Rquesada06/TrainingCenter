@@ -8,39 +8,62 @@ LauFit is a mobile fitness coaching app that connects personal trainers with the
 
 The trainer can create a program and assign it to a client in under 3 minutes — if that flow is fast and reliable, trainers will adopt the tool.
 
+## Current Milestone: v1.1 Performance Tracking & Timers
+
+**Goal:** Turn passive "mark complete" workouts into logged, measurable training — clients record actual loads per set and run trainer-set timers, and both sides see real training progress (PRs, strength trends).
+
+**Target features:**
+- Per-set workout logging — client enters actual weight + reps + RPE per set and checks each off
+- Trainer set-prescription + timer config — sets × rep-range × target RPE, plus rest-seconds and work-duration per exercise
+- Rest + work timers — client-started countdowns from the trainer's values, with alarm sound + vibration on completion
+- Training Insights (client) — new Insights tab: auto-detected Personal Records + strength/volume trend bars
+- Coach visibility — logged per-set loads surfaced in the existing session-detail; per-client PRs/trends via the same Insights view
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+<!-- Shipped and confirmed valuable in v1.0 (Phases 1–4), device-verified. -->
+
+- ✓ Trainer can log in with email/password and stay logged in — v1.0
+- ✓ Trainer can create and manage client accounts — v1.0
+- ✓ Trainer can build a reusable exercise library (name, type, sets/reps, video URL) — v1.0
+- ✓ Trainer can create daily routines by selecting exercises from their library — v1.0
+- ✓ Trainer can create multi-week programs by assigning routines to days — v1.0
+- ✓ Trainer can mark days as rest days in a program — v1.0
+- ✓ Trainer can assign a program to a client with a start date (immutable snapshot) — v1.0
+- ✓ Trainer dashboard shows active clients and their current programs + adherence — v1.0
+- ✓ Client can log in and see today's workout (auto-calculated from assignment + start date) — v1.0
+- ✓ Client can view exercise detail (instructions, YouTube video, sets/reps) — v1.0
+- ✓ Client can toggle between gym/home variants when available — v1.0
+- ✓ Client can mark exercises as complete and finalize the session (crash-safe, duplicate-guarded) — v1.0
+- ✓ Client and trainer can view paginated session history — v1.0
+- ✓ Client and trainer have a profile with name + photo — v1.0
 
 ### Active
 
-- [ ] Trainer can log in with email/password and stay logged in
-- [ ] Trainer can create and manage client accounts
-- [ ] Trainer can build a reusable exercise library (name, type, sets/reps, video URL)
-- [ ] Trainer can create daily routines by selecting exercises from their library
-- [ ] Trainer can create multi-week programs by assigning routines to days
-- [ ] Trainer can mark days as rest days in a program
-- [ ] Trainer can assign a program to a client with a start date
-- [ ] Trainer dashboard shows active clients and their current programs
-- [ ] Client can log in and see today's workout (auto-calculated from assignment + start date)
-- [ ] Client can view exercise detail (instructions, video, sets/reps)
-- [ ] Client can toggle between gym/home variants when available
-- [ ] Client can mark exercises as complete and finalize the session
-- [ ] Client and trainer can view session history
-- [ ] Client has a basic profile (name, photo)
+<!-- v1.1 scope. Building toward these. -->
+
+- [ ] Client logs actual weight + reps + RPE per set, checking each set off
+- [ ] Trainer prescribes set targets (sets × rep-range × RPE) and timer values (rest-seconds, work-duration) per exercise
+- [ ] Client runs a rest timer between sets from the trainer's configured rest period
+- [ ] Client runs a work/duration timer for timed exercises from the trainer's configured duration
+- [ ] Timer signals completion with an alarm sound + vibration
+- [ ] Client sees an Insights view with auto-detected Personal Records per lift
+- [ ] Client sees strength/volume trend bars derived from logged sessions
+- [ ] Trainer sees a client's logged per-set loads in the existing session detail
+- [ ] Trainer can view a client's Personal Records + strength trends
 
 ### Out of Scope
 
+- Bodyweight / body-fat tracking — body-composition reads as nutrition, not training performance (this milestone is training-focused)
+- Steps / heart-rate / sleep / kcal cards — require Apple Health / Google Fit (wearables deferred)
+- Nutrition tracking — out of scope
+- Data export (CSV/PDF from Insights) — deferred; not core to the progress loop
 - Chat/messaging — adds complexity, not core to workout delivery
-- Nutrition tracking — out of MVP scope
 - In-app payments — post-MVP monetization
-- Push notifications (advanced) — Phase 2+
-- Wearables / Apple Health / Google Fit — Phase 8
 - Custom video upload — uses YouTube/Vimeo links instead
-- Multi-language — English only for MVP
-- Advanced analytics — deferred to Phase 6
+- Multi-language — English only
 
 ## Context
 
@@ -67,7 +90,9 @@ The trainer can create a program and assign it to a client in under 3 minutes �
 | Gym/home via `alternativeExerciseId` cross-reference | Simpler than embedded variants; reuses exercise library; easier to query | — Pending |
 | Firebase over custom backend | Auth + DB + Storage ready in hours; real-time listeners perfect for trainer→client sync; scales without ops | — Pending |
 | Obsidian Performance design theme | Cleaner, more modern than Elite Bio-Performance — electric green accent used sparingly, 8px grid | — Pending |
-| exercises embedded in ROUTINES | Always read together; 20–30 exercise limit per routine makes embedded array safe | — Pending |
+| exercises embedded in ROUTINES | Always read together; 20–30 exercise limit per routine makes embedded array safe | ✓ Good |
+| v1.1 is training-performance, not body-composition | User steer: "useful for training and progress more than a nutrition app" — log lifting loads + PRs/trends, defer bodyweight/wearables | — Pending |
+| Per-set actuals logged client-side; trainer prescribes at exercise level | Avoids per-set prescription complexity in the builder; client records weight/reps/RPE per set against a sets×rep-range×RPE target | — Pending |
 
 ## Evolution
 
@@ -87,4 +112,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after initialization*
+*Last updated: 2026-06-05 after starting milestone v1.1 (Performance Tracking & Timers); v1.0 shipped Phases 1–4*
