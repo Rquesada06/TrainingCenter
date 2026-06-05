@@ -10,44 +10,20 @@
  */
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
-import { useForm, FormProvider } from 'react-hook-form';
+import { render, fireEvent, act } from '@testing-library/react-native';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { routineSchema } from '@/validation/routine.schema';
-import type { RoutineFormValues } from '@/validation/routine.schema';
 import { RoutineExerciseRow } from '../RoutineExerciseRow';
 
-// Minimal wrapper so RHF Controller hooks can resolve the control context
-function Wrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm<RoutineFormValues>({
-    resolver: zodResolver(routineSchema),
-    defaultValues: {
-      name: 'Test Routine',
-      exercises: [
-        {
-          exerciseId: 'ex-1',
-          name: 'Back Squat',
-          sets: 3,
-          reps: 10,
-          rest: 90,
-          order: 0,
-          timed: false,
-          repsMin: 8,
-          repsMax: 10,
-          targetRpe: undefined,
-        },
-      ],
-    },
-  });
-  return <FormProvider {...methods}>{children}</FormProvider>;
-}
-
+/**
+ * Renders RoutineExerciseRow inside a minimal RHF form.
+ * Returns the render result + the toggle element for interaction.
+ */
 function renderRow(timedDefault = false) {
-  const methods = { control: undefined as unknown };
-  let capturedControl: ReturnType<typeof useForm>['control'];
-
   function InnerWrapper() {
-    const form = useForm<RoutineFormValues>({
+    const form = useForm<z.input<typeof routineSchema>, unknown, z.output<typeof routineSchema>>({
       resolver: zodResolver(routineSchema),
       defaultValues: {
         name: 'Test Routine',
@@ -66,7 +42,6 @@ function renderRow(timedDefault = false) {
         ],
       },
     });
-    capturedControl = form.control;
     return (
       <RoutineExerciseRow
         index={0}
@@ -79,54 +54,92 @@ function renderRow(timedDefault = false) {
     );
   }
 
-  const result = render(<InnerWrapper />);
-  return result;
+  return render(<InnerWrapper />);
 }
 
-// ─── RED tests: these should FAIL before implementation ───────────────────────
+// ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('RoutineExerciseRow — prescription fields (PRES-01/02/03)', () => {
-  test('renders "Reps (min–max)" label for rep range fields', () => {
-    const { getByText } = renderRow();
-    // This should find the combined rep-range label
-    expect(getByText('Reps (min–max)')).toBeTruthy();
+  describe('default weighted state (Timed OFF)', () => {
+    test('renders "Reps (min–max)" label for rep range fields', () => {
+      const { getByText } = renderRow(false);
+      expect(getByText('Reps (min–max)')).toBeTruthy();
+    });
+
+    test('renders "Target RPE" label for the RPE field', () => {
+      const { getByText } = renderRow(false);
+      expect(getByText('Target RPE')).toBeTruthy();
+    });
+
+    test('renders "Rest (s)" label in weighted mode', () => {
+      const { getByText } = renderRow(false);
+      expect(getByText('Rest (s)')).toBeTruthy();
+    });
+
+    test('does NOT render "Duration (s)" label when timed is OFF', () => {
+      const { queryByText } = renderRow(false);
+      expect(queryByText('Duration (s)')).toBeNull();
+    });
   });
 
-  test('renders "Target RPE" label for the RPE field', () => {
-    const { getByText } = renderRow();
-    expect(getByText('Target RPE')).toBeTruthy();
-  });
+  describe('Timed toggle', () => {
+    test('renders Timed toggle with accessibilityRole="switch"', () => {
+      const { getAllByRole } = renderRow(false);
+      const switches = getAllByRole('switch');
+      expect(switches.length).toBeGreaterThanOrEqual(1);
+    });
 
-  test('renders Timed toggle with accessibilityRole="switch"', () => {
-    const { getAllByRole } = renderRow();
-    const switches = getAllByRole('switch');
-    expect(switches.length).toBeGreaterThanOrEqual(1);
-  });
+    test('toggling ON shows Duration field and hides Reps-range', () => {
+      const { getAllByRole, queryByText, getByText } = renderRow(false);
+      const switches = getAllByRole('switch');
+      const timedSwitch = switches[0];
 
-  test('does NOT render "Duration (s)" label when timed is OFF', () => {
-    const { queryByText } = renderRow(false);
-    // Duration should be hidden when timed is OFF
-    expect(queryByText('Duration (s)')).toBeNull();
-  });
+      // Initial state: Reps visible, Duration hidden
+      expect(getByText('Reps (min–max)')).toBeTruthy();
+      expect(queryByText('Duration (s)')).toBeNull();
 
-  test('renders "Duration (s)" label when timed is ON', () => {
-    const { getByText } = renderRow(true);
-    expect(getByText('Duration (s)')).toBeTruthy();
-  });
+      // Fire the toggle
+      act(() => {
+        fireEvent(timedSwitch, 'valueChange', true);
+      });
 
-  test('does NOT render "Reps (min–max)" label when timed is ON', () => {
-    const { queryByText } = renderRow(true);
-    // Rep-range should be hidden when timed is ON
-    expect(queryByText('Reps (min–max)')).toBeNull();
-  });
+      // After toggle ON: Duration visible, Reps hidden
+      expect(getByText('Duration (s)')).toBeTruthy();
+      expect(queryByText('Reps (min–max)')).toBeNull();
+    });
 
-  test('does NOT render "Rest (s)" label when timed is ON', () => {
-    const { queryByText } = renderRow(true);
-    expect(queryByText('Rest (s)')).toBeNull();
-  });
+    test('toggling ON hides Rest (s) field', () => {
+      const { getAllByRole, queryByText, getByText } = renderRow(false);
+      const switches = getAllByRole('switch');
+      const timedSwitch = switches[0];
 
-  test('renders "Rest (s)" label when timed is OFF (weighted default)', () => {
-    const { getByText } = renderRow(false);
-    expect(getByText('Rest (s)')).toBeTruthy();
+      // Initially Rest is visible
+      expect(getByText('Rest (s)')).toBeTruthy();
+
+      act(() => {
+        fireEvent(timedSwitch, 'valueChange', true);
+      });
+
+      // After toggle ON: Rest hidden
+      expect(queryByText('Rest (s)')).toBeNull();
+    });
+
+    test('toggling ON then OFF is reversible (shows Reps-range again)', () => {
+      const { getAllByRole, queryByText, getByText } = renderRow(false);
+      const switches = getAllByRole('switch');
+      const timedSwitch = switches[0];
+
+      // Toggle ON
+      act(() => {
+        fireEvent(timedSwitch, 'valueChange', true);
+      });
+      expect(queryByText('Reps (min–max)')).toBeNull();
+
+      // Toggle OFF
+      act(() => {
+        fireEvent(timedSwitch, 'valueChange', false);
+      });
+      expect(getByText('Reps (min–max)')).toBeTruthy();
+    });
   });
 });
