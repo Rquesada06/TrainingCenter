@@ -350,4 +350,128 @@ describe('createAssignment Cloud Function', () => {
     expect(typeof result.assignmentId).toBe('string');
     expect(result.assignmentId.length).toBeGreaterThan(0);
   });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Phase 05 Plan 01 — PRES-01/02/03: prescription fields in snapshot (TIER 4)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  test('snapshot exercise carries repsMin/repsMax/targetRpe/timed from routine exercise (PRES-01/02/03)', async () => {
+    const prescribedRoutineDoc = {
+      trainerId: TRAINER_UID,
+      name: 'Full Body A',
+      exercises: [
+        {
+          exerciseId: EXERCISE_ID,
+          name: 'Back Squat',
+          sets: 5,
+          reps: 5,
+          rest: 90,
+          alternativeExerciseId: ALT_EXERCISE_ID,
+          order: 0,
+          repsMin: 8,
+          repsMax: 10,
+          targetRpe: 8,
+          timed: false,
+        },
+      ],
+    };
+
+    _docResolver = (path) => {
+      if (path === `users/${TRAINER_UID}`) return makeDocSnap(true, TRAINER_UID, trainerDoc);
+      if (path === `programs/${PROGRAM_ID}`) return makeDocSnap(true, PROGRAM_ID, programDoc);
+      if (path === `users/${CLIENT_UID}`) return makeDocSnap(true, CLIENT_UID, clientDoc);
+      if (path === `routines/${ROUTINE_ID}`) return makeDocSnap(true, ROUTINE_ID, prescribedRoutineDoc);
+      if (path === `exercises/${EXERCISE_ID}`) return makeDocSnap(true, EXERCISE_ID, exerciseDoc);
+      if (path === `exercises/${ALT_EXERCISE_ID}`) return makeDocSnap(true, ALT_EXERCISE_ID, altExerciseDoc);
+      return makeDocSnap(false, '', null);
+    };
+
+    const context = { auth: { uid: TRAINER_UID, token: {} } };
+    const data = { programId: PROGRAM_ID, clientId: CLIENT_UID, startDate: '2026-06-01' };
+
+    await wrappedCreateAssignment(data, context);
+
+    const setPayload = mockBatchSet.mock.calls[0][1];
+    const snapshotEx = setPayload.snapshot.weeks[0].days[0].routine.exercises[0];
+
+    expect(snapshotEx.repsMin).toBe(8);
+    expect(snapshotEx.repsMax).toBe(10);
+    expect(snapshotEx.targetRpe).toBe(8);
+    expect(snapshotEx.timed).toBe(false);
+  });
+
+  test('alternative exercise branch carries repsMin/repsMax/targetRpe/timed (defaults: null/null/null/false)', async () => {
+    const prescribedRoutineDoc = {
+      trainerId: TRAINER_UID,
+      name: 'Full Body A',
+      exercises: [
+        {
+          exerciseId: EXERCISE_ID,
+          name: 'Back Squat',
+          sets: 5,
+          reps: 5,
+          rest: 90,
+          alternativeExerciseId: ALT_EXERCISE_ID,
+          order: 0,
+          repsMin: 8,
+          repsMax: 10,
+          targetRpe: 8,
+          timed: false,
+        },
+      ],
+    };
+
+    _docResolver = (path) => {
+      if (path === `users/${TRAINER_UID}`) return makeDocSnap(true, TRAINER_UID, trainerDoc);
+      if (path === `programs/${PROGRAM_ID}`) return makeDocSnap(true, PROGRAM_ID, programDoc);
+      if (path === `users/${CLIENT_UID}`) return makeDocSnap(true, CLIENT_UID, clientDoc);
+      if (path === `routines/${ROUTINE_ID}`) return makeDocSnap(true, ROUTINE_ID, prescribedRoutineDoc);
+      if (path === `exercises/${EXERCISE_ID}`) return makeDocSnap(true, EXERCISE_ID, exerciseDoc);
+      if (path === `exercises/${ALT_EXERCISE_ID}`) return makeDocSnap(true, ALT_EXERCISE_ID, altExerciseDoc);
+      return makeDocSnap(false, '', null);
+    };
+
+    const context = { auth: { uid: TRAINER_UID, token: {} } };
+    const data = { programId: PROGRAM_ID, clientId: CLIENT_UID, startDate: '2026-06-01' };
+
+    await wrappedCreateAssignment(data, context);
+
+    const setPayload = mockBatchSet.mock.calls[0][1];
+    const altEx = setPayload.snapshot.weeks[0].days[0].routine.exercises[0].alternativeExercise;
+
+    expect(altEx).not.toBeNull();
+    expect(altEx.repsMin).toBe(null);
+    expect(altEx.repsMax).toBe(null);
+    expect(altEx.targetRpe).toBe(null);
+    expect(altEx.timed).toBe(false);
+  });
+
+  test('exercise without prescription fields defaults safely (timed=false, others=null)', async () => {
+    // routineDoc has no repsMin/repsMax/targetRpe/timed — legacy routine
+    _docResolver = (path) => {
+      if (path === `users/${TRAINER_UID}`) return makeDocSnap(true, TRAINER_UID, trainerDoc);
+      if (path === `programs/${PROGRAM_ID}`) return makeDocSnap(true, PROGRAM_ID, programDoc);
+      if (path === `users/${CLIENT_UID}`) return makeDocSnap(true, CLIENT_UID, clientDoc);
+      if (path === `routines/${ROUTINE_ID}`) return makeDocSnap(true, ROUTINE_ID, routineDoc);
+      if (path === `exercises/${EXERCISE_ID}`) return makeDocSnap(true, EXERCISE_ID, exerciseDoc);
+      if (path === `exercises/${ALT_EXERCISE_ID}`) return makeDocSnap(true, ALT_EXERCISE_ID, altExerciseDoc);
+      return makeDocSnap(false, '', null);
+    };
+
+    const context = { auth: { uid: TRAINER_UID, token: {} } };
+    const data = { programId: PROGRAM_ID, clientId: CLIENT_UID, startDate: '2026-06-01' };
+
+    await wrappedCreateAssignment(data, context);
+
+    const setPayload = mockBatchSet.mock.calls[0][1];
+    const snapshotEx = setPayload.snapshot.weeks[0].days[0].routine.exercises[0];
+
+    expect(snapshotEx.repsMin).toBe(null);
+    expect(snapshotEx.repsMax).toBe(null);
+    expect(snapshotEx.targetRpe).toBe(null);
+    expect(snapshotEx.timed).toBe(false);
+    // Ensure no undefined values (S3 — null-not-undefined)
+    expect(snapshotEx.repsMin).not.toBeUndefined();
+    expect(snapshotEx.timed).not.toBeUndefined();
+  });
 });
