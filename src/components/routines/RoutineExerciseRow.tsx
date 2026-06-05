@@ -2,19 +2,26 @@
  * RoutineExerciseRow — One exercise entry in the routine builder.
  *
  * Phase 02 Plan 04 (ROUT-02, ROUT-03, ROUT-05)
+ * Phase 05 Plan 04 (PRES-01/02/03) — rep range, target RPE, Timed toggle
  *
  * Renders:
  * - Exercise name header + drag handle + remove button
- * - 4 numeric TextFields for sets/reps/duration/rest (ROUT-02)
+ * - Timed toggle (D-11): ON → Sets + Duration(s); OFF → Sets + Reps(min–max) + Target RPE + Rest(s)
+ * - Hidden fields RETAIN their RHF values when toggled (reversible — D-11)
  * - Notes field (ROUT-03)
  * - Alternative exercise selector (ROUT-05)
  *
  * Uses RHF Controller for all fields so values stay in the form state.
+ * Numeric Controller convention (verbatim):
+ *   value={String(field.value ?? '')}
+ *   onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+ *   keyboardType="number-pad"
+ *   error={fieldState.error?.message}
  */
 
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Controller, type Control } from 'react-hook-form';
+import { Pressable, Switch, Text, View } from 'react-native';
+import { Controller, type Control, useWatch } from 'react-hook-form';
 import { TextField } from '@/components/ui/TextField';
 import type { RoutineFormValues } from '@/validation/routine.schema';
 
@@ -37,6 +44,14 @@ export function RoutineExerciseRow({
   onOpenAlternativePicker,
   dragHandle,
 }: RoutineExerciseRowProps) {
+  // Watch the timed field for this exercise to drive conditional rendering.
+  // useWatch subscribes to a single field — no re-render on other field changes.
+  const isTimed = useWatch({
+    control,
+    name: `exercises.${index}.timed`,
+    defaultValue: false,
+  });
+
   return (
     <View
       style={{
@@ -68,88 +83,230 @@ export function RoutineExerciseRow({
         </Pressable>
       </View>
 
-      {/* Numeric overrides: sets / reps / duration / rest — ROUT-02 */}
-      <View style={{ flexDirection: 'row', gap: 8 }}>
-        {/* Sets */}
-        <View style={{ flex: 1 }}>
-          <Controller
-            name={`exercises.${index}.sets`}
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Sets"
-                value={String(field.value ?? '')}
-                onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                keyboardType="number-pad"
-                error={fieldState.error?.message}
+      {/* Timed toggle — D-11 explicit boolean, never inferred from field presence */}
+      <Controller
+        name={`exercises.${index}.timed`}
+        control={control}
+        render={({ field }) => {
+          const checked = !!field.value;
+          return (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 12,
+              }}
+            >
+              <Text
+                style={{ color: '#888888', fontSize: 14, marginRight: 8 }}
+              >
+                Timed
+              </Text>
+              <Switch
+                value={checked}
+                onValueChange={(v) => field.onChange(v)}
+                trackColor={{ false: '#444444', true: '#00FF66' }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor="#444444"
+                accessibilityRole="switch"
+                accessibilityState={{ checked }}
+                accessibilityLabel="Timed exercise toggle"
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               />
-            )}
-          />
-        </View>
-        {/* Reps */}
-        <View style={{ flex: 1 }}>
-          <Controller
-            name={`exercises.${index}.reps`}
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Reps"
-                value={String(field.value ?? '')}
-                onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                keyboardType="number-pad"
-                error={fieldState.error?.message}
+              {/* Timed badge — shown when toggle is ON (UI-SPEC B2, #FFD600) */}
+              {checked ? (
+                <View
+                  style={{
+                    marginLeft: 8,
+                    paddingHorizontal: 8,
+                    paddingVertical: 2,
+                    borderRadius: 99,
+                    borderWidth: 1,
+                    borderColor: '#FFD600',
+                    backgroundColor: 'rgba(255,214,0,0.2)',
+                  }}
+                >
+                  <Text
+                    style={{ color: '#FFD600', fontSize: 12, fontWeight: '400' }}
+                  >
+                    Timed
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          );
+        }}
+      />
+
+      {/* ── WEIGHTED fields (Timed OFF) ─────────────────────────────────────── */}
+      {!isTimed ? (
+        <>
+          {/* Row 1: Sets + Reps (min–max) + Target RPE */}
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 0 }}>
+            {/* Sets */}
+            <View style={{ flex: 1 }}>
+              <Controller
+                name={`exercises.${index}.sets`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    label="Sets"
+                    value={String(field.value ?? '')}
+                    onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                    keyboardType="number-pad"
+                    error={fieldState.error?.message}
+                  />
+                )}
               />
-            )}
-          />
-        </View>
-        {/* Duration (s) */}
-        <View style={{ flex: 1 }}>
-          <Controller
-            name={`exercises.${index}.duration`}
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Dur (s)"
-                value={String(field.value ?? '')}
-                onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                keyboardType="number-pad"
-                error={fieldState.error?.message}
+            </View>
+
+            {/* Rep range — two fields with en-dash separator */}
+            <View style={{ flex: 2 }}>
+              <Text
+                style={{
+                  color: '#888888',
+                  fontSize: 14,
+                  marginBottom: 4,
+                  fontWeight: '400',
+                }}
+              >
+                Reps (min–max)
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ flex: 1 }}>
+                  <Controller
+                    name={`exercises.${index}.repsMin`}
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        label=""
+                        value={String(field.value ?? '')}
+                        onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                        keyboardType="number-pad"
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                </View>
+                <Text
+                  style={{
+                    color: '#888888',
+                    fontSize: 16,
+                    fontWeight: '400',
+                    paddingBottom: 4,
+                  }}
+                >
+                  –
+                </Text>
+                <View style={{ flex: 1 }}>
+                  <Controller
+                    name={`exercises.${index}.repsMax`}
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        label=""
+                        value={String(field.value ?? '')}
+                        onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                        keyboardType="number-pad"
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* Target RPE (optional) */}
+            <View style={{ flex: 1 }}>
+              <Controller
+                name={`exercises.${index}.targetRpe`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    label="Target RPE"
+                    value={String(field.value ?? '')}
+                    onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                    keyboardType="number-pad"
+                    error={fieldState.error?.message}
+                  />
+                )}
               />
-            )}
-          />
+            </View>
+          </View>
+
+          {/* Row 2: Rest (s) */}
+          <View style={{ marginTop: 8 }}>
+            <Controller
+              name={`exercises.${index}.rest`}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  label="Rest (s)"
+                  value={String(field.value ?? '')}
+                  onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                  keyboardType="number-pad"
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </View>
+        </>
+      ) : null}
+
+      {/* ── TIMED fields (Timed ON) ──────────────────────────────────────────── */}
+      {isTimed ? (
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {/* Sets */}
+          <View style={{ flex: 1 }}>
+            <Controller
+              name={`exercises.${index}.sets`}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  label="Sets"
+                  value={String(field.value ?? '')}
+                  onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                  keyboardType="number-pad"
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </View>
+          {/* Duration (s) */}
+          <View style={{ flex: 2 }}>
+            <Controller
+              name={`exercises.${index}.duration`}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  label="Duration (s)"
+                  value={String(field.value ?? '')}
+                  onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
+                  keyboardType="number-pad"
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </View>
         </View>
-        {/* Rest (s) */}
-        <View style={{ flex: 1 }}>
-          <Controller
-            name={`exercises.${index}.rest`}
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Rest (s)"
-                value={String(field.value ?? '')}
-                onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                keyboardType="number-pad"
-                error={fieldState.error?.message}
-              />
-            )}
-          />
-        </View>
-      </View>
+      ) : null}
 
       {/* Notes field — ROUT-03 */}
-      <Controller
-        name={`exercises.${index}.notes`}
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Notes"
-            value={field.value ?? ''}
-            onChangeText={field.onChange}
-            placeholder="Optional — e.g. slow eccentric"
-            multiline
-          />
-        )}
-      />
+      <View style={{ marginTop: 8 }}>
+        <Controller
+          name={`exercises.${index}.notes`}
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Notes"
+              value={field.value ?? ''}
+              onChangeText={field.onChange}
+              placeholder="Optional — e.g. slow eccentric"
+              multiline
+            />
+          )}
+        />
+      </View>
 
       {/* Alternative exercise — ROUT-05 */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>

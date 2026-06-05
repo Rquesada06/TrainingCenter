@@ -95,6 +95,14 @@ export function RoutineBuilder({
           name: ex.name,
           sets: ex.defaultSets ?? 3,
           reps: ex.defaultReps,
+          // Phase 05 Plan 04 — prescription seed defaults (PRES-01/02/03)
+          // Seed repsMin/repsMax from the exercise's default reps so the builder
+          // row is valid out of the box. targetRpe left undefined (optional).
+          // timed defaults to false (weighted — D-11: explicit boolean, never inferred).
+          repsMin: ex.defaultReps,
+          repsMax: ex.defaultReps,
+          targetRpe: undefined,
+          timed: false,
           duration: ex.defaultDuration,
           rest: ex.defaultRest ?? 60,
           notes: '',
