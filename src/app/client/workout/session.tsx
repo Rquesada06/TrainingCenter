@@ -1,21 +1,33 @@
 /**
  * Workout Session Screen — Phase 03 Plan 04 (WORK-03..08, D-07..D-14)
+ *                       + Phase 05 Plan 03 (LOG-01..04, D-07/D-08/D-09)
  *
  * Active workout execution AND read-only completed view (D-12) — same screen,
  * routed via `readOnly` param.
  *
  * Active mode:
  *   - Header: back + routine name + GymHomeToggle
- *   - FlatList of ExerciseRow (single-open expand, checkbox per exercise)
+ *   - FlatList of exercise cards (single-open expand)
+ *   - Per-set SetRow rows inside expanded weighted exercise cards (Phase 05)
  *   - Pinned FinishButton at bottom
  *   - Resume / Start-over prompt on mount if prior in-progress session exists (D-14)
  *   - Navigation guard on back when session has progress (2D)
- *   - Finish: builds Session record → withSaveFeedback → clearSession → celebration
+ *   - Finish: buildFinalizedSession → withSaveFeedback → clearSession → celebration
  *
  * Read-only mode (readOnly=true param):
  *   - Header title "Session Complete"; toggle disabled
  *   - Checkboxes show completedExerciseIds from Firestore (useTodaySession), non-interactive
  *   - FinishButton replaced by PrimaryButton outline "Close Session" → back
+ *
+ * Phase 05 Plan 03 wiring:
+ *   - Prior sessions fetched once via useQuery + fetchSessionsForAssignment for prefill
+ *   - seedExercise(resolvePrefill(exercise, priorSessions)) on first expand (LOG-03)
+ *   - SetRow ×N per weighted exercise (LOG-01/02), sourcing from sessionStore.loggedSets
+ *   - Collapsed card: "{checked}/{sets} sets logged" caption + left-edge accent (D-08)
+ *   - buildFinalizedSession replaces inline sessionRecord build (LOG-04)
+ *   - withSaveFeedback wrapper unchanged (S2 pattern)
+ *   - Timed exercises: v1.0 ExerciseRow path — WorkTimerControl added in Plan 05
+ *   - Old sessions (no loggedExercises) still load without crashing (null-guard)
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -29,6 +41,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
 import { useClientActiveAssignment } from '@/hooks/useClientActiveAssignment';
 import { useTodaySession } from '@/hooks/useTodaySession';
 import { useFinishSession } from '@/hooks/useFinishSession';
@@ -38,12 +51,16 @@ import { resolveVariant } from '@/lib/variantResolver';
 import { computeTodayWorkout, localTodayString } from '@/lib/workoutDayComputer';
 import { withSaveFeedback } from '@/lib/mutationFeedback';
 import { getLastMode, setLastMode } from '@/lib/lastWorkoutMode';
+import { buildFinalizedSession } from '@/lib/sessionFinalize';
+import { resolvePrefill } from '@/lib/prefill';
+import { fetchSessionsForAssignment } from '@/services/session.service';
 import { GymHomeToggle } from '@/components/workout/GymHomeToggle';
 import { ExerciseRow } from '@/components/workout/ExerciseRow';
+import { SetRow } from '@/components/workout/SetRow';
 import { FinishButton } from '@/components/workout/FinishButton';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { AssignmentSnapshotExercise } from '@/types/assignment';
-import type { Session } from '@/types/session';
+import type { LoggedExercise } from '@/types/session';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -52,6 +69,91 @@ import type { Session } from '@/types/session';
 interface ResolvedItem {
   exercise: AssignmentSnapshotExercise;
   modeTag: 'gym_only' | 'home_only' | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Secondary line below exercise name in the collapsed card (UI-SPEC A1).
+ * Weighted: {sets}×{repsMin}–{repsMax} · RPE {targetRpe}
+ * Timed:    {duration}s + Timed badge
+ */
+function SecondaryLine({ exercise }: { exercise: AssignmentSnapshotExercise }) {
+  if (exercise.timed) {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+        {exercise.duration !== null && (
+          <Text style={{ fontSize: 14, color: '#888888', marginRight: 6 }}>
+            {exercise.duration}s
+          </Text>
+        )}
+        <View
+          style={{
+            backgroundColor: 'rgba(255,214,0,0.2)',
+            borderWidth: 1,
+            borderColor: '#FFD600',
+            borderRadius: 999,
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+          }}
+        >
+          <Text style={{ fontSize: 14, color: '#FFD600' }}>Timed</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Weighted secondary line
+  const hasRange = exercise.repsMin !== null || exercise.repsMax !== null;
+  const repsText = hasRange
+    ? `${exercise.sets}×${exercise.repsMin ?? '?'}–${exercise.repsMax ?? '?'}`
+    : exercise.reps !== null
+      ? `${exercise.sets}×${exercise.reps}`
+      : `${exercise.sets} sets`;
+
+  const rpeText = exercise.targetRpe !== null ? ` · RPE ${exercise.targetRpe}` : '';
+
+  return (
+    <Text style={{ fontSize: 14, color: '#888888', marginTop: 2 }}>
+      {repsText}{rpeText}
+    </Text>
+  );
+}
+
+/**
+ * Column header row for the set table (UI-SPEC A2).
+ * Flex weights: SET 0.9 / PESO 2.6 / REPS 2.0 / RPE 2.2 / STATUS 1.6, gap 8.
+ */
+function SetTableHeader() {
+  const headers: Array<{ label: string; flex: number }> = [
+    { label: 'SET', flex: 0.9 },
+    { label: 'PESO (KG)', flex: 2.6 },
+    { label: 'REPS', flex: 2.0 },
+    { label: 'RPE', flex: 2.2 },
+    { label: 'STATUS', flex: 1.6 },
+  ];
+
+  return (
+    <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+      {headers.map(({ label, flex }) => (
+        <View key={label} style={{ flex, alignItems: 'center' }}>
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: '400',
+              color: '#888888',
+              letterSpacing: 0.5,
+              textTransform: 'uppercase',
+            }}
+          >
+            {label}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,6 +176,23 @@ export default function SessionScreen() {
   const { data: todaySession } = useTodaySession();
   const finishMutation = useFinishSession();
 
+  // ── Prior sessions for prefill (LOG-03/D-09) ─────────────────────────────────
+  // Fetch ALL prior sessions for this assignment once on screen mount so
+  // resolvePrefill can seed each set from last-session actuals (D-09).
+  // Uses fetchSessionsForAssignment (plain async → Session[]), NOT the
+  // paginated useSessionHistory infinite hook (plan pinned this).
+  // Before the query resolves, resolvePrefill falls back to the trainer target
+  // on empty priorSessions — no loading gate needed.
+  const { data: priorSessions = [] } = useQuery({
+    queryKey: ['priorSessions', uid, assignment?.id],
+    queryFn: () =>
+      uid && assignment?.id
+        ? fetchSessionsForAssignment(uid, assignment.id)
+        : Promise.resolve([]),
+    enabled: !!uid && !!assignment?.id,
+    staleTime: Infinity, // immutable for this screen lifetime
+  });
+
   // ── SessionStore ─────────────────────────────────────────────────────────────
   const storeMode = useSessionStore((s) => s.mode);
   const storeIsActive = useSessionStore((s) => s.isActive);
@@ -84,10 +203,14 @@ export default function SessionScreen() {
   const storeWeekIndex = useSessionStore((s) => s.weekIndex);
   const storeDayIndex = useSessionStore((s) => s.dayIndex);
   const storeAssignmentId = useSessionStore((s) => s.assignmentId);
+  const storeLoggedSets = useSessionStore((s) => s.loggedSets);
   const startSession = useSessionStore((s) => s.startSession);
   const clearSession = useSessionStore((s) => s.clearSession);
   const toggleExercise = useSessionStore((s) => s.toggleExercise);
   const setMode = useSessionStore((s) => s.setMode);
+  const setSetValue = useSessionStore((s) => s.setSetValue);
+  const toggleSet = useSessionStore((s) => s.toggleSet);
+  const seedExercise = useSessionStore((s) => s.seedExercise);
 
   // ── Local UI state ───────────────────────────────────────────────────────────
   const [mode, setLocalMode] = useState<'gym' | 'home'>('gym');
@@ -95,6 +218,8 @@ export default function SessionScreen() {
   const [hydrated, setHydrated] = useState(false);
   const resumeShownRef = useRef(false);
   const sessionStartedRef = useRef(false);
+  // Track which exercises have been seeded so seedExercise is called at most once per exercise
+  const seededExercisesRef = useRef<Set<string>>(new Set());
 
   // ── Derive workout day ───────────────────────────────────────────────────────
   const workoutResult =
@@ -124,7 +249,6 @@ export default function SessionScreen() {
   useEffect(() => {
     getLastMode().then((savedMode) => {
       setLocalMode(savedMode);
-      // Also align the store mode
       setMode(savedMode);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -163,7 +287,6 @@ export default function SessionScreen() {
                 assignmentId: assignment.id,
                 startedAt: new Date().toISOString(),
               });
-              // Reset to last saved mode
               getLastMode().then((savedMode) => {
                 setLocalMode(savedMode);
                 setMode(savedMode);
@@ -174,14 +297,12 @@ export default function SessionScreen() {
             text: 'Resume',
             style: 'default',
             onPress: () => {
-              // Keep existing store state; sync local mode from store
               setLocalMode(storeMode);
             },
           },
         ]
       );
     } else if (!sessionStartedRef.current) {
-      // No in-progress session → start fresh
       sessionStartedRef.current = true;
       startSession({
         clientId: uid,
@@ -211,7 +332,7 @@ export default function SessionScreen() {
     }
   }, [readOnly, storeIsActive, storeCompletedIds.length, router]);
 
-  // ── Mode toggle (D-08/D-09/D-11) ────────────────────────────────────────────
+  // ── Mode toggle ──────────────────────────────────────────────────────────────
   const handleModeChange = useCallback(
     (newMode: 'gym' | 'home') => {
       setLocalMode(newMode);
@@ -221,14 +342,29 @@ export default function SessionScreen() {
     [setMode]
   );
 
-  // ── Expand/collapse (single-open) ────────────────────────────────────────────
-  const handleToggleExpand = useCallback((exerciseId: string) => {
-    setExpandedId((prev) => (prev === exerciseId ? null : exerciseId));
-  }, []);
+  // ── Expand/collapse (single-open) — with prefill seed on first expand ──────
+  const handleToggleExpand = useCallback(
+    (exerciseId: string, exercise: AssignmentSnapshotExercise) => {
+      const isOpening = expandedId !== exerciseId;
+      setExpandedId((prev) => (prev === exerciseId ? null : exerciseId));
 
-  // Marking an exercise done collapses it and opens the next unfinished one,
-  // so the workout flows naturally. `nextExpandId` is the next not-yet-completed
-  // exercise after this one (null = none left → just collapse).
+      // Seed prefill on FIRST expand of a weighted exercise (LOG-03/D-09).
+      // Only called once — seededExercisesRef tracks visited exercises.
+      if (
+        isOpening &&
+        !exercise.timed &&
+        !seededExercisesRef.current.has(exerciseId) &&
+        !readOnly
+      ) {
+        seededExercisesRef.current.add(exerciseId);
+        const seeds = resolvePrefill(exercise, priorSessions);
+        seedExercise(exerciseId, seeds);
+      }
+    },
+    [expandedId, priorSessions, seedExercise, readOnly]
+  );
+
+  // ── Toggle per-exercise completion (v1.0 path, still used for timed exercises) ─
   const handleToggleComplete = useCallback(
     (exerciseId: string, nextExpandId: string | null) => {
       if (readOnly) return;
@@ -241,47 +377,81 @@ export default function SessionScreen() {
     [readOnly, storeCompletedIds, toggleExercise]
   );
 
-  // ── Finish flow (WORK-06/07, D-13) ──────────────────────────────────────────
+  // ── Finish flow (WORK-06/07, D-13, LOG-04) ──────────────────────────────────
   const handleFinish = useCallback(() => {
     if (!uid || !assignment || weekIndex === null || dayIndex === null) return;
 
     const completedAt = new Date().toISOString();
     const startedAt = storeStartedAt ?? completedAt;
-    const completedCount = storeCompletedIds.length;
-    const total = exercises.length;
 
-    const sessionRecord: Omit<Session, 'id'> = {
-      clientId: uid,
-      trainerId: trainerId ?? assignment.trainerId,
-      assignmentId: storeAssignmentId ?? assignment.id,
-      date: today,
-      weekIndex: storeWeekIndex ?? weekIndex,
-      dayIndex: storeDayIndex ?? dayIndex,
-      mode: storeMode,
-      completedExerciseIds: [...storeCompletedIds],
-      totalExercises: total,
-      startedAt,
-      completedAt,
-      routineName,
+    // Resolved exercise list for finalize payload
+    const resolvedExerciseList = resolvedExercises.map((r) => r.exercise);
+
+    // Build loggedExercises from live store state for buildFinalizedSession.
+    // Null-guard: storeLoggedSets[id] may be empty for unstarted exercises.
+    const loggedExercisesInput: LoggedExercise[] = resolvedExerciseList.map((ex) => ({
+      exerciseId: ex.exerciseId,
+      name: ex.name,
+      timed: ex.timed,
+      sets: storeLoggedSets[ex.exerciseId] ?? [],
+    }));
+
+    // Replace inline sessionRecord build with buildFinalizedSession (LOG-04).
+    // buildFinalizedSession derives completedExerciseIds via the ≥1-set rule (D-08).
+    const sessionRecord = buildFinalizedSession(
+      {
+        clientId: uid,
+        trainerId: trainerId ?? assignment.trainerId,
+        assignmentId: storeAssignmentId ?? assignment.id,
+        date: today,
+        weekIndex: storeWeekIndex ?? weekIndex,
+        dayIndex: storeDayIndex ?? dayIndex,
+        mode: storeMode,
+        startedAt,
+        completedAt,
+        routineName,
+      },
+      resolvedExerciseList,
+      loggedExercisesInput,
+    );
+
+    const completedCount = sessionRecord.completedExerciseIds.length;
+    const total = sessionRecord.totalExercises;
+
+    const doFinish = () => {
+      // Keep the exact withSaveFeedback wrapper shape (S2 — unchanged from v1.0)
+      withSaveFeedback(
+        () => finishMutation.mutateAsync(sessionRecord),
+        () => {
+          clearSession();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          router.push({
+            pathname: '/client/workout/celebration' as any,
+            params: {
+              completed: String(completedCount),
+              total: String(total),
+              startedAt,
+              completedAt,
+            },
+          });
+        },
+        'Could not save session'
+      );
     };
 
-    withSaveFeedback(
-      () => finishMutation.mutateAsync(sessionRecord),
-      () => {
-        clearSession();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        router.push({
-          pathname: '/client/workout/celebration' as any,
-          params: {
-            completed: String(completedCount),
-            total: String(total),
-            startedAt,
-            completedAt,
-          },
-        });
-      },
-      'Could not save session'
-    );
+    // Incomplete-confirm threshold uses per-exercise completion derived from sets (D-08, UI-SPEC A5).
+    if (completedCount < total) {
+      Alert.alert(
+        'Finish session?',
+        `You've logged ${completedCount} of ${total} exercises. Unlogged sets won't be saved. Finish anyway?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Finish', style: 'default', onPress: doFinish },
+        ]
+      );
+    } else {
+      doFinish();
+    }
   }, [
     uid,
     assignment,
@@ -294,6 +464,7 @@ export default function SessionScreen() {
     storeMode,
     storeCompletedIds,
     storeStartedAt,
+    storeLoggedSets,
     exercises.length,
     routineName,
     today,
@@ -302,7 +473,7 @@ export default function SessionScreen() {
     router,
   ]);
 
-  // ── Resolved exercise list (re-resolves on mode change per D-08) ─────────────
+  // ── Resolved exercise list (re-resolves on mode change) ─────────────────────
   const resolvedExercises: ResolvedItem[] = exercises.map((ex) =>
     resolveVariant(ex, mode)
   );
@@ -367,26 +538,161 @@ export default function SessionScreen() {
         keyExtractor={(item) => item.exercise.exerciseId}
         renderItem={({ item, index }) => {
           const exId = item.exercise.exerciseId;
+          const exercise = item.exercise;
+          const isExpanded = expandedId === exId;
+
+          // Live per-set state for this exercise (null-guard: old sessions have none)
+          const liveSets = storeLoggedSets[exId] ?? [];
+          const checkedCount = liveSets.filter((s) => s.completed).length;
+
+          // Exercise complete when ≥1 set checked (D-08)
           const isCompleted = readOnly
             ? readOnlyCompletedIds.includes(exId)
-            : storeCompletedIds.includes(exId);
-          // Next not-yet-completed exercise after this one (guided flow).
+            : checkedCount > 0;
+
+          // Next not-yet-completed exercise (guided flow) — for timed exercise toggle
           const nextExpandId =
             resolvedExercises
               .slice(index + 1)
-              .find((r) => !storeCompletedIds.includes(r.exercise.exerciseId))
+              .find((r) => {
+                const rSets = storeLoggedSets[r.exercise.exerciseId] ?? [];
+                return rSets.filter(s => s.completed).length === 0;
+              })
               ?.exercise.exerciseId ?? null;
 
+          // Progress caption (UI-SPEC A1, D-08)
+          const progressCaption = exercise.timed
+            ? exercise.duration !== null
+              ? `Hold ${exercise.duration}s`
+              : null
+            : `${checkedCount}/${exercise.sets} sets logged`;
+          const captionColor = checkedCount >= 1 ? '#00FF66' : '#888888';
+
+          // Complete left-edge accent (UI-SPEC A1 — replaces v1.0 strikethrough)
+          const completedAccentStyle = isCompleted && !readOnly
+            ? { borderLeftWidth: 3, borderLeftColor: '#00FF66' }
+            : {};
+
           return (
-            <ExerciseRow
-              exercise={item.exercise}
-              modeTag={item.modeTag}
-              isCompleted={isCompleted}
-              onToggleComplete={() => handleToggleComplete(exId, nextExpandId)}
-              isExpanded={expandedId === exId}
-              onToggleExpand={() => handleToggleExpand(exId)}
-              readOnly={readOnly}
-            />
+            <View
+              style={[
+                {
+                  backgroundColor: '#1A1A1A',
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#2A2A2A',
+                },
+                completedAccentStyle,
+              ]}
+              accessibilityState={{ expanded: isExpanded }}
+            >
+              {/* Collapsed header row */}
+              <Pressable
+                onPress={() => handleToggleExpand(exId, exercise)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={`${exercise.name}, ${isCompleted ? 'complete' : 'incomplete'}`}
+                accessibilityState={{ expanded: isExpanded }}
+              >
+                <View style={{ flex: 1, marginRight: 8 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: '600',
+                      color: '#FFFFFF',
+                    }}
+                    numberOfLines={1}
+                  >
+                    {exercise.name}
+                  </Text>
+
+                  {/* Secondary line: repsMin–repsMax or timed badge */}
+                  <SecondaryLine exercise={exercise} />
+
+                  {/* Progress caption */}
+                  {progressCaption !== null && (
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: captionColor,
+                        marginTop: 2,
+                      }}
+                    >
+                      {progressCaption}
+                    </Text>
+                  )}
+                </View>
+
+                <Ionicons
+                  name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                  size={16}
+                  color="#444444"
+                />
+              </Pressable>
+
+              {/* Expanded detail section */}
+              {isExpanded && (
+                <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+                  {/* ── Weighted exercise: SetRow table (LOG-01/02) ── */}
+                  {!exercise.timed ? (
+                    <View>
+                      {/* Column header */}
+                      <SetTableHeader />
+
+                      {/* One SetRow per set */}
+                      {Array.from({ length: exercise.sets }, (_, i) => {
+                        const setNumber = i + 1;
+                        const liveSet = liveSets[i];
+
+                        // isPrefilled: the set was seeded from prefill but not yet
+                        // confirmed by the client (not checked and not yet edited).
+                        // We track "edited" via whether the store set differs from
+                        // the seed; for simplicity the SetRow manages its own editedState.
+                        const isPrefilled = liveSet !== undefined && !liveSet.completed;
+
+                        return (
+                          <SetRow
+                            key={setNumber}
+                            setNumber={setNumber}
+                            weight={liveSet?.weight ?? null}
+                            reps={liveSet?.reps ?? null}
+                            rpe={liveSet?.rpe ?? null}
+                            completed={liveSet?.completed ?? false}
+                            isPrefilled={isPrefilled}
+                            readOnly={readOnly}
+                            onChangeWeight={(val) =>
+                              setSetValue(exId, setNumber, 'weight', val)
+                            }
+                            onChangeReps={(val) =>
+                              setSetValue(exId, setNumber, 'reps', val)
+                            }
+                            onChangeRpe={(val) =>
+                              setSetValue(exId, setNumber, 'rpe', val)
+                            }
+                            onToggleDone={() => toggleSet(exId, setNumber)}
+                          />
+                        );
+                      })}
+                    </View>
+                  ) : (
+                    /* ── Timed exercise: v1.0 ExerciseRow path (WorkTimerControl in Plan 05) ── */
+                    <ExerciseRow
+                      exercise={exercise}
+                      modeTag={item.modeTag}
+                      isCompleted={isCompleted}
+                      onToggleComplete={() => handleToggleComplete(exId, nextExpandId)}
+                      isExpanded={true}
+                      onToggleExpand={() => handleToggleExpand(exId, exercise)}
+                      readOnly={readOnly}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
           );
         }}
         contentContainerStyle={{
@@ -417,6 +723,7 @@ export default function SessionScreen() {
             onPress={() => router.back()}
           />
         ) : (
+          // "Finish Session" label per UI-SPEC A5 (FinishButton renders the label)
           <FinishButton
             completedCount={storeCompletedIds.length}
             totalExercises={exercises.length}
