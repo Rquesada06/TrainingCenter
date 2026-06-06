@@ -20,7 +20,7 @@
  * RPE cell opens RpeStepper (not a free keypad, D-01).
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RpeStepper } from './RpeStepper';
@@ -91,6 +91,26 @@ export function SetRow({
   const [weightEdited, setWeightEdited] = useState(false);
   const [repsEdited, setRepsEdited] = useState(false);
 
+  // Local keystroke buffers for the numeric cells. A fully-controlled numeric
+  // TextInput (value={String(weight)}) reverts mid-edit on the New-Architecture
+  // build — deleting a value re-asserts it. Buffer the visible text locally and
+  // push the parsed number to the store in parallel; re-sync only when the store
+  // value genuinely differs (prefill seed / carry-down) so we never fight typing.
+  const [weightText, setWeightText] = useState(weight !== null ? String(weight) : '');
+  const [repsText, setRepsText] = useState(reps !== null ? String(reps) : '');
+
+  useEffect(() => {
+    const typed = weightText.trim() === '' ? null : Number(weightText);
+    if (typed !== weight) setWeightText(weight !== null ? String(weight) : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weight]);
+
+  useEffect(() => {
+    const typed = repsText.trim() === '' ? null : Number(repsText);
+    if (typed !== reps) setRepsText(reps !== null ? String(reps) : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reps]);
+
   // Focus state for focused-cell border highlight
   const [weightFocused, setWeightFocused] = useState(false);
   const [repsFocused, setRepsFocused] = useState(false);
@@ -105,12 +125,14 @@ export function SetRow({
   const rpeColor = '#FFFFFF'; // RPE is always user-entered (never prefilled)
 
   const handleWeightChange = (text: string) => {
+    setWeightText(text);
     setWeightEdited(true);
     const parsed = text === '' ? null : parseFloat(text);
     onChangeWeight(parsed !== null && !isNaN(parsed) ? parsed : null);
   };
 
   const handleRepsChange = (text: string) => {
+    setRepsText(text);
     setRepsEdited(true);
     const parsed = text === '' ? null : parseInt(text, 10);
     onChangeReps(parsed !== null && !isNaN(parsed) ? parsed : null);
@@ -157,7 +179,7 @@ export function SetRow({
         ]}
       >
         <TextInput
-          value={weight !== null ? String(weight) : ''}
+          value={weightText}
           onChangeText={handleWeightChange}
           onFocus={() => setWeightFocused(true)}
           onBlur={() => setWeightFocused(false)}
@@ -185,7 +207,7 @@ export function SetRow({
         ]}
       >
         <TextInput
-          value={reps !== null ? String(reps) : ''}
+          value={repsText}
           onChangeText={handleRepsChange}
           onFocus={() => setRepsFocused(true)}
           onBlur={() => setRepsFocused(false)}
