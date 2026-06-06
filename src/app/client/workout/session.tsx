@@ -800,7 +800,11 @@ export default function SessionScreen() {
           );
         }}
         contentContainerStyle={{
-          paddingBottom: readOnly ? insets.bottom + 80 : insets.bottom + 96,
+          // Grow the bottom padding while the rest-timer bar is mounted so the
+          // last set row is never hidden behind it (bar is ~56px above the CTA).
+          paddingBottom:
+            (readOnly ? insets.bottom + 80 : insets.bottom + 96) +
+            (restTimer.isRunning ? 64 : 0),
         }}
         showsVerticalScrollIndicator={false}
         // Android clips offscreen subviews by default; with dynamic-height
@@ -808,6 +812,16 @@ export default function SessionScreen() {
         // check/uncheck (row reappears only on re-expand). Disable the clipping.
         removeClippedSubviews={false}
       />
+
+      {/* ── Rest-timer bar (pinned above the finish CTA while a rest is running) ── */}
+      {restTimer.isRunning && (
+        <RestTimerBar
+          remainingMs={restTimer.remainingMs}
+          totalMs={restTimerTotalMsRef.current}
+          onSkip={() => restTimer.skip()}
+          onAdd15={() => restTimer.add15()}
+        />
+      )}
 
       {/* ── Bottom CTA ── */}
       <View
