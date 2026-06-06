@@ -12,17 +12,16 @@
  * - Alternative exercise selector (ROUT-05)
  *
  * Uses RHF Controller for all fields so values stay in the form state.
- * Numeric Controller convention (verbatim):
- *   value={String(field.value ?? '')}
- *   onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
- *   keyboardType="number-pad"
- *   error={fieldState.error?.message}
+ * Numeric fields use <NumberField> (local keystroke buffer) instead of a raw
+ * controlled TextField — a fully-controlled numeric input reverts mid-edit on
+ * the New-Architecture/Fabric build (delete "10" → "10" reappears).
  */
 
 import React from 'react';
 import { Pressable, Switch, Text, View } from 'react-native';
 import { Controller, type Control, useWatch } from 'react-hook-form';
 import { TextField } from '@/components/ui/TextField';
+import { NumberField } from '@/components/ui/NumberField';
 import type { RoutineFormValues } from '@/validation/routine.schema';
 
 export interface RoutineExerciseRowProps {
@@ -163,11 +162,10 @@ export function RoutineExerciseRow({
                 name={`exercises.${index}.sets`}
                 control={control}
                 render={({ field, fieldState }) => (
-                  <TextField
+                  <NumberField
                     label="Sets"
-                    value={String(field.value ?? '')}
-                    onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                    keyboardType="number-pad"
+                    value={field.value}
+                    onChangeNumber={field.onChange}
                     error={fieldState.error?.message}
                   />
                 )}
@@ -192,11 +190,10 @@ export function RoutineExerciseRow({
                     name={`exercises.${index}.repsMin`}
                     control={control}
                     render={({ field, fieldState }) => (
-                      <TextField
+                      <NumberField
                         label=""
-                        value={String(field.value ?? '')}
-                        onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                        keyboardType="number-pad"
+                        value={field.value}
+                        onChangeNumber={field.onChange}
                         error={fieldState.error?.message}
                       />
                     )}
@@ -217,11 +214,10 @@ export function RoutineExerciseRow({
                     name={`exercises.${index}.repsMax`}
                     control={control}
                     render={({ field, fieldState }) => (
-                      <TextField
+                      <NumberField
                         label=""
-                        value={String(field.value ?? '')}
-                        onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                        keyboardType="number-pad"
+                        value={field.value}
+                        onChangeNumber={field.onChange}
                         error={fieldState.error?.message}
                       />
                     )}
@@ -236,11 +232,10 @@ export function RoutineExerciseRow({
                 name={`exercises.${index}.targetRpe`}
                 control={control}
                 render={({ field, fieldState }) => (
-                  <TextField
+                  <NumberField
                     label="Target RPE"
-                    value={String(field.value ?? '')}
-                    onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                    keyboardType="number-pad"
+                    value={field.value}
+                    onChangeNumber={field.onChange}
                     error={fieldState.error?.message}
                   />
                 )}
@@ -254,11 +249,10 @@ export function RoutineExerciseRow({
               name={`exercises.${index}.rest`}
               control={control}
               render={({ field, fieldState }) => (
-                <TextField
+                <NumberField
                   label="Rest (s)"
-                  value={String(field.value ?? '')}
-                  onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                  keyboardType="number-pad"
+                  value={field.value}
+                  onChangeNumber={field.onChange}
                   error={fieldState.error?.message}
                 />
               )}
@@ -276,11 +270,10 @@ export function RoutineExerciseRow({
               name={`exercises.${index}.sets`}
               control={control}
               render={({ field, fieldState }) => (
-                <TextField
+                <NumberField
                   label="Sets"
-                  value={String(field.value ?? '')}
-                  onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                  keyboardType="number-pad"
+                  value={field.value}
+                  onChangeNumber={field.onChange}
                   error={fieldState.error?.message}
                 />
               )}
@@ -292,11 +285,10 @@ export function RoutineExerciseRow({
               name={`exercises.${index}.duration`}
               control={control}
               render={({ field, fieldState }) => (
-                <TextField
+                <NumberField
                   label="Duration (s)"
-                  value={String(field.value ?? '')}
-                  onChangeText={(v) => field.onChange(v ? Number(v) : undefined)}
-                  keyboardType="number-pad"
+                  value={field.value}
+                  onChangeNumber={field.onChange}
                   error={fieldState.error?.message}
                 />
               )}

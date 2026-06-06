@@ -27,7 +27,7 @@ import type { SortableRenderItemProps, SortableData } from 'react-native-reanima
  * (weighted) row. TODO: switch to the lib's dynamic-height mode to avoid gaps on
  * shorter timed rows.
  */
-const ITEM_HEIGHT = 380;
+const ITEM_HEIGHT = 430;
 
 /** Minimal field shape required for rendering — exerciseId + RHF id */
 export interface SortableField extends SortableData {
