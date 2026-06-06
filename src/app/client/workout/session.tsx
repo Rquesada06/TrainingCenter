@@ -1,6 +1,7 @@
 /**
  * Workout Session Screen — Phase 03 Plan 04 (WORK-03..08, D-07..D-14)
  *                       + Phase 05 Plan 03 (LOG-01..04, D-07/D-08/D-09)
+ *                       + Phase 05 Plan 05 (TIMR-01..04)
  *
  * Active workout execution AND read-only completed view (D-12) — same screen,
  * routed via `readOnly` param.
@@ -10,6 +11,7 @@
  *   - FlatList of exercise cards (single-open expand)
  *   - Per-set SetRow rows inside expanded weighted exercise cards (Phase 05)
  *   - Pinned FinishButton at bottom
+ *   - RestTimerBar pinned above FinishButton when rest timer active (TIMR-01)
  *   - Resume / Start-over prompt on mount if prior in-progress session exists (D-14)
  *   - Navigation guard on back when session has progress (2D)
  *   - Finish: buildFinalizedSession → withSaveFeedback → clearSession → celebration
@@ -26,8 +28,13 @@
  *   - Collapsed card: "{checked}/{sets} sets logged" caption + left-edge accent (D-08)
  *   - buildFinalizedSession replaces inline sessionRecord build (LOG-04)
  *   - withSaveFeedback wrapper unchanged (S2 pattern)
- *   - Timed exercises: v1.0 ExerciseRow path — WorkTimerControl added in Plan 05
  *   - Old sessions (no loggedExercises) still load without crashing (null-guard)
+ *
+ * Phase 05 Plan 05 wiring (TIMR):
+ *   - useCountdownTimer for rest (auto-start on set check) + work (manual Start)
+ *   - RestTimerBar mounted above bottom CTA when restTimer.isRunning (TIMR-01)
+ *   - WorkTimerControl in timed-exercise expanded body (TIMR-02)
+ *   - Both timers: absolute endsAt / foreground recompute / keep-awake / fire-once alarm (D-06)
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -57,8 +64,12 @@ import { fetchSessionsForAssignment } from '@/services/session.service';
 import { GymHomeToggle } from '@/components/workout/GymHomeToggle';
 import { ExerciseRow } from '@/components/workout/ExerciseRow';
 import { SetRow } from '@/components/workout/SetRow';
+import { RestTimerBar } from '@/components/workout/RestTimerBar';
+import { WorkTimerControl } from '@/components/workout/WorkTimerControl';
+import type { WorkTimerState } from '@/components/workout/WorkTimerControl';
 import { FinishButton } from '@/components/workout/FinishButton';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
+import { useCountdownTimer } from '@/hooks/useCountdownTimer';
 import type { AssignmentSnapshotExercise } from '@/types/assignment';
 import type { LoggedExercise } from '@/types/session';
 
@@ -221,6 +232,25 @@ export default function SessionScreen() {
   // Track which exercises have been seeded so seedExercise is called at most once per exercise
   const seededExercisesRef = useRef<Set<string>>(new Set());
 
+  // ── Timers (TIMR-01/02/03/04) ────────────────────────────────────────────────
+  // Rest timer: auto-starts on set check (D-04); one at a time, last-check-wins
+  const restTimer = useCountdownTimer();
+  // Work timers: one per exercise (manual Start, D-05); stored by exerciseId
+  // Using a record of states driven by useCountdownTimer instances is too many hooks.
+  // Instead, use a single work timer + track which exercise owns it.
+  const [workTimerExerciseId, setWorkTimerExerciseId] = useState<string | null>(null);
+  const [workTimerState, setWorkTimerState] = useState<WorkTimerState>('idle');
+  const workTimer = useCountdownTimer(() => {
+    // On expiry: mark the timed exercise's implicit set complete (D-08)
+    if (workTimerExerciseId) {
+      toggleSet(workTimerExerciseId, 1);
+    }
+    setWorkTimerState('done');
+  });
+
+  // Rest timer total for progress track — stored when started
+  const restTimerTotalMsRef = useRef(0);
+
   // ── Derive workout day ───────────────────────────────────────────────────────
   const workoutResult =
     assignment ? computeTodayWorkout(assignment, today) : null;
@@ -364,7 +394,7 @@ export default function SessionScreen() {
     [expandedId, priorSessions, seedExercise, readOnly]
   );
 
-  // ── Toggle per-exercise completion (v1.0 path, still used for timed exercises) ─
+  // ── Toggle per-exercise completion (v1.0 path, kept for compatibility) ─────
   const handleToggleComplete = useCallback(
     (exerciseId: string, nextExpandId: string | null) => {
       if (readOnly) return;
@@ -375,6 +405,22 @@ export default function SessionScreen() {
       }
     },
     [readOnly, storeCompletedIds, toggleExercise]
+  );
+
+  // ── Per-set done toggle + rest timer auto-start (TIMR-01, D-04) ─────────────
+  // Wraps toggleSet so checking a set also auto-starts the rest timer from
+  // that exercise's rest seconds. Last-check-wins: one rest timer at a time.
+  const handleToggleSet = useCallback(
+    (exerciseId: string, setNumber: number, exerciseRestSec: number | null) => {
+      if (readOnly) return;
+      toggleSet(exerciseId, setNumber);
+      // Auto-start rest timer if exercise has a rest prescription (TIMR-01)
+      if (exerciseRestSec && exerciseRestSec > 0) {
+        restTimerTotalMsRef.current = exerciseRestSec * 1_000;
+        restTimer.start(exerciseRestSec);
+      }
+    },
+    [readOnly, toggleSet, restTimer]
   );
 
   // ── Finish flow (WORK-06/07, D-13, LOG-04) ──────────────────────────────────
@@ -673,22 +719,45 @@ export default function SessionScreen() {
                             onChangeRpe={(val) =>
                               setSetValue(exId, setNumber, 'rpe', val)
                             }
-                            onToggleDone={() => toggleSet(exId, setNumber)}
+                            onToggleDone={() =>
+                              handleToggleSet(exId, setNumber, exercise.rest ?? null)
+                            }
                           />
                         );
                       })}
                     </View>
                   ) : (
-                    /* ── Timed exercise: v1.0 ExerciseRow path (WorkTimerControl in Plan 05) ── */
-                    <ExerciseRow
-                      exercise={exercise}
-                      modeTag={item.modeTag}
-                      isCompleted={isCompleted}
-                      onToggleComplete={() => handleToggleComplete(exId, nextExpandId)}
-                      isExpanded={true}
-                      onToggleExpand={() => handleToggleExpand(exId, exercise)}
-                      readOnly={readOnly}
-                    />
+                    /* ── Timed exercise: WorkTimerControl (TIMR-02) ── */
+                    (() => {
+                      // Determine work timer state for this exercise
+                      const isThisExercise = workTimerExerciseId === exId;
+                      const timerState: WorkTimerState = isThisExercise
+                        ? workTimerState
+                        : isCompleted
+                          ? 'done'
+                          : 'idle';
+                      const timerRemainingMs = isThisExercise
+                        ? workTimer.remainingMs
+                        : 0;
+
+                      return (
+                        <WorkTimerControl
+                          durationSec={exercise.duration ?? 0}
+                          state={timerState}
+                          remainingMs={timerRemainingMs}
+                          onStart={() => {
+                            setWorkTimerExerciseId(exId);
+                            setWorkTimerState('running');
+                            workTimer.start(exercise.duration ?? 0);
+                          }}
+                          onSkip={() => {
+                            workTimer.skip();
+                            setWorkTimerState('idle');
+                          }}
+                          onAdd15={() => workTimer.add15()}
+                        />
+                      );
+                    })()
                   )}
                 </View>
               )}

@@ -101,7 +101,7 @@ describe('RestTimerBar — structure', () => {
   });
 
   it('has accessibilityRole timer', () => {
-    const { getByRole } = render(
+    const { UNSAFE_getByProps } = render(
       <RestTimerBar
         remainingMs={60_000}
         totalMs={90_000}
@@ -109,7 +109,7 @@ describe('RestTimerBar — structure', () => {
         onAdd15={jest.fn()}
       />
     );
-    expect(getByRole('timer')).toBeTruthy();
+    expect(UNSAFE_getByProps({ accessibilityRole: 'timer' })).toBeTruthy();
   });
 
   it('displays countdown time in mm:ss format', () => {

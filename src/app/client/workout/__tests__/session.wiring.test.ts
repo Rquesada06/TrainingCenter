@@ -10,6 +10,20 @@
 
 // Mock all native/Firebase dependencies before importing the module
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
+// Native timer modules — session.tsx now imports useCountdownTimer, which pulls
+// in these native modules. Mock them so the suite loads without a native runtime
+// (mirrors src/hooks/__tests__/useCountdownTimer.test.ts).
+jest.mock('expo-audio', () => ({
+  createAudioPlayer: jest.fn(() => ({ play: jest.fn(), remove: jest.fn() })),
+}));
+jest.mock('expo-haptics', () => ({
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  NotificationFeedbackType: { Success: 'success' },
+}));
+jest.mock('expo-keep-awake', () => ({
+  activateKeepAwakeAsync: jest.fn().mockResolvedValue(undefined),
+  deactivateKeepAwake: jest.fn().mockResolvedValue(undefined),
+}));
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({})),
   useRouter: jest.fn(() => ({ back: jest.fn(), push: jest.fn() })),
