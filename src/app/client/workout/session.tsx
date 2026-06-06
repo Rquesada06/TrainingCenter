@@ -372,26 +372,33 @@ export default function SessionScreen() {
     [setMode]
   );
 
+  // Seed prefill for a weighted exercise on first reveal (LOG-03/D-09).
+  // Idempotent — seededExercisesRef tracks visited exercises so we seed once.
+  // Used by both manual expand and guided auto-advance.
+  const seedExerciseIfNeeded = useCallback(
+    (exerciseId: string, exercise: AssignmentSnapshotExercise) => {
+      if (
+        exercise.timed ||
+        readOnly ||
+        seededExercisesRef.current.has(exerciseId)
+      ) {
+        return;
+      }
+      seededExercisesRef.current.add(exerciseId);
+      const seeds = resolvePrefill(exercise, priorSessions);
+      seedExercise(exerciseId, seeds);
+    },
+    [priorSessions, seedExercise, readOnly]
+  );
+
   // ── Expand/collapse (single-open) — with prefill seed on first expand ──────
   const handleToggleExpand = useCallback(
     (exerciseId: string, exercise: AssignmentSnapshotExercise) => {
       const isOpening = expandedId !== exerciseId;
       setExpandedId((prev) => (prev === exerciseId ? null : exerciseId));
-
-      // Seed prefill on FIRST expand of a weighted exercise (LOG-03/D-09).
-      // Only called once — seededExercisesRef tracks visited exercises.
-      if (
-        isOpening &&
-        !exercise.timed &&
-        !seededExercisesRef.current.has(exerciseId) &&
-        !readOnly
-      ) {
-        seededExercisesRef.current.add(exerciseId);
-        const seeds = resolvePrefill(exercise, priorSessions);
-        seedExercise(exerciseId, seeds);
-      }
+      if (isOpening) seedExerciseIfNeeded(exerciseId, exercise);
     },
-    [expandedId, priorSessions, seedExercise, readOnly]
+    [expandedId, seedExerciseIfNeeded]
   );
 
   // ── Toggle per-exercise completion (v1.0 path, kept for compatibility) ─────
@@ -416,7 +423,7 @@ export default function SessionScreen() {
       exerciseId: string,
       setNumber: number,
       exercise: AssignmentSnapshotExercise,
-      nextExpandId: string | null
+      nextExercise: AssignmentSnapshotExercise | null
     ) => {
       if (readOnly) return;
 
@@ -436,15 +443,21 @@ export default function SessionScreen() {
           restTimer.start(restSec);
         }
 
-        // Guided auto-advance: when ALL sets are now checked, collapse + advance.
+        // Guided auto-advance: when ALL sets are now checked, collapse this
+        // exercise and expand (and seed) the next not-yet-finished one.
         const after = useSessionStore.getState().loggedSets[exerciseId] ?? [];
         const completedCount = after.filter((s) => s.completed).length;
         if (completedCount >= exercise.sets) {
-          setExpandedId(nextExpandId);
+          if (nextExercise) {
+            seedExerciseIfNeeded(nextExercise.exerciseId, nextExercise);
+            setExpandedId(nextExercise.exerciseId);
+          } else {
+            setExpandedId(null); // nothing left to advance to — collapse
+          }
         }
       }
     },
-    [readOnly, toggleSet, restTimer]
+    [readOnly, toggleSet, restTimer, seedExerciseIfNeeded]
   );
 
   // ── Finish flow (WORK-06/07, D-13, LOG-04) ──────────────────────────────────
@@ -620,15 +633,17 @@ export default function SessionScreen() {
             ? readOnlyCompletedIds.includes(exId)
             : checkedCount > 0;
 
-          // Next not-yet-completed exercise (guided flow) — for timed exercise toggle
-          const nextExpandId =
+          // Next not-yet-FINISHED exercise for guided auto-advance: the first one
+          // after this whose checked sets are fewer than its total (so a partially
+          // logged exercise still qualifies — only fully-complete ones are skipped).
+          const nextExercise =
             resolvedExercises
               .slice(index + 1)
               .find((r) => {
                 const rSets = storeLoggedSets[r.exercise.exerciseId] ?? [];
-                return rSets.filter(s => s.completed).length === 0;
+                return rSets.filter((s) => s.completed).length < r.exercise.sets;
               })
-              ?.exercise.exerciseId ?? null;
+              ?.exercise ?? null;
 
           // Progress caption (UI-SPEC A1, D-08)
           const progressCaption = exercise.timed
@@ -744,7 +759,7 @@ export default function SessionScreen() {
                               setSetValue(exId, setNumber, 'rpe', val)
                             }
                             onToggleDone={() =>
-                              handleToggleSet(exId, setNumber, exercise, nextExpandId)
+                              handleToggleSet(exId, setNumber, exercise, nextExercise)
                             }
                           />
                         );
