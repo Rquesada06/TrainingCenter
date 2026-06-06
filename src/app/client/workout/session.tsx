@@ -407,17 +407,41 @@ export default function SessionScreen() {
     [readOnly, storeCompletedIds, toggleExercise]
   );
 
-  // ── Per-set done toggle + rest timer auto-start (TIMR-01, D-04) ─────────────
-  // Wraps toggleSet so checking a set also auto-starts the rest timer from
-  // that exercise's rest seconds. Last-check-wins: one rest timer at a time.
+  // ── Per-set done toggle + rest timer auto-start + guided auto-advance ───────
+  // Checking a set (not unchecking) auto-starts the rest timer (TIMR-01, D-04)
+  // and, once EVERY set is checked, collapses this exercise and expands the next
+  // incomplete one (guided flow). Unchecking does neither (no timer restart).
   const handleToggleSet = useCallback(
-    (exerciseId: string, setNumber: number, exerciseRestSec: number | null) => {
+    (
+      exerciseId: string,
+      setNumber: number,
+      exercise: AssignmentSnapshotExercise,
+      nextExpandId: string | null
+    ) => {
       if (readOnly) return;
+
+      // Determine whether this toggle is a CHECK or an UNCHECK (pre-toggle state)
+      const before = useSessionStore.getState().loggedSets[exerciseId] ?? [];
+      const wasCompleted =
+        before.find((s) => s.setNumber === setNumber)?.completed ?? false;
+
       toggleSet(exerciseId, setNumber);
-      // Auto-start rest timer if exercise has a rest prescription (TIMR-01)
-      if (exerciseRestSec && exerciseRestSec > 0) {
-        restTimerTotalMsRef.current = exerciseRestSec * 1_000;
-        restTimer.start(exerciseRestSec);
+
+      // Only react on a CHECK — unchecking must not restart the timer or advance.
+      if (!wasCompleted) {
+        // Auto-start the rest timer from this exercise's rest seconds (TIMR-01)
+        const restSec = exercise.rest;
+        if (restSec && restSec > 0) {
+          restTimerTotalMsRef.current = restSec * 1_000;
+          restTimer.start(restSec);
+        }
+
+        // Guided auto-advance: when ALL sets are now checked, collapse + advance.
+        const after = useSessionStore.getState().loggedSets[exerciseId] ?? [];
+        const completedCount = after.filter((s) => s.completed).length;
+        if (completedCount >= exercise.sets) {
+          setExpandedId(nextExpandId);
+        }
       }
     },
     [readOnly, toggleSet, restTimer]
@@ -720,7 +744,7 @@ export default function SessionScreen() {
                               setSetValue(exId, setNumber, 'rpe', val)
                             }
                             onToggleDone={() =>
-                              handleToggleSet(exId, setNumber, exercise.rest ?? null)
+                              handleToggleSet(exId, setNumber, exercise, nextExpandId)
                             }
                           />
                         );
@@ -779,6 +803,10 @@ export default function SessionScreen() {
           paddingBottom: readOnly ? insets.bottom + 80 : insets.bottom + 96,
         }}
         showsVerticalScrollIndicator={false}
+        // Android clips offscreen subviews by default; with dynamic-height
+        // expanded cells that blanks a set row when its height changes on
+        // check/uncheck (row reappears only on re-expand). Disable the clipping.
+        removeClippedSubviews={false}
       />
 
       {/* ── Bottom CTA ── */}
