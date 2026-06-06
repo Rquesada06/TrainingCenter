@@ -11,7 +11,7 @@
  *   - FlatList of exercise cards (single-open expand)
  *   - Per-set SetRow rows inside expanded weighted exercise cards (Phase 05)
  *   - Pinned FinishButton at bottom
- *   - RestTimerBar pinned above FinishButton when rest timer active (TIMR-01)
+ *   - Inline rest countdown under the resting exercise's name (TIMR-01)
  *   - Resume / Start-over prompt on mount if prior in-progress session exists (D-14)
  *   - Navigation guard on back when session has progress (2D)
  *   - Finish: buildFinalizedSession → withSaveFeedback → clearSession → celebration
@@ -32,7 +32,7 @@
  *
  * Phase 05 Plan 05 wiring (TIMR):
  *   - useCountdownTimer for rest (auto-start on set check) + work (manual Start)
- *   - RestTimerBar mounted above bottom CTA when restTimer.isRunning (TIMR-01)
+ *   - Rest countdown shows inline on the resting card when restTimer.isRunning (TIMR-01)
  *   - WorkTimerControl in timed-exercise expanded body (TIMR-02)
  *   - Both timers: absolute endsAt / foreground recompute / keep-awake / fire-once alarm (D-06)
  */
@@ -64,7 +64,7 @@ import { fetchSessionsForAssignment } from '@/services/session.service';
 import { GymHomeToggle } from '@/components/workout/GymHomeToggle';
 import { ExerciseMedia } from '@/components/workout/ExerciseMedia';
 import { SetRow } from '@/components/workout/SetRow';
-import { RestTimerBar } from '@/components/workout/RestTimerBar';
+import { formatMmSs } from '@/lib/timer';
 import { WorkTimerControl } from '@/components/workout/WorkTimerControl';
 import type { WorkTimerState } from '@/components/workout/WorkTimerControl';
 import { FinishButton } from '@/components/workout/FinishButton';
@@ -270,6 +270,8 @@ export default function SessionScreen() {
   // Using a record of states driven by useCountdownTimer instances is too many hooks.
   // Instead, use a single work timer + track which exercise owns it.
   const [workTimerExerciseId, setWorkTimerExerciseId] = useState<string | null>(null);
+  // Which exercise the rest timer belongs to (drives the inline header countdown).
+  const [restTimerExerciseId, setRestTimerExerciseId] = useState<string | null>(null);
   const [workTimerState, setWorkTimerState] = useState<WorkTimerState>('idle');
   const workTimer = useCountdownTimer(() => {
     // On expiry: mark the timed exercise's implicit set complete (D-08)
@@ -471,6 +473,7 @@ export default function SessionScreen() {
         const restSec = exercise.rest;
         if (restSec && restSec > 0) {
           restTimerTotalMsRef.current = restSec * 1_000;
+          setRestTimerExerciseId(exerciseId);
           restTimer.start(restSec);
         }
 
@@ -732,6 +735,46 @@ export default function SessionScreen() {
                     {item.modeTag !== null && <ModeTagPill tag={item.modeTag} />}
                   </View>
 
+                  {/* Inline rest timer — shown on the resting exercise's card,
+                      right under its name (replaces the old pinned bottom bar). */}
+                  {restTimer.isRunning && restTimerExerciseId === exId && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 14,
+                        marginTop: 4,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: '600',
+                          fontFamily: 'JetBrainsMono-Regular',
+                          color: restTimer.remainingMs <= 10_000 ? '#FFD600' : '#00FF66',
+                        }}
+                      >
+                        Rest {formatMmSs(restTimer.remainingMs)}
+                      </Text>
+                      <Pressable
+                        onPress={() => restTimer.skip()}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        accessibilityRole="button"
+                        accessibilityLabel="Skip rest timer"
+                      >
+                        <Text style={{ fontSize: 13, color: '#888888' }}>Skip</Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => restTimer.add15()}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        accessibilityRole="button"
+                        accessibilityLabel="Add 15 seconds"
+                      >
+                        <Text style={{ fontSize: 13, color: '#888888' }}>+15s</Text>
+                      </Pressable>
+                    </View>
+                  )}
+
                   {/* Secondary line: repsMin–repsMax or timed badge */}
                   <SecondaryLine exercise={exercise} />
 
@@ -852,11 +895,7 @@ export default function SessionScreen() {
           );
         }}
         contentContainerStyle={{
-          // Grow the bottom padding while the rest-timer bar is mounted so the
-          // last set row is never hidden behind it (bar is ~56px above the CTA).
-          paddingBottom:
-            (readOnly ? insets.bottom + 80 : insets.bottom + 96) +
-            (restTimer.isRunning ? 64 : 0),
+          paddingBottom: readOnly ? insets.bottom + 80 : insets.bottom + 96,
         }}
         showsVerticalScrollIndicator={false}
         // Android clips offscreen subviews by default; with dynamic-height
@@ -864,16 +903,6 @@ export default function SessionScreen() {
         // check/uncheck (row reappears only on re-expand). Disable the clipping.
         removeClippedSubviews={false}
       />
-
-      {/* ── Rest-timer bar (pinned above the finish CTA while a rest is running) ── */}
-      {restTimer.isRunning && (
-        <RestTimerBar
-          remainingMs={restTimer.remainingMs}
-          totalMs={restTimerTotalMsRef.current}
-          onSkip={() => restTimer.skip()}
-          onAdd15={() => restTimer.add15()}
-        />
-      )}
 
       {/* ── Bottom CTA ── */}
       <View
