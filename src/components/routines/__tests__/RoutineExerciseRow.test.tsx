@@ -47,7 +47,7 @@ function renderRow(timedDefault = false) {
         index={0}
         control={form.control as never}
         exerciseName="Back Squat"
-        alternativeName={null}
+        resolveExerciseName={() => null}
         onRemove={() => {}}
         onOpenAlternativePicker={() => {}}
       />

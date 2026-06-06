@@ -29,7 +29,8 @@ export interface RoutineExerciseRowProps {
   index: number;
   control: Control<RoutineFormValues>;
   exerciseName: string;
-  alternativeName: string | null;
+  /** Resolve an exerciseId → display name (for the chosen alternative). */
+  resolveExerciseName: (id: string) => string | null;
   onRemove: () => void;
   onOpenAlternativePicker: () => void;
   dragHandle?: React.ReactNode;
@@ -39,7 +40,7 @@ export function RoutineExerciseRow({
   index,
   control,
   exerciseName,
-  alternativeName,
+  resolveExerciseName,
   onRemove,
   onOpenAlternativePicker,
   dragHandle,
@@ -51,6 +52,19 @@ export function RoutineExerciseRow({
     name: `exercises.${index}.timed`,
     defaultValue: false,
   });
+
+  // Resolve the chosen alternative's name from a scoped field subscription so
+  // the PARENT builder no longer needs watch('exercises') (which re-rendered the
+  // whole drag-list on every keystroke — that churn made controlled TextInputs
+  // snap back on the New-Architecture build).
+  const alternativeExerciseId = useWatch({
+    control,
+    name: `exercises.${index}.alternativeExerciseId`,
+    defaultValue: undefined,
+  });
+  const alternativeName = alternativeExerciseId
+    ? resolveExerciseName(alternativeExerciseId)
+    : null;
 
   return (
     <View

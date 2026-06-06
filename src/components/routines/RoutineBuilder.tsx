@@ -55,7 +55,6 @@ export function RoutineBuilder({
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<z.input<typeof routineSchema>, unknown, z.output<typeof routineSchema>>({
     resolver: zodResolver(routineSchema),
     defaultValues: defaultValues ?? { name: '', exercises: [] },
@@ -66,10 +65,10 @@ export function RoutineBuilder({
     name: 'exercises',
   });
 
-  // useFieldArray's `fields` holds INITIAL values only — setValue on a nested
-  // field (e.g. picking an alternative) does not update it. Watch the live array
-  // so rows re-render with the current alternativeExerciseId.
-  const watchedExercises = watch('exercises');
+  // NOTE: we deliberately do NOT watch('exercises') here. Watching the whole
+  // array re-rendered this component (and the drag-list) on every keystroke,
+  // which made controlled TextInputs revert on the New-Architecture build. Each
+  // row instead resolves its own alternative name via a scoped useWatch.
 
   // ── Exercise name map for display ─────────────────────────────────────────
   const exercisesQuery = useExercises();
@@ -80,6 +79,13 @@ export function RoutineBuilder({
     }
     return map;
   }, [exercisesQuery.data]);
+
+  // Stable name resolver passed to each row (so the row can resolve its chosen
+  // alternative's display name without the parent re-rendering on field edits).
+  const resolveExerciseName = useCallback(
+    (id: string): string | null => exercisesMap[id]?.name ?? null,
+    [exercisesMap]
+  );
 
   // ── Picker state ──────────────────────────────────────────────────────────
   const pickerRef = useRef<ExercisePickerSheetRef>(null);
@@ -209,23 +215,18 @@ export function RoutineBuilder({
             <SortableExerciseList
               fields={fields as unknown as SortableField[]}
               onReorder={handleReorder}
-              renderItem={({ item, index, dragHandle }) => {
-                // Read the live alternative from the watched array, not the
-                // stale useFieldArray `item`, so the row reflects the picker.
-                const altId = watchedExercises?.[index]?.alternativeExerciseId;
-                return (
-                  <RoutineExerciseRow
-                    key={item.id}
-                    index={index}
-                    control={control as never}
-                    exerciseName={exercisesMap[item.exerciseId]?.name ?? item.name ?? item.exerciseId}
-                    alternativeName={altId ? (exercisesMap[altId]?.name ?? null) : null}
-                    onRemove={() => remove(index)}
-                    onOpenAlternativePicker={() => openAlternativePicker(index)}
-                    dragHandle={dragHandle}
-                  />
-                );
-              }}
+              renderItem={({ item, index, dragHandle }) => (
+                <RoutineExerciseRow
+                  key={item.id}
+                  index={index}
+                  control={control as never}
+                  exerciseName={exercisesMap[item.exerciseId]?.name ?? item.name ?? item.exerciseId}
+                  resolveExerciseName={resolveExerciseName}
+                  onRemove={() => remove(index)}
+                  onOpenAlternativePicker={() => openAlternativePicker(index)}
+                  dragHandle={dragHandle}
+                />
+              )}
             />
           </View>
         ) : (
