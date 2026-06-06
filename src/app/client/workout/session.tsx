@@ -62,7 +62,7 @@ import { buildFinalizedSession } from '@/lib/sessionFinalize';
 import { resolvePrefill } from '@/lib/prefill';
 import { fetchSessionsForAssignment } from '@/services/session.service';
 import { GymHomeToggle } from '@/components/workout/GymHomeToggle';
-import { ExerciseRow } from '@/components/workout/ExerciseRow';
+import { ExerciseMedia } from '@/components/workout/ExerciseMedia';
 import { SetRow } from '@/components/workout/SetRow';
 import { RestTimerBar } from '@/components/workout/RestTimerBar';
 import { WorkTimerControl } from '@/components/workout/WorkTimerControl';
@@ -759,6 +759,17 @@ export default function SessionScreen() {
                       );
                     })()
                   )}
+
+                  {/* ── Trainer notes + demo media (UI-SPEC A2/A3: retained, below the set table) ── */}
+                  {exercise.notes !== null && (
+                    <Text style={{ fontSize: 14, color: '#888888', marginTop: 8 }}>
+                      {exercise.notes}
+                    </Text>
+                  )}
+                  <ExerciseMedia
+                    videoUrl={exercise.videoUrl}
+                    imageUrl={exercise.imageUrl}
+                  />
                 </View>
               )}
             </View>

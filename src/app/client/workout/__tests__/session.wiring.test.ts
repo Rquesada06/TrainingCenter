@@ -117,8 +117,8 @@ jest.mock('@/services/session.service', () => ({
 jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn(() => ({ data: [], isLoading: false })),
 }));
-jest.mock('@/components/workout/ExerciseRow', () => ({
-  ExerciseRow: () => null,
+jest.mock('@/components/workout/ExerciseMedia', () => ({
+  ExerciseMedia: () => null,
 }));
 jest.mock('@/components/workout/SetRow', () => ({
   SetRow: () => null,
