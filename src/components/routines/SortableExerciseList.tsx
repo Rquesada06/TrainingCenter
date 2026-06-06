@@ -19,8 +19,15 @@ import { Text, View } from 'react-native';
 import { Sortable, SortableItem } from 'react-native-reanimated-dnd';
 import type { SortableRenderItemProps, SortableData } from 'react-native-reanimated-dnd';
 
-/** Height of one RoutineExerciseRow — used by react-native-reanimated-dnd for layout */
-const ITEM_HEIGHT = 280;
+/**
+ * Height of one RoutineExerciseRow — used by react-native-reanimated-dnd for layout.
+ * Phase 05 added the prescription fields (rep range / target RPE / timed toggle),
+ * making the weighted row ~370px. Undersizing this clips the lower fields (Rest /
+ * Notes / Alt) and overlaps adjacent rows, intercepting taps. Sized to the tallest
+ * (weighted) row. TODO: switch to the lib's dynamic-height mode to avoid gaps on
+ * shorter timed rows.
+ */
+const ITEM_HEIGHT = 380;
 
 /** Minimal field shape required for rendering — exerciseId + RHF id */
 export interface SortableField extends SortableData {

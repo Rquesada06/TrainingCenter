@@ -85,6 +85,12 @@ export default function EditRoutineScreen() {
       name: ex.name,
       sets: ex.sets,
       reps: ex.reps,
+      // Phase 05 prescription fields — were dropped here, so an edited routine
+      // re-opened with empty rep range / RPE / timed (PRES-01/02/03).
+      repsMin: ex.repsMin,
+      repsMax: ex.repsMax,
+      targetRpe: ex.targetRpe,
+      timed: ex.timed,
       duration: ex.duration,
       rest: ex.rest,
       notes: ex.notes ?? '',
