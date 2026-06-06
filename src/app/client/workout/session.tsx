@@ -95,7 +95,7 @@ function SecondaryLine({ exercise }: { exercise: AssignmentSnapshotExercise }) {
   if (exercise.timed) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-        {exercise.duration !== null && (
+        {exercise.duration != null && (
           <Text style={{ fontSize: 14, color: '#888888', marginRight: 6 }}>
             {exercise.duration}s
           </Text>
@@ -116,20 +116,51 @@ function SecondaryLine({ exercise }: { exercise: AssignmentSnapshotExercise }) {
     );
   }
 
-  // Weighted secondary line
-  const hasRange = exercise.repsMin !== null || exercise.repsMax !== null;
-  const repsText = hasRange
-    ? `${exercise.sets}×${exercise.repsMin ?? '?'}–${exercise.repsMax ?? '?'}`
-    : exercise.reps !== null
-      ? `${exercise.sets}×${exercise.reps}`
-      : `${exercise.sets} sets`;
+  // Weighted secondary line. Use `!= null` (not `!== null`) so pre-prescription
+  // snapshots — where these fields are `undefined`, not `null` — fall back to the
+  // legacy `reps` / "{sets} sets" instead of rendering "?–?" and "RPE undefined".
+  const min = exercise.repsMin ?? exercise.repsMax ?? null;
+  const max = exercise.repsMax ?? exercise.repsMin ?? null;
+  const repsText =
+    min != null && max != null
+      ? min === max
+        ? `${exercise.sets}×${min}`
+        : `${exercise.sets}×${min}–${max}`
+      : exercise.reps != null
+        ? `${exercise.sets}×${exercise.reps}`
+        : `${exercise.sets} sets`;
 
-  const rpeText = exercise.targetRpe !== null ? ` · RPE ${exercise.targetRpe}` : '';
+  const rpeText = exercise.targetRpe != null ? ` · RPE ${exercise.targetRpe}` : '';
 
   return (
     <Text style={{ fontSize: 14, color: '#888888', marginTop: 2 }}>
       {repsText}{rpeText}
     </Text>
+  );
+}
+
+/**
+ * Mode-availability pill (D-10): yellow "gym only" / "home only" badge shown on a
+ * card when the chosen mode has no valid variant for that exercise. Restored from
+ * the v1.0 ExerciseRow — the Phase-5 card rework dropped it.
+ */
+function ModeTagPill({ tag }: { tag: 'gym_only' | 'home_only' }) {
+  return (
+    <View
+      style={{
+        backgroundColor: 'rgba(255,214,0,0.2)',
+        borderWidth: 1,
+        borderColor: '#FFD600',
+        borderRadius: 999,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        marginLeft: 6,
+      }}
+    >
+      <Text style={{ color: '#FFD600', fontSize: 13, fontWeight: '400' }}>
+        {tag === 'gym_only' ? 'gym only' : 'home only'}
+      </Text>
+    </View>
   );
 }
 
@@ -684,16 +715,22 @@ export default function SessionScreen() {
                 accessibilityState={{ expanded: isExpanded }}
               >
                 <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      fontWeight: '600',
-                      color: '#FFFFFF',
-                    }}
-                    numberOfLines={1}
+                  <View
+                    style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}
                   >
-                    {exercise.name}
-                  </Text>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        fontWeight: '600',
+                        color: '#FFFFFF',
+                        flexShrink: 1,
+                      }}
+                      numberOfLines={1}
+                    >
+                      {exercise.name}
+                    </Text>
+                    {item.modeTag !== null && <ModeTagPill tag={item.modeTag} />}
+                  </View>
 
                   {/* Secondary line: repsMin–repsMax or timed badge */}
                   <SecondaryLine exercise={exercise} />
