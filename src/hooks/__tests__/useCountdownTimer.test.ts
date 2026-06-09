@@ -39,6 +39,7 @@ jest.mock('react-native', () => ({
       return { remove: jest.fn() };
     }),
   },
+  Vibration: { vibrate: jest.fn(), cancel: jest.fn() },
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────

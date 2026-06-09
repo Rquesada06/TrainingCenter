@@ -22,7 +22,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Vibration } from 'react-native';
 import { createAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import {
@@ -38,7 +38,7 @@ import { addFifteen } from '@/lib/timer';
 const KEEP_AWAKE_TAG = 'countdown-timer';
 const TICK_INTERVAL_MS = 250;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const ALARM_ASSET = require('../../assets/audio/alarm.mp3') as number;
+const ALARM_ASSET = require('../../assets/audio/alarm.wav') as number;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Hook
@@ -118,7 +118,9 @@ export function useCountdownTimer(onExpire?: () => void): CountdownTimerState {
         // Non-fatal: alarm audio failure should not block finalize path
       }
 
-      // Vibration (expo-haptics)
+      // Vibration — a strong, unmistakable alarm pattern via RN Vibration
+      // (the expo-haptics "Success" notification alone was too subtle to notice).
+      Vibration.vibrate([0, 500, 250, 500, 250, 500]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
 
       // User callback
