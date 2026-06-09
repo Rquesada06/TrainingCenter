@@ -474,6 +474,7 @@ export default function SessionScreen() {
         if (restSec && restSec > 0) {
           restTimerTotalMsRef.current = restSec * 1_000;
           setRestTimerExerciseId(exerciseId);
+          restTimer.beep(); // short confirmation beep on rest start
           restTimer.start(restSec);
         }
 

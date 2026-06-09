@@ -39,6 +39,8 @@ const KEEP_AWAKE_TAG = 'countdown-timer';
 const TICK_INTERVAL_MS = 250;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const ALARM_ASSET = require('../../assets/audio/alarm.wav') as number;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const BEEP_ASSET = require('../../assets/audio/beep.wav') as number;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Hook
@@ -55,6 +57,8 @@ export interface CountdownTimerState {
   add15: () => void;
   /** Dismiss the timer immediately — no alarm fires. */
   skip: () => void;
+  /** Play a short confirmation beep (e.g. when a rest auto-starts). */
+  beep: () => void;
 }
 
 /**
@@ -150,11 +154,22 @@ export function useCountdownTimer(onExpire?: () => void): CountdownTimerState {
     setEndsAt(null);
   }, []);
 
+  const beep = useCallback(() => {
+    try {
+      const player = createAudioPlayer(BEEP_ASSET);
+      player.play();
+      setTimeout(() => player.remove(), 1000);
+    } catch {
+      // Non-fatal: a missed confirmation beep must never block the timer.
+    }
+  }, []);
+
   return {
     remainingMs,
     isRunning: endsAt != null,
     start,
     add15: add15cb,
     skip,
+    beep,
   };
 }
