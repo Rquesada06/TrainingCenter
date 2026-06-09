@@ -114,7 +114,16 @@ export default function EditRoutineScreen() {
         </Text>
       </View>
 
+      {/*
+        RHF reads defaultValues only at mount. On reopen, react-query returns the
+        cached (stale) routine first and refetches in the background — without this
+        key the form would stay initialized from the stale copy (e.g. a just-saved
+        repsMin shows empty). Keying on the loaded exercises re-initializes the form
+        once the fresh data arrives. The form's own edits don't change `data`, so
+        this does not remount mid-edit.
+      */}
       <RoutineBuilder
+        key={JSON.stringify(data.exercises)}
         defaultValues={defaultValues}
         submitLabel="Save Changes"
         submitting={updateMutation.isPending}
