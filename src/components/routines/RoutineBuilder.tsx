@@ -129,6 +129,15 @@ export function RoutineBuilder({
     [altPickerIndex, setValue]
   );
 
+  const handleRemoveAlternative = useCallback(
+    (index: number) => {
+      setValue(`exercises.${index}.alternativeExerciseId`, undefined, {
+        shouldDirty: true,
+      });
+    },
+    [setValue]
+  );
+
   const openAlternativePicker = useCallback(
     (index: number) => {
       setAltPickerIndex(index);
@@ -224,6 +233,7 @@ export function RoutineBuilder({
                   resolveExerciseName={resolveExerciseName}
                   onRemove={() => remove(index)}
                   onOpenAlternativePicker={() => openAlternativePicker(index)}
+                  onRemoveAlternative={() => handleRemoveAlternative(index)}
                   dragHandle={dragHandle}
                 />
               )}

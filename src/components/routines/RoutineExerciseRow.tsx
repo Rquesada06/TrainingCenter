@@ -32,6 +32,8 @@ export interface RoutineExerciseRowProps {
   resolveExerciseName: (id: string) => string | null;
   onRemove: () => void;
   onOpenAlternativePicker: () => void;
+  /** Clear the chosen alternative (set alternativeExerciseId back to undefined). */
+  onRemoveAlternative: () => void;
   dragHandle?: React.ReactNode;
 }
 
@@ -42,6 +44,7 @@ export function RoutineExerciseRow({
   resolveExerciseName,
   onRemove,
   onOpenAlternativePicker,
+  onRemoveAlternative,
   dragHandle,
 }: RoutineExerciseRowProps) {
   // Watch the timed field for this exercise to drive conditional rendering.
@@ -328,6 +331,18 @@ export function RoutineExerciseRow({
             {alternativeName ?? '+ Add alternative'}
           </Text>
         </Pressable>
+        {/* Clear the alternative (only when one is set) */}
+        {alternativeName ? (
+          <Pressable
+            onPress={onRemoveAlternative}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel="Remove alternative"
+            style={{ marginLeft: 8 }}
+          >
+            <Text style={{ color: '#888888', fontSize: 16, fontWeight: '400' }}>×</Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );

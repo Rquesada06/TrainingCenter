@@ -50,6 +50,7 @@ function renderRow(timedDefault = false) {
         resolveExerciseName={() => null}
         onRemove={() => {}}
         onOpenAlternativePicker={() => {}}
+        onRemoveAlternative={() => {}}
       />
     );
   }
