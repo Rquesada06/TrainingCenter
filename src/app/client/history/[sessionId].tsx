@@ -23,7 +23,7 @@ import { useAssignment } from '@/hooks/useAssignment';
 import { getSession } from '@/services/session.service';
 import { resolveSessionExercises } from '@/lib/sessionDetail';
 import { StatusBadge } from '@/components/sessions/StatusBadge';
-import type { Session } from '@/types/session';
+import type { Session, LoggedExercise } from '@/types/session';
 import type { SessionPage } from '@/services/session.service';
 import type { InfiniteData } from '@tanstack/react-query';
 import type { AssignmentSnapshotExercise } from '@/types/assignment';
@@ -37,39 +37,81 @@ function formatSessionDate(date: string): string {
   });
 }
 
-/** One completed/skipped exercise row (inline — not a separate component for MVP). */
+/**
+ * One exercise row: name + completed status, with the per-set loads logged for it
+ * (weight × reps @ RPE) underneath — surfaced for the client AND the coach who
+ * opens this same screen (COAV-01). Null-guards v1.0 sessions with no per-set data.
+ */
 function ExerciseDetailRow({
   name,
   completed,
+  logged,
 }: {
   name: string;
   completed: boolean;
+  logged?: LoggedExercise;
 }) {
+  const loggedSets =
+    logged && !logged.timed
+      ? logged.sets.filter((s) => s.completed && (s.weight != null || s.reps != null))
+      : [];
+
   return (
     <View
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#2A2A2A',
       }}
     >
-      <Ionicons
-        name={completed ? 'checkmark-circle' : 'ellipse-outline'}
-        size={20}
-        color={completed ? '#00FF66' : '#444444'}
-      />
-      <Text
-        style={{
-          fontSize: 16,
-          fontWeight: '400',
-          color: completed ? '#FFFFFF' : '#888888',
-          marginLeft: 10,
-        }}
-      >
-        {name}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Ionicons
+          name={completed ? 'checkmark-circle' : 'ellipse-outline'}
+          size={20}
+          color={completed ? '#00FF66' : '#444444'}
+        />
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '400',
+            color: completed ? '#FFFFFF' : '#888888',
+            marginLeft: 10,
+          }}
+        >
+          {name}
+        </Text>
+      </View>
+
+      {loggedSets.length > 0 && (
+        <View
+          style={{
+            marginLeft: 30,
+            marginTop: 6,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 6,
+          }}
+        >
+          {loggedSets.map((s) => (
+            <View
+              key={s.setNumber}
+              style={{
+                backgroundColor: '#0E0E0E',
+                borderRadius: 6,
+                paddingHorizontal: 8,
+                paddingVertical: 3,
+              }}
+            >
+              <Text
+                style={{ fontSize: 13, color: '#FFFFFF', fontFamily: 'JetBrainsMono-Regular' }}
+              >
+                {s.weight != null ? `${s.weight}kg` : '–'} × {s.reps != null ? s.reps : '–'}
+                {s.rpe != null ? `  @${s.rpe}` : ''}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -126,6 +168,11 @@ export default function SessionDetailScreen() {
   const assignmentMissing = !isAssignmentLoading && !assignment;
   const fallbackCompletedIds = session.completedExerciseIds;
 
+  // Per-exercise logged loads (Phase 5 data), keyed by exerciseId. Empty for v1.0.
+  const loggedById = new Map<string, LoggedExercise>(
+    (session.loggedExercises ?? []).map((le) => [le.exerciseId, le])
+  );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
       <ScrollView
@@ -178,13 +225,19 @@ export default function SessionDetailScreen() {
           ) : (
             <>
               {completed.map((ex: AssignmentSnapshotExercise) => (
-                <ExerciseDetailRow key={ex.exerciseId} name={ex.name} completed />
+                <ExerciseDetailRow
+                  key={ex.exerciseId}
+                  name={ex.name}
+                  completed
+                  logged={loggedById.get(ex.exerciseId)}
+                />
               ))}
               {skipped.map((ex: AssignmentSnapshotExercise) => (
                 <ExerciseDetailRow
                   key={ex.exerciseId}
                   name={ex.name}
                   completed={false}
+                  logged={loggedById.get(ex.exerciseId)}
                 />
               ))}
             </>
