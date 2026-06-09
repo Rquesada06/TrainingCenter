@@ -77,6 +77,9 @@ export function AssignProgramModal({
   const [startDate, setStartDate] = useState<string>(todayYMD());
   const [existingAssignment, setExistingAssignment] = useState<Assignment | null>(null);
   const [dateError, setDateError] = useState<string>('');
+  // True while the pre-submit "existing active assignment" check runs, so the
+  // Continue button shows a spinner instead of looking unresponsive.
+  const [checking, setChecking] = useState(false);
 
   // Reset state when modal becomes visible
   React.useEffect(() => {
@@ -106,19 +109,24 @@ export function AssignProgramModal({
     // ASGN-02: check for existing active assignment before calling CF.
     // Wrapped so a query failure surfaces as an Alert instead of an uncaught
     // promise rejection that crashes the modal.
-    await withSaveFeedback(
-      async () => {
-        const existing = await findActiveAssignmentForClient(selectedClient.uid, trainerId);
-        if (existing) {
-          setExistingAssignment(existing);
-          setStep('confirmOverwrite');
-        } else {
-          await submitAssignment();
-        }
-      },
-      () => {},
-      'Could not check existing assignments',
-    );
+    setChecking(true);
+    try {
+      await withSaveFeedback(
+        async () => {
+          const existing = await findActiveAssignmentForClient(selectedClient.uid, trainerId);
+          if (existing) {
+            setExistingAssignment(existing);
+            setStep('confirmOverwrite');
+          } else {
+            await submitAssignment();
+          }
+        },
+        () => {},
+        'Could not check existing assignments',
+      );
+    } finally {
+      setChecking(false);
+    }
   };
 
   const submitAssignment = async () => {
@@ -236,7 +244,8 @@ export function AssignProgramModal({
                 <PrimaryButton
                   label="Continue"
                   onPress={handleContinue}
-                  disabled={!DATE_REGEX.test(startDate)}
+                  loading={checking}
+                  disabled={!DATE_REGEX.test(startDate) || checking}
                 />
               </View>
             </View>
