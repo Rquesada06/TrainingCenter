@@ -68,11 +68,13 @@ describe('SetRow', () => {
     expect(json).not.toContain('line-through');
   });
 
-  it('renders placeholder em-dash when weight is null', () => {
-    const { getAllByText } = render(<SetRow {...defaultProps} weight={null} />);
-    // Em-dash placeholders for weight and reps
-    const dashes = getAllByText('–');
-    expect(dashes.length).toBeGreaterThanOrEqual(1);
+  it('renders em-dash placeholders on the empty numeric inputs', () => {
+    const { getAllByPlaceholderText } = render(
+      <SetRow {...defaultProps} weight={null} reps={null} rpe={null} />
+    );
+    // Weight, reps, and RPE are all typed inputs with an em-dash placeholder.
+    const dashes = getAllByPlaceholderText('–');
+    expect(dashes.length).toBeGreaterThanOrEqual(3);
   });
 
   it('shows weight value when weight is set', () => {

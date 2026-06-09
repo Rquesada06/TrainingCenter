@@ -17,13 +17,12 @@
  *   - accessibilityRole="checkbox"
  *
  * NO textDecorationLine: 'line-through' — v1.0 strikethrough is dropped (Phase 5).
- * RPE cell opens RpeStepper (not a free keypad, D-01).
+ * RPE cell is a typed numeric field like PESO (decimal-pad, allows 0.5 steps).
  */
 
 import React, { useEffect, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { RpeStepper } from './RpeStepper';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -114,9 +113,16 @@ export function SetRow({
   // Focus state for focused-cell border highlight
   const [weightFocused, setWeightFocused] = useState(false);
   const [repsFocused, setRepsFocused] = useState(false);
+  const [rpeFocused, setRpeFocused] = useState(false);
 
-  // RPE stepper visibility
-  const [showRpeStepper, setShowRpeStepper] = useState(false);
+  // RPE is a typed numeric field (like PESO), not a stepper. Buffered locally
+  // (Fabric revert) and decimal-capable so 0.5 steps (e.g. 8.5) are enterable.
+  const [rpeText, setRpeText] = useState(rpe !== null ? String(rpe) : '');
+  useEffect(() => {
+    const typed = rpeText.trim() === '' ? null : Number(rpeText);
+    if (typed !== rpe) setRpeText(rpe !== null ? String(rpe) : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpe]);
 
   // Value color rule: muted (#888888) if prefilled + unconfirmed; white otherwise
   const isUnconfirmed = isPrefilled && !completed;
@@ -136,6 +142,12 @@ export function SetRow({
     setRepsEdited(true);
     const parsed = text === '' ? null : parseInt(text, 10);
     onChangeReps(parsed !== null && !isNaN(parsed) ? parsed : null);
+  };
+
+  const handleRpeChange = (text: string) => {
+    setRpeText(text);
+    const parsed = text === '' ? null : parseFloat(text);
+    onChangeRpe(parsed !== null && !isNaN(parsed) ? parsed : null);
   };
 
   // Row container: highlight border when set is completed
@@ -226,38 +238,32 @@ export function SetRow({
         />
       </View>
 
-      {/* ── RPE cell ── tappable, opens RpeStepper inline */}
-      <View style={[CELL_BASE, { flex: COL.rpe }]}>
-        {showRpeStepper && !readOnly ? (
-          <RpeStepper
-            value={rpe}
-            onChange={(val) => {
-              onChangeRpe(val);
-              if (val === null) setShowRpeStepper(false);
-            }}
-          />
-        ) : (
-          <Pressable
-            onPress={() => !readOnly && setShowRpeStepper(true)}
-            accessibilityLabel={`Set ${setNumber} RPE`}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            style={{ alignItems: 'center', justifyContent: 'center', minHeight: 28 }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: 'JetBrainsMono-Regular',
-                color: rpe !== null ? rpeColor : '#444444',
-              }}
-            >
-              {rpe !== null
-                ? Number.isInteger(rpe)
-                  ? String(rpe)
-                  : rpe.toFixed(1)
-                : '–'}
-            </Text>
-          </Pressable>
-        )}
+      {/* ── RPE cell ── typed numeric field (like PESO); decimal for 0.5 steps */}
+      <View
+        style={[
+          CELL_BASE,
+          { flex: COL.rpe },
+          rpeFocused ? { borderWidth: 1, borderColor: '#00FF66' } : {},
+        ]}
+      >
+        <TextInput
+          value={rpeText}
+          onChangeText={handleRpeChange}
+          onFocus={() => setRpeFocused(true)}
+          onBlur={() => setRpeFocused(false)}
+          placeholder="–"
+          placeholderTextColor="#444444"
+          keyboardType="decimal-pad"
+          editable={!readOnly}
+          accessibilityLabel={`Set ${setNumber} RPE`}
+          style={{
+            fontSize: 16,
+            fontFamily: 'JetBrainsMono-Regular',
+            color: rpeColor,
+            textAlign: 'center',
+            width: '100%',
+          }}
+        />
       </View>
 
       {/* ── STATUS (done-check) cell — adapted from ExerciseRow.tsx:144-159 ── */}
