@@ -43,6 +43,11 @@ export function VolumeChart({
       {title ? (
         <Text style={{ fontSize: 14, color: '#888888', marginBottom: 12 }}>{title}</Text>
       ) : null}
+      {/*
+        Plain line chart (no areaChart fill) — gifted-charts' area gradient needs
+        expo-linear-gradient / react-native-linear-gradient, which we deliberately
+        do NOT install to avoid an extra native module. Line + dots only.
+      */}
       <LineChart
         data={data}
         width={chartWidth}
@@ -51,11 +56,6 @@ export function VolumeChart({
         color="#00FF66"
         dataPointsColor="#00FF66"
         curved
-        areaChart
-        startFillColor="#00FF66"
-        endFillColor="#00FF66"
-        startOpacity={0.25}
-        endOpacity={0.02}
         initialSpacing={8}
         yAxisColor="#2A2A2A"
         xAxisColor="#2A2A2A"
