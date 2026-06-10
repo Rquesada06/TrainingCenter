@@ -20,6 +20,7 @@ import { PRCard } from '@/components/insights/PRCard';
 import { VolumeChart } from '@/components/insights/VolumeChart';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { AppBar } from '@/components/ui/AppBar';
 import type { Session } from '@/types/session';
 
 export default function InsightsScreen() {
@@ -38,6 +39,7 @@ export default function InsightsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+      <AppBar />
       <ScreenHeader
         eyebrow="Performance Overview"
         title="Insights"

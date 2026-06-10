@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { useClients } from '@/hooks/useClients';
 import { ClientListItem } from '@/components/clients/ClientListItem';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { AppBar } from '@/components/ui/AppBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { User } from '@/types/user';
@@ -34,6 +35,7 @@ export default function ClientsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+      <AppBar />
       <ScreenHeader
         eyebrow="Management Console"
         title="Client Roster"
