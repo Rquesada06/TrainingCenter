@@ -15,78 +15,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
 import { useSessionHistory } from '@/hooks/useSessionHistory';
-import { computePRs } from '@/lib/insights';
-import type { ExercisePR } from '@/lib/insights';
+import { computePRs, volumeTrend } from '@/lib/insights';
+import { PRCard } from '@/components/insights/PRCard';
+import { VolumeChart } from '@/components/insights/VolumeChart';
 import { EmptyState } from '@/components/ui/EmptyState';
 import type { Session } from '@/types/session';
-
-function PRCard({ pr }: { pr: ExercisePR }) {
-  return (
-    <View
-      style={{
-        backgroundColor: '#1A1A1A',
-        borderRadius: 8,
-        padding: 16,
-        marginBottom: 8,
-        borderWidth: 1,
-        borderColor: '#2A2A2A',
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-        <Text
-          style={{ flex: 1, fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}
-          numberOfLines={1}
-        >
-          {pr.name}
-        </Text>
-        {pr.isNew ? (
-          <View
-            style={{
-              backgroundColor: 'rgba(0,255,102,0.2)',
-              borderWidth: 1,
-              borderColor: '#00FF66',
-              borderRadius: 999,
-              paddingHorizontal: 8,
-              paddingVertical: 2,
-              marginLeft: 8,
-            }}
-          >
-            <Text style={{ color: '#00FF66', fontSize: 11, fontWeight: '700' }}>NEW</Text>
-          </View>
-        ) : null}
-      </View>
-
-      <View style={{ flexDirection: 'row', gap: 16 }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, color: '#888888' }}>Est. 1RM</Text>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: '600',
-              color: '#00FF66',
-              fontFamily: 'JetBrainsMono-Regular',
-            }}
-          >
-            {Math.round(pr.best1RM)}kg
-          </Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, color: '#888888' }}>Heaviest</Text>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: '600',
-              color: '#FFFFFF',
-              fontFamily: 'JetBrainsMono-Regular',
-            }}
-          >
-            {pr.heaviestWeight}kg
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-}
 
 export default function InsightsScreen() {
   const uid = useAuthStore((s) => s.uid);
@@ -100,6 +33,7 @@ export default function InsightsScreen() {
 
   const sessions: Session[] = data?.pages.flatMap((p) => p.items) ?? [];
   const prs = computePRs(sessions);
+  const volume = volumeTrend(sessions);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
@@ -127,6 +61,7 @@ export default function InsightsScreen() {
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
         >
+          <VolumeChart points={volume} title="Total volume over time (kg)" />
           {prs.map((pr) => (
             <PRCard key={pr.exerciseId} pr={pr} />
           ))}

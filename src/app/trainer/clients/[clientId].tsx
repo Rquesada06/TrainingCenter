@@ -20,6 +20,9 @@ import { useUpdateClient } from '@/hooks/useUpdateClient';
 import { useSessionHistory } from '@/hooks/useSessionHistory';
 import { ClientPhoto } from '@/components/clients/ClientPhoto';
 import { SessionListItem } from '@/components/sessions/SessionListItem';
+import { computePRs, volumeTrend } from '@/lib/insights';
+import { PRCard } from '@/components/insights/PRCard';
+import { VolumeChart } from '@/components/insights/VolumeChart';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TextField } from '@/components/ui/TextField';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
@@ -36,6 +39,9 @@ export default function ClientProfileScreen() {
   // HIST-03: this client's session history, newest-first paginated (shared hook + components)
   const history = useSessionHistory(clientId);
   const sessions: Session[] = history.data?.pages.flatMap((p) => p.items) ?? [];
+  // Per-client Insights (COAV-02) — PRs + volume from the loaded session history.
+  const prs = computePRs(sessions);
+  const volume = volumeTrend(sessions);
 
   // Local state for the editable name field
   const [nameValue, setNameValue] = useState('');
@@ -217,6 +223,21 @@ export default function ClientProfileScreen() {
             </Text>
           )}
         </View>
+
+        {/* ── Insights (COAV-02) — PRs + volume trend for this client ────── */}
+        {prs.length > 0 ? (
+          <View style={{ marginBottom: 8 }}>
+            <Text
+              style={{ color: '#888888', fontSize: 13, marginBottom: 8, fontWeight: '600' }}
+            >
+              INSIGHTS
+            </Text>
+            <VolumeChart points={volume} title="Total volume over time (kg)" />
+            {prs.map((pr) => (
+              <PRCard key={pr.exerciseId} pr={pr} />
+            ))}
+          </View>
+        ) : null}
 
         {/* ── Session history (HIST-03) — inline list, no nested scroll ──── */}
         <View>
