@@ -5,13 +5,18 @@
  *
  * Render path: a full-screen `absoluteFill` overlay (pointerEvents="box-none" so
  * touches fall through everywhere except the button) positions the button with
- * flex alignment + padding rather than bare `position:absolute` bottom/right
- * insets. On the New Architecture (Fabric), a lone absolute child of a flex
- * SafeAreaView gets layout-starved / not composited — the same bug that hid the
- * header AddButton. Giving the button a real measured parent sidesteps it.
+ * flex alignment + padding. On the New Architecture (Fabric), a lone absolute
+ * child of a flex SafeAreaView gets layout-starved; the overlay gives it a real
+ * measured parent.
+ *
+ * IMPORTANT: the button's `style` must be a STATIC value, never the
+ * `({ pressed }) => …` function form. On this build (Fabric + React Compiler) a
+ * function-style Pressable child silently does not paint — that bug hid both this
+ * FAB and the earlier header AddButton. Press feedback is driven by local state
+ * (onPressIn/onPressOut) selecting between static styles instead.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,6 +28,7 @@ export interface FabProps {
 
 export function Fab({ onPress, accessibilityLabel = 'Add' }: FabProps) {
   const insets = useSafeAreaInsets();
+  const [pressed, setPressed] = useState(false);
   return (
     <View
       pointerEvents="box-none"
@@ -30,9 +36,12 @@ export function Fab({ onPress, accessibilityLabel = 'Add' }: FabProps) {
     >
       <Pressable
         onPress={onPress}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        style={({ pressed }) => [styles.fab, pressed && styles.pressed]}
+        android_ripple={{ color: 'rgba(0,0,0,0.18)', borderless: false, radius: 28 }}
+        style={pressed ? [styles.fab, styles.pressed] : styles.fab}
       >
         <Ionicons name="add" size={30} color="#0E0E0E" />
       </Pressable>
