@@ -159,12 +159,22 @@ export async function getSession(id: string): Promise<Session | null> {
  */
 export async function fetchSessionsForAssignment(
   clientId: string,
-  assignmentId: string
+  assignmentId: string,
+  trainerId?: string
 ): Promise<Session[]> {
-  const snap = await sessionsCollection()
+  let q = sessionsCollection()
     .where('clientId', '==', clientId)
-    .where('assignmentId', '==', assignmentId)
-    .get();
+    .where('assignmentId', '==', assignmentId);
+
+  // Trainer-facing reads (e.g. client-card adherence) must constrain trainerId to
+  // satisfy the sessions read rule — same rules-as-not-filters requirement as
+  // fetchSessionPage. Equality-only, so no composite index is needed. Clients
+  // reading their own (workout prefill) omit it; clientId == self suffices.
+  if (trainerId) {
+    q = q.where('trainerId', '==', trainerId);
+  }
+
+  const snap = await q.get();
 
   if (snap.empty) return []; // RNFB v24: .empty is a PROPERTY, not a method
   return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Session));

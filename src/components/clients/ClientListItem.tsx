@@ -25,6 +25,7 @@ import { useActiveAssignment } from '@/hooks/useActiveAssignment';
 import { fetchSessionsForAssignment } from '@/services/session.service';
 import { computeAdherence } from '@/lib/adherence';
 import { localTodayString } from '@/lib/workoutDayComputer';
+import { useAuthStore } from '@/stores/authStore';
 import type { User } from '@/types/user';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -59,12 +60,16 @@ export interface ClientListItemProps {
 
 export function ClientListItem({ client, onPress }: ClientListItemProps) {
   const activeAssignment = useActiveAssignment(client.uid);
+  // Trainer context: pass the trainer's uid so the adherence read carries the
+  // trainerId filter the sessions read rule requires (else Firestore denies it).
+  const trainerUid = useAuthStore((s) => s.uid);
 
   // HIST-04: lazy per-client sessions fetch for the current active program.
   // Enabled only once an active assignment exists (RESEARCH.md Open Q2 — MVP ~5 clients).
   const sessionsQ = useQuery({
-    queryKey: ['adherenceSessions', client.uid, activeAssignment.data?.id],
-    queryFn: () => fetchSessionsForAssignment(client.uid, activeAssignment.data!.id),
+    queryKey: ['adherenceSessions', client.uid, activeAssignment.data?.id, trainerUid],
+    queryFn: () =>
+      fetchSessionsForAssignment(client.uid, activeAssignment.data!.id, trainerUid ?? undefined),
     enabled: !!activeAssignment.data?.id,
   });
 
