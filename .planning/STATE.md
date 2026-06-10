@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: polishing
-last_updated: "2026-06-09T00:00:00.000Z"
-last_activity: 2026-06-09 -- v1.1 functionally complete; StitchUI polish + add-button debugging
+last_updated: "2026-06-10T00:00:00.000Z"
+last_activity: 2026-06-10 -- fixed invisible add-button (stale Metro + Fabric style-array bug), trainer client history + adherence (Firestore rules-not-filters), and ScreenHeader fade-in (focus replay)
 progress:
   total_phases: 6
   completed_phases: 6
@@ -27,25 +27,41 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 Phase: 5 & 6 — functionally COMPLETE + device-UAT (2026-06-09). Formal GSD
 verification/SUMMARY paperwork skipped (built interactively). All work pushed to
 `main` (github.com:Rquesada06/TrainingCenter).
-Last activity: 2026-06-09 — StitchUI polish pass + trainer add-button debugging
+Last activity: 2026-06-10 — device-verified fixes for the invisible add-button,
+trainer client history + adherence, and the title fade-in (see Resolved below).
+
+### ✅ Resolved 2026-06-10 (device-verified)
+
+1. **Trainer "+" add button now renders.** Two stacked causes: (a) a 7-day-old
+   `expo start` squatting on port 8081 served the device a frozen JS bundle, and
+   (b) a `false` element in a `Pressable` style array — `style={({pressed}) =>
+   [s.fab, pressed && s.pressed]}` → `[s.fab, false]` — which Fabric + React
+   Compiler silently drops (same bug that hid the old header pill). Fix in
+   `src/components/ui/Fab.tsx`: static style + onPressIn/Out state, absoluteFill
+   overlay. Memory: [[fabric-falsy-style-array-not-painting]], [[stale-metro-port-8081]].
+2. **Trainer client session history now displays** (was "No sessions yet"). Firestore
+   rules-are-not-filters: the trainer query lacked `where('trainerId','==',uid)` the
+   sessions read rule requires → whole read denied, swallowed into empty. Added the
+   filter to `fetchSessionPage`/`useSessionHistory` + composite index
+   `sessions[clientId, trainerId, date desc]` (deployed to laufit-dev).
+   Memory: [[firestore-rules-not-filters-trainer-reads]].
+3. **Trainer client-card adherence now computes** — same `trainerId`-filter fix on
+   `fetchSessionsForAssignment` (equality-only, no index needed).
+4. **ScreenHeader title fade-in restored + replays on focus** — was removed in
+   050f3ee (mis-blamed for the add-button bug), now back via `useFocusEffect` so it
+   re-animates each visit, not just first mount. Orphaned `AddButton.tsx`/`collapsible.tsx`
+   deleted.
 
 ### ⚠️ Open items / Resume next session
 
-1. **Trainer "add" button not rendering on device.** Header pill AND a floating
-   "+" FAB both invisible on all 4 trainer list screens (Clients/Exercises/Routines/
-   Programs) despite verified-correct code (tsc clean, 300 tests green). Two
-   different render paths failed → almost certainly a **stale Metro bundle**.
-   FIRST ACTION: `npx expo start --dev-client -c` (clear cache) + reload. If still
-   missing, get a screenshot of the Clients screen. (Add buttons currently live as
-   `<Fab>` from `src/components/ui/Fab.tsx`.)
-2. **Google login broken** — Android SHA-1 not registered in Firebase `laufit-dev`
+1. **Google login broken** — Android SHA-1 not registered in Firebase `laufit-dev`
    (google-services.json has only client_type:3 web, no client_type:1 Android →
    `DEVELOPER_ERROR`). Fix: `eas credentials -p android` → add SHA-1 in Firebase
    Android app `com.trainingcenter.dev` → re-download google-services.json (both
    `./` and `android/app/`) → `eas build --profile development --platform android`.
-3. **③ Client focus/goal tag** — last StitchUI feature, not built (needs a new
+2. **Client focus/goal tag** — last StitchUI feature, not built (needs a new
    `focus` field on the client doc + edit UI + Firestore write + roster display).
-4. **Formal verification** — run `/gsd-verify-work 5` / write 05-06 + Phase-6
+3. **Formal verification** — run `/gsd-verify-work 5` / write 05-06 + Phase-6
    SUMMARYs if you want the GSD paperwork closed.
 
 ### v1.1 Roadmap Notes (recorded 2026-06-05)
