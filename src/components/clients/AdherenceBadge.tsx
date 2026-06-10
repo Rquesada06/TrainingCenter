@@ -34,20 +34,32 @@ export function AdherenceBadge({ adherence }: AdherenceBadgeProps) {
 
   const color = getAdherenceColor(adherence);
 
+  const pct = Math.max(0, Math.min(100, adherence));
+
   return (
-    <View
-      style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}
-      accessibilityLabel={`Adherence: ${adherence} percent`}
-    >
-      <Text
+    <View style={{ marginTop: 8 }} accessibilityLabel={`Adherence: ${adherence} percent`}>
+      <View
         style={{
-          fontSize: 14,
-          fontWeight: '400',
-          color,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 4,
         }}
       >
-        {`${adherence}% adherence`}
-      </Text>
+        <Text
+          style={{ fontSize: 11, fontWeight: '600', color: '#888888', letterSpacing: 0.5 }}
+        >
+          ADHERENCE
+        </Text>
+        <Text style={{ fontSize: 13, fontWeight: '600', color }}>{adherence}%</Text>
+      </View>
+      <View
+        style={{ height: 6, borderRadius: 3, backgroundColor: '#2A2A2A', overflow: 'hidden' }}
+      >
+        <View
+          style={{ height: 6, borderRadius: 3, width: `${pct}%`, backgroundColor: color }}
+        />
+      </View>
     </View>
   );
 }
