@@ -21,7 +21,7 @@ import { router } from 'expo-router';
 import { usePrograms } from '@/hooks/usePrograms';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { AppBar } from '@/components/ui/AppBar';
-import { AddButton } from '@/components/ui/AddButton';
+import { Fab } from '@/components/ui/Fab';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Program } from '@/types/program';
 
@@ -70,7 +70,6 @@ export default function ProgramsScreen() {
       <ScreenHeader
         eyebrow="Your Library"
         title="Programs"
-        right={<AddButton onPress={() => router.push('/trainer/programs/new')} />}
       />
 
       {/* Body */}
@@ -106,6 +105,7 @@ export default function ProgramsScreen() {
           }
         />
       )}
+      <Fab onPress={() => router.push('/trainer/programs/new')} accessibilityLabel="Add program" />
     </SafeAreaView>
   );
 }

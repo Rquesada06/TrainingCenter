@@ -18,7 +18,7 @@ import { useClients } from '@/hooks/useClients';
 import { ClientListItem } from '@/components/clients/ClientListItem';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { AppBar } from '@/components/ui/AppBar';
-import { AddButton } from '@/components/ui/AddButton';
+import { Fab } from '@/components/ui/Fab';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { User } from '@/types/user';
@@ -45,7 +45,6 @@ export default function ClientsScreen() {
             ? undefined
             : `${allClients.length} ${allClients.length === 1 ? 'athlete' : 'athletes'}`
         }
-        right={<AddButton onPress={() => router.push('/trainer/clients/add')} />}
       />
       <View style={{ flex: 1, paddingHorizontal: 16 }}>
         {/* Search */}
@@ -121,6 +120,7 @@ export default function ClientsScreen() {
           />
         )}
       </View>
+      <Fab onPress={() => router.push('/trainer/clients/add')} accessibilityLabel="Add client" />
     </SafeAreaView>
   );
 }

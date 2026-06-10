@@ -22,7 +22,7 @@ import { ExerciseListItem } from '@/components/exercises/ExerciseListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { AppBar } from '@/components/ui/AppBar';
-import { AddButton } from '@/components/ui/AddButton';
+import { Fab } from '@/components/ui/Fab';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { ExerciseCategory, LocationType } from '@/types/exercise';
 
@@ -48,7 +48,6 @@ export default function ExercisesScreen() {
         <ScreenHeader
           eyebrow="Your Library"
           title="Exercises"
-          right={<AddButton onPress={() => router.push('/trainer/exercises/new')} />}
         />
 
         {/* ── Filter bar (search + category + locationType) ── */}
@@ -104,6 +103,7 @@ export default function ExercisesScreen() {
           />
         )}
       </View>
+      <Fab onPress={() => router.push('/trainer/exercises/new')} accessibilityLabel="Add exercise" />
     </SafeAreaView>
   );
 }
