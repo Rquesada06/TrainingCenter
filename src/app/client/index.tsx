@@ -182,6 +182,7 @@ export default function ClientHomeScreen() {
           <ActiveWorkoutCard
             routineName={activeResult.day.routine?.name ?? 'Workout'}
             exerciseCount={activeResult.day.routine?.exercises.length ?? 0}
+            exercises={activeResult.day.routine?.exercises ?? []}
             hasInProgressSession={hasInProgressSession ?? false}
             // Route exists after Plan 04; use as any to avoid type error on unscaffolded route
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
