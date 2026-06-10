@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useClients } from '@/hooks/useClients';
 import { ClientListItem } from '@/components/clients/ClientListItem';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import type { User } from '@/types/user';
@@ -26,25 +27,17 @@ export default function ClientsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
-      <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }}>
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 16,
-          }}
-        >
-          <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>
-            Clients
-          </Text>
+      <ScreenHeader
+        eyebrow="Management Console"
+        title="Client Roster"
+        right={
           <PrimaryButton
-            label="+ Add Client"
+            label="+ Add"
             onPress={() => router.push('/trainer/clients/add')}
           />
-        </View>
-
+        }
+      />
+      <View style={{ flex: 1, paddingHorizontal: 16 }}>
         {/* Loading state */}
         {isLoading ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

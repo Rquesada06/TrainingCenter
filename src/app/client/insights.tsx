@@ -19,6 +19,7 @@ import { computePRs, volumeTrend } from '@/lib/insights';
 import { PRCard } from '@/components/insights/PRCard';
 import { VolumeChart } from '@/components/insights/VolumeChart';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Session } from '@/types/session';
 
 export default function InsightsScreen() {
@@ -37,12 +38,11 @@ export default function InsightsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
-      <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
-        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#FFFFFF' }}>Insights</Text>
-        <Text style={{ fontSize: 14, color: '#888888', marginTop: 2 }}>
-          Personal records
-        </Text>
-      </View>
+      <ScreenHeader
+        eyebrow="Performance Overview"
+        title="Insights"
+        subtitle="Personal records"
+      />
 
       {isLoading ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
