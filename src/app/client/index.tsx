@@ -36,6 +36,8 @@ import {
   ProgramCompleteCard,
   WorkoutDoneCard,
 } from '@/components/workout/HomeStateCards';
+import { AppBar } from '@/components/ui/AppBar';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 
 export default function ClientHomeScreen() {
   const router = useRouter();
@@ -195,8 +197,10 @@ export default function ClientHomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+      <AppBar />
+      <ScreenHeader eyebrow="Performance Dashboard" title="Today" />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 24 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         {card}
