@@ -210,6 +210,12 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Infrastructure + Auth | 4/4 | Complete   | 2026-05-28 |
 | 2. Trainer Content Creation | 5/5 | Complete    | 2026-06-03 |
 | 3. Client Workout Execution | 5/5 | Complete    | 2026-06-04 |
-| 4. History + Polish | 3/7 | In Progress|  |
-| 5. Per-Set Logging, Prescription & Timers | 4/6 | In Progress|  |
-| 6. Training Insights & Coach Visibility | 0/0 | Not started | - |
+| 4. History + Polish | 7/7 | Complete | 2026-06-05 |
+| 5. Per-Set Logging, Prescription & Timers | 6/6 | Complete * | 2026-06-09 |
+| 6. Training Insights & Coach Visibility | 5 slices | Complete * | 2026-06-09 |
+
+\* **Functionally complete + device-UAT, but missing formal GSD paperwork** (the
+"Formal verification" open item in STATE.md): Phase 5 has no `05-06` SUMMARY;
+Phase 6 was built ad-hoc as slices `06-01..06-05` with no PLAN/SUMMARY files. All
+six phases are shipped to `main` (github.com:Rquesada06/TrainingCenter) and
+device-verified. (Earlier table values 4=3/7, 5=4/6, 6=0/0 were stale.)
