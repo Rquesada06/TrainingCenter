@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { View, Text, Animated } from 'react-native';
+import { View, Text } from 'react-native';
 
 export interface ScreenHeaderProps {
   /** Small green uppercase label above the title (e.g. "PERFORMANCE OVERVIEW"). */
@@ -20,26 +20,8 @@ export interface ScreenHeaderProps {
 }
 
 export function ScreenHeader({ eyebrow, title, subtitle, right }: ScreenHeaderProps) {
-  // Soft fade + rise on mount (RN Animated — no reanimated/worklets, jest-safe).
-  const opacity = React.useRef(new Animated.Value(0)).current;
-  const translateY = React.useRef(new Animated.Value(8)).current;
-  React.useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 260, useNativeDriver: true }),
-      Animated.timing(translateY, { toValue: 0, duration: 260, useNativeDriver: true }),
-    ]).start();
-  }, [opacity, translateY]);
-
   return (
-    <Animated.View
-      style={{
-        paddingHorizontal: 16,
-        paddingTop: 16,
-        paddingBottom: 12,
-        opacity,
-        transform: [{ translateY }],
-      }}
-    >
+    <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
       {eyebrow ? (
         <Text
           style={{
@@ -70,6 +52,6 @@ export function ScreenHeader({ eyebrow, title, subtitle, right }: ScreenHeaderPr
       {subtitle ? (
         <Text style={{ color: '#888888', fontSize: 14, marginTop: 4 }}>{subtitle}</Text>
       ) : null}
-    </Animated.View>
+    </View>
   );
 }
