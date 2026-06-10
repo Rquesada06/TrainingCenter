@@ -20,6 +20,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { usePrograms } from '@/hooks/usePrograms';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { AppBar } from '@/components/ui/AppBar';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Program } from '@/types/program';
 
 function ProgramListItem({ program, onPress }: { program: Program; onPress: () => void }) {
@@ -63,35 +65,24 @@ export default function ProgramsScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
       <StatusBar barStyle="light-content" />
 
-      {/* Header */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          borderBottomWidth: 1,
-          borderBottomColor: '#1A1A1A',
-        }}
-      >
-        <Text style={{ color: '#FFFFFF', fontSize: 22, fontWeight: '700' }}>
-          Programs
-        </Text>
-        <Pressable
-          onPress={() => router.push('/trainer/programs/new')}
-          style={{
-            backgroundColor: '#00FF66',
-            paddingHorizontal: 14,
-            paddingVertical: 7,
-            borderRadius: 8,
-          }}
-        >
-          <Text style={{ color: '#0E0E0E', fontWeight: '600', fontSize: 14 }}>
-            + Add
-          </Text>
-        </Pressable>
-      </View>
+      <AppBar />
+      <ScreenHeader
+        eyebrow="Your Library"
+        title="Programs"
+        right={
+          <Pressable
+            onPress={() => router.push('/trainer/programs/new')}
+            style={{
+              backgroundColor: '#00FF66',
+              paddingHorizontal: 14,
+              paddingVertical: 7,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ color: '#0E0E0E', fontWeight: '600', fontSize: 14 }}>+ Add</Text>
+          </Pressable>
+        }
+      />
 
       {/* Body */}
       {isLoading ? (

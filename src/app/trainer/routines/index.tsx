@@ -17,6 +17,8 @@ import { useRouter } from 'expo-router';
 import { useRoutines } from '@/hooks/useRoutines';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
+import { AppBar } from '@/components/ui/AppBar';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Routine } from '@/types/routine';
 
 export default function RoutinesScreen() {
@@ -47,25 +49,17 @@ export default function RoutinesScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
       <View style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: 8,
-          }}
-        >
-          <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>
-            Routines
-          </Text>
-          <PrimaryButton
-            label="+ Add"
-            onPress={() => router.push('/trainer/routines/new')}
-          />
-        </View>
+        <AppBar />
+        <ScreenHeader
+          eyebrow="Your Library"
+          title="Routines"
+          right={
+            <PrimaryButton
+              label="+ Add"
+              onPress={() => router.push('/trainer/routines/new')}
+            />
+          }
+        />
 
         {/* Loading */}
         {isLoading ? (
