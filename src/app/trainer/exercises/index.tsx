@@ -22,6 +22,7 @@ import { ExerciseListItem } from '@/components/exercises/ExerciseListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { AppBar } from '@/components/ui/AppBar';
+import { AddButton } from '@/components/ui/AddButton';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { ExerciseCategory, LocationType } from '@/types/exercise';
 
@@ -47,12 +48,7 @@ export default function ExercisesScreen() {
         <ScreenHeader
           eyebrow="Your Library"
           title="Exercises"
-          right={
-            <PrimaryButton
-              label="+ Add"
-              onPress={() => router.push('/trainer/exercises/new')}
-            />
-          }
+          right={<AddButton onPress={() => router.push('/trainer/exercises/new')} />}
         />
 
         {/* ── Filter bar (search + category + locationType) ── */}

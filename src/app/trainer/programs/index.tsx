@@ -21,6 +21,7 @@ import { router } from 'expo-router';
 import { usePrograms } from '@/hooks/usePrograms';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { AppBar } from '@/components/ui/AppBar';
+import { AddButton } from '@/components/ui/AddButton';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Program } from '@/types/program';
 
@@ -69,19 +70,7 @@ export default function ProgramsScreen() {
       <ScreenHeader
         eyebrow="Your Library"
         title="Programs"
-        right={
-          <Pressable
-            onPress={() => router.push('/trainer/programs/new')}
-            style={{
-              backgroundColor: '#00FF66',
-              paddingHorizontal: 14,
-              paddingVertical: 7,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ color: '#0E0E0E', fontWeight: '600', fontSize: 14 }}>+ Add</Text>
-          </Pressable>
-        }
+        right={<AddButton onPress={() => router.push('/trainer/programs/new')} />}
       />
 
       {/* Body */}

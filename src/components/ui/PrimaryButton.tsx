@@ -35,8 +35,11 @@ export function PrimaryButton({ label, onPress, loading = false, disabled = fals
         isOutline
           ? 'bg-transparent border-[#444444]'
           : 'bg-[#00FF66] border-[#00FF66]',
-        isDisabled ? 'opacity-50' : 'opacity-100',
       ].join(' ')}
+      style={({ pressed }) => ({
+        opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
+        transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
+      })}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
     >

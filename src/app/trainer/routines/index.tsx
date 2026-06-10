@@ -18,6 +18,7 @@ import { useRoutines } from '@/hooks/useRoutines';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { AppBar } from '@/components/ui/AppBar';
+import { AddButton } from '@/components/ui/AddButton';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Routine } from '@/types/routine';
 
@@ -53,12 +54,7 @@ export default function RoutinesScreen() {
         <ScreenHeader
           eyebrow="Your Library"
           title="Routines"
-          right={
-            <PrimaryButton
-              label="+ Add"
-              onPress={() => router.push('/trainer/routines/new')}
-            />
-          }
+          right={<AddButton onPress={() => router.push('/trainer/routines/new')} />}
         />
 
         {/* Loading */}
