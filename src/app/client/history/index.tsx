@@ -19,6 +19,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { useSessionHistory } from '@/hooks/useSessionHistory';
 import { SessionListItem } from '@/components/sessions/SessionListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { AppBar } from '@/components/ui/AppBar';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Session } from '@/types/session';
 
 export default function ClientHistoryScreen() {
@@ -40,11 +42,8 @@ export default function ClientHistoryScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
-        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
-          <Text style={{ fontSize: 28, fontWeight: '600', color: '#FFFFFF' }}>
-            History
-          </Text>
-        </View>
+        <AppBar />
+        <ScreenHeader eyebrow="Training Log" title="History" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <ActivityIndicator color="#00FF66" size="large" />
         </View>
@@ -56,11 +55,8 @@ export default function ClientHistoryScreen() {
   if (isError) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
-        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
-          <Text style={{ fontSize: 28, fontWeight: '600', color: '#FFFFFF' }}>
-            History
-          </Text>
-        </View>
+        <AppBar />
+        <ScreenHeader eyebrow="Training Log" title="History" />
         <View style={{ flex: 1, paddingVertical: 48, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 20, fontWeight: '600', color: '#FFFFFF', textAlign: 'center' }}>
             Could not load sessions
@@ -75,11 +71,8 @@ export default function ClientHistoryScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
-      <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
-        <Text style={{ fontSize: 28, fontWeight: '600', color: '#FFFFFF', marginBottom: 12 }}>
-          History
-        </Text>
-      </View>
+      <AppBar />
+      <ScreenHeader eyebrow="Training Log" title="History" />
       <FlatList<Session>
         data={sessions}
         keyExtractor={(s) => s.id}

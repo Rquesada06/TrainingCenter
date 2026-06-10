@@ -23,6 +23,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { signOut } from '@/firebase/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { useUser } from '@/hooks/useUser';
@@ -126,16 +127,11 @@ export default function TrainerProfileScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0E' }}>
+      <ScreenHeader eyebrow="Account" title="Profile" />
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40, paddingTop: 8 }}
       >
-        <Text
-          style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '600', marginBottom: 24, marginTop: 8 }}
-        >
-          Profile
-        </Text>
-
         {/* ── Avatar section ── */}
         <View style={{ alignItems: 'center', marginBottom: 24 }}>
           <Pressable
