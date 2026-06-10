@@ -102,12 +102,22 @@ export interface SessionPage {
  */
 export async function fetchSessionPage(
   clientId: string,
-  cursor: FirebaseFirestoreTypes.QueryDocumentSnapshot<Session> | undefined
+  cursor: FirebaseFirestoreTypes.QueryDocumentSnapshot<Session> | undefined,
+  trainerId?: string
 ): Promise<SessionPage> {
-  let q = sessionsCollection()
-    .where('clientId', '==', clientId)
-    .orderBy('date', 'desc')
-    .limit(SESSION_PAGE_SIZE);
+  let q = sessionsCollection().where('clientId', '==', clientId);
+
+  // Trainer reading a client's history: the sessions read rule requires
+  // `resource.data.trainerId == request.auth.uid`. Firestore rules are NOT
+  // filters — without a matching `trainerId` equality constraint the whole
+  // query is rejected (PERMISSION_DENIED). Clients reading their own history
+  // omit this; their `clientId == self` filter already satisfies the rule.
+  // (Requires composite index sessions[clientId ASC, trainerId ASC, date DESC].)
+  if (trainerId) {
+    q = q.where('trainerId', '==', trainerId);
+  }
+
+  q = q.orderBy('date', 'desc').limit(SESSION_PAGE_SIZE);
 
   if (cursor) {
     q = q.startAfter(cursor);

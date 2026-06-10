@@ -18,6 +18,7 @@ import { useClient } from '@/hooks/useClient';
 import { useActiveAssignment } from '@/hooks/useActiveAssignment';
 import { useUpdateClient } from '@/hooks/useUpdateClient';
 import { useSessionHistory } from '@/hooks/useSessionHistory';
+import { useAuthStore } from '@/stores/authStore';
 import { ClientPhoto } from '@/components/clients/ClientPhoto';
 import { SessionListItem } from '@/components/sessions/SessionListItem';
 import { computePRs, volumeTrend } from '@/lib/insights';
@@ -36,8 +37,11 @@ export default function ClientProfileScreen() {
   const activeAssignment = useActiveAssignment(clientId);
   const updateClient = useUpdateClient();
 
-  // HIST-03: this client's session history, newest-first paginated (shared hook + components)
-  const history = useSessionHistory(clientId);
+  // HIST-03: this client's session history, newest-first paginated (shared hook + components).
+  // Pass the trainer's uid so the query carries the `trainerId` filter the sessions
+  // read rule requires — without it Firestore denies the whole read (T-04-01).
+  const trainerUid = useAuthStore((s) => s.uid);
+  const history = useSessionHistory(clientId, trainerUid ?? undefined);
   const sessions: Session[] = history.data?.pages.flatMap((p) => p.items) ?? [];
   // Per-client Insights (COAV-02) — PRs + volume from the loaded session history.
   const prs = computePRs(sessions);

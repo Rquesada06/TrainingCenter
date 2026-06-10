@@ -29,10 +29,10 @@ import {
 import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import type { Session } from '@/types/session';
 
-export function useSessionHistory(clientId: string | undefined) {
+export function useSessionHistory(clientId: string | undefined, trainerId?: string) {
   return useInfiniteQuery({
-    queryKey: ['sessionHistory', clientId],
-    queryFn: ({ pageParam }) => fetchSessionPage(clientId!, pageParam),
+    queryKey: ['sessionHistory', clientId, trainerId ?? null],
+    queryFn: ({ pageParam }) => fetchSessionPage(clientId!, pageParam, trainerId),
     initialPageParam: undefined as
       | FirebaseFirestoreTypes.QueryDocumentSnapshot<Session>
       | undefined,

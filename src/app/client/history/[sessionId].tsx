@@ -123,7 +123,7 @@ export default function SessionDetailScreen() {
 
   // 1. Try the infinite-query cache (no extra read when arriving from the list).
   const cached = queryClient
-    .getQueryData<InfiniteData<SessionPage>>(['sessionHistory', uid])
+    .getQueryData<InfiniteData<SessionPage>>(['sessionHistory', uid, null])
     ?.pages.flatMap((p) => p.items)
     .find((s) => s.id === sessionId);
 
