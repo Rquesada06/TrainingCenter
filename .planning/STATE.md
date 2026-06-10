@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: executing
-last_updated: "2026-06-05T22:20:46.320Z"
-last_activity: 2026-06-05 -- Phase 05 execution started
+status: polishing
+last_updated: "2026-06-09T00:00:00.000Z"
+last_activity: 2026-06-09 -- v1.1 functionally complete; StitchUI polish + add-button debugging
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 6
   total_plans: 27
-  completed_plans: 21
-  percent: 67
+  completed_plans: 27
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Trainer can create a program and assign it to a client in under 3 minutes
-**Current focus:** Phase 05 — per-set-logging-prescription-timers
+**Current focus:** Milestone v1.1 wrap-up + UI polish (Phases 5 & 6 functionally done)
 
 ## Current Position
 
-Phase: 05 (per-set-logging-prescription-timers) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 05
-Last activity: 2026-06-05 -- Phase 05 execution started
+Phase: 5 & 6 — functionally COMPLETE + device-UAT (2026-06-09). Formal GSD
+verification/SUMMARY paperwork skipped (built interactively). All work pushed to
+`main` (github.com:Rquesada06/TrainingCenter).
+Last activity: 2026-06-09 — StitchUI polish pass + trainer add-button debugging
+
+### ⚠️ Open items / Resume next session
+
+1. **Trainer "add" button not rendering on device.** Header pill AND a floating
+   "+" FAB both invisible on all 4 trainer list screens (Clients/Exercises/Routines/
+   Programs) despite verified-correct code (tsc clean, 300 tests green). Two
+   different render paths failed → almost certainly a **stale Metro bundle**.
+   FIRST ACTION: `npx expo start --dev-client -c` (clear cache) + reload. If still
+   missing, get a screenshot of the Clients screen. (Add buttons currently live as
+   `<Fab>` from `src/components/ui/Fab.tsx`.)
+2. **Google login broken** — Android SHA-1 not registered in Firebase `laufit-dev`
+   (google-services.json has only client_type:3 web, no client_type:1 Android →
+   `DEVELOPER_ERROR`). Fix: `eas credentials -p android` → add SHA-1 in Firebase
+   Android app `com.trainingcenter.dev` → re-download google-services.json (both
+   `./` and `android/app/`) → `eas build --profile development --platform android`.
+3. **③ Client focus/goal tag** — last StitchUI feature, not built (needs a new
+   `focus` field on the client doc + edit UI + Firestore write + roster display).
+4. **Formal verification** — run `/gsd-verify-work 5` / write 05-06 + Phase-6
+   SUMMARYs if you want the GSD paperwork closed.
+
+### v1.1 Roadmap Notes (recorded 2026-06-05)
+
+- Phase 5 (LOG-01..04, PRES-01..03, TIMR-01..04 — 11 reqs): schema + logging + prescription + timers. Native dev-client rebuild required (react-native-svg / expo-audio / expo-haptics / expo-keep-awake).
 
 ### v1.1 Roadmap Notes (recorded 2026-06-05)
 

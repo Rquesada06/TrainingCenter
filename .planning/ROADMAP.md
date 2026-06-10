@@ -19,8 +19,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Trainer Content Creation** - Exercise library, routine builder, program builder, client management, program assignment with snapshot transaction, trainer dashboard (completed 2026-06-02)
 - [x] **Phase 3: Client Workout Execution** - Workout calculator, four home states, session execution, gym/home toggle, crash-safe local state, completion flow, duplicate guard (completed 2026-06-04)
 - [x] **Phase 4: History + Polish** - Paginated session history, trainer client history view, profiles with photos, empty states, adherence metrics (completed 2026-06-05) — **MVP complete** 🎉
-- [ ] **Phase 5: Per-Set Logging, Prescription & Timers** - Extend Session with per-set logs (additive, single finalize write), trainer prescribes sets/rep-range/target-RPE + rest + duration, per-set weight/reps/RPE/done logging UI, rest + work timers with keep-awake + alarm sound + vibration (native rebuild)
-- [ ] **Phase 6: Training Insights & Coach Visibility** - PR + volume pure functions, client Insights tab with PR cards + volume trend charts, per-set loads surfaced in existing coach session-detail, per-client Insights for the coach (zero extra trainer steps)
+- [x] **Phase 5: Per-Set Logging, Prescription & Timers** - per-set logs, trainer prescription (rep-range/RPE/rest/duration/timed), logging UI, rest+work timers with keep-awake + alarm + vibration — **functionally complete + device-UAT 2026-06-09; formal GSD verification/SUMMARY for 05-06 still pending**
+- [x] **Phase 6: Training Insights & Coach Visibility** - PR + volume pure functions, client Insights tab (PR cards + volume chart), per-set loads in coach session-detail, per-client coach Insights — **built ad-hoc as slices 06-01..06-05 (2026-06-09); volume chart drawn directly with react-native-svg (gifted-charts dropped); formal plan/verification skipped**
 
 ## Phase Details
 
