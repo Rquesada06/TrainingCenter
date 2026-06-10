@@ -56,12 +56,14 @@ export function ScreenHeader({ eyebrow, title, subtitle, right }: ScreenHeaderPr
       ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text
-          style={{ flex: 1, color: '#FFFFFF', fontSize: 28, fontWeight: '700' }}
-          numberOfLines={1}
-        >
-          {title}
-        </Text>
+        <View style={{ flex: 1, marginRight: right ? 12 : 0 }}>
+          <Text
+            style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '700' }}
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+        </View>
         {right ?? null}
       </View>
 
