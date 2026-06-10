@@ -13,6 +13,7 @@
 
 import React from 'react';
 import { View, Text, Animated } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 
 export interface ScreenHeaderProps {
   /** Small green uppercase label above the title (e.g. "PERFORMANCE OVERVIEW"). */
@@ -27,12 +28,21 @@ export interface ScreenHeaderProps {
 export function ScreenHeader({ eyebrow, title, subtitle, right }: ScreenHeaderProps) {
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(8)).current;
-  React.useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 260, useNativeDriver: true }),
-      Animated.timing(translateY, { toValue: 0, duration: 260, useNativeDriver: true }),
-    ]).start();
-  }, [opacity, translateY]);
+  // Replay the fade+rise every time the screen gains focus, not just on first
+  // mount. Tab/stack screens stay mounted after the first visit, so a plain
+  // useEffect would only ever animate once per app session.
+  useFocusEffect(
+    React.useCallback(() => {
+      opacity.setValue(0);
+      translateY.setValue(8);
+      const anim = Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 260, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, duration: 260, useNativeDriver: true }),
+      ]);
+      anim.start();
+      return () => anim.stop();
+    }, [opacity, translateY])
+  );
 
   return (
     <Animated.View

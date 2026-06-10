@@ -16,6 +16,7 @@ module.exports = {
       displayName: 'react-native',
       preset: 'jest-expo',
       testMatch: ['<rootDir>/src/**/*.test.{ts,tsx}'],
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
